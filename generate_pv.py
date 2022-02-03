@@ -108,5 +108,5 @@ for semestre in semestres:
 ## Creation des PV pirates
 from pv_writer  import PDFWriter;
 logger.info("Creation de la version PDF du PV " + parcours + " (" + annee + ")");
-# PDFWriter(all_PVs, annee, niveau, parcours, semestres);
+PDFWriter(all_PVs, annee, niveau, parcours, semestres);
 
