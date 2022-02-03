@@ -19,9 +19,19 @@ logger = logging.getLogger('mylogger')
 ##########################################################
 
 ## Welcome message
-from misc import Start;
+from misc import Start,Bye;
 Start();
 
+# Options
+import getopt, sys;
+
+try:   optlist, arglist = getopt.getopt(sys.argv[1:], "d", ["debug"]);
+except getopt.GetoptError as err:
+    logger.error(str(err));
+    Bye();
+
+for o,a in optlist:
+    if o in ["-d", "--debug"]: logger.setLevel(logging.DEBUG);
 
 ## Obtention de la liste des PV disponible
 logger.info("");
@@ -29,6 +39,10 @@ logger.info("Obtention de la liste des PV disponibles");
 from misc import GetPVList;
 PV_dico = GetPVList();
 
+# Safety
+if len(PV_dico) == 0:
+  logger.error("Pas de PV disponibles");
+  Bye();
 
 ## Choice du niveau
 logger.warning("Choisir un niveau parmi:");
@@ -79,10 +93,9 @@ if len(semestres)==1:
 else:
     logger.warning("Generation du PV pour les semestres : " + ', '.join(semestres) );
 
-## Obtention des infos
+## Obtention des infos et verifications
 from xml_reader import GetXML, DecodeXML;
 from pv_checker import SanityCheck;
-from pv_writer  import PDFWriter;
 all_PVs = {};
 for semestre in semestres:
     logger.info("Lecture da la version XML du PV pour le semestre " + semestre);
@@ -90,9 +103,10 @@ for semestre in semestres:
     PV_semestre = GetXML(niveau, annee, semestre, parcours);
     PV_semestre = DecodeXML(PV_semestre);
     print("         *** Verification des moyennes du PV");
-    SanityCheck(PV_semestre, parcours);
-    all_PVs[semestre] = PV_semestre;
+    all_PVs[semestre] = SanityCheck(PV_semestre, parcours, semestre);
 
+## Creation des PV pirates
+from pv_writer  import PDFWriter;
 logger.info("Creation de la version PDF du PV " + parcours + " (" + annee + ")");
-PDFWriter(all_PVs, annee, niveau, parcours, semestres);
+# PDFWriter(all_PVs, annee, niveau, parcours, semestres);
 

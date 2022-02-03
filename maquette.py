@@ -114,8 +114,14 @@ UEs = {
     'LU2ST402': {'ects': 6, 'nom':'MinSDT2'},
     'LK4SVM00': {'ects': 9, 'nom':'MinSDV0'},
     'LU2SV404': {'ects': 3, 'nom':'MinSDV1'},
-    'LU2SV415': {'ects': 6, 'nom':'MinSDV2'}
+    'LU2SV415': {'ects': 6, 'nom':'MinSDV2'},
 
+    'LU3PY101': {'ects': 6, 'nom':'PhysQuant1'},
+    'LU3PY121': {'ects': 9, 'nom':'OEM'},
+    'LU3PY213': {'ects': 3, 'nom':'Math-S5'},
+    'LU3PY214': {'ects': 6, 'nom':'MilieuxContinus'},
+    'LU3PY215': {'ects': 3, 'nom':'PhysExp3'},
+    'LU3PYOIP': {'ects': 3, 'nom':'OIP'}
 };
 
 # Maquette MONO
@@ -140,6 +146,15 @@ Maquette = {
         'semestre': "S4"
     },
 
+    'LK5PYJ00' : {
+        'UE'      : [
+           ['LU3PY101', 'LU3PY121', 'LU3PYOIP'],
+        ],
+        'parcours': ['MONO', 'MAJ'],
+        'nom'     : "MAJ",
+        'semestre': "S5"
+    },
+
     # bloc Complementaire
     'LK3PYC00': {
         'UE'      : [['LU2PY212', 'LU2PY220']],
@@ -152,6 +167,13 @@ Maquette = {
         'parcours': ['MONO'],
         'nom'     : "CMP",
         'semestre': "S4"
+    },
+
+    'LK5PYC00': {
+        'UE'      : [['LU3PY213', 'LU3PY214', 'LU3PY215']],
+        'parcours': ['MONO'],
+        'nom'     : "CMP",
+        'semestre': "S5"
     },
 
     # bloc Mineure
