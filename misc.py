@@ -68,3 +68,37 @@ def GetPVList():
 
     # Output
     return dico;
+
+
+
+##########################################################
+###                                                    ###
+###                List flattening                     ###
+###                                                    ###
+##########################################################
+from collections.abc import Iterable
+def flatten(l):
+    for el in l:
+        if isinstance(el, Iterable) and not isinstance(el, (str, bytes)): yield from flatten(el)
+        else: yield el
+
+
+
+##########################################################
+###                                                    ###
+###         Get information from the structure         ###
+###                                                    ###
+##########################################################
+from maquette import Maquette, UEs;
+def GetBlocsMaquette(semestre,parcours):
+    return sorted([x for x in Maquette.keys() if parcours in Maquette[x]['parcours'] and semestre == Maquette[x]['semestre']]);
+
+import itertools;
+def GetUEsMaquette(blocs_maquette):
+    length = len( [Maquette[x]['UE'] for x in blocs_maquette ] );
+    UEs_maquette = [Maquette[x]['UE'] for x in blocs_maquette][length-1];
+    while length>1:
+        UEs_maquette = [sorted(list(flatten(x))) for  x in itertools.product(UEs_maquette, [Maquette[x]['UE'] for x in blocs_maquette][length-2])];
+        length-=1;
+    return UEs_maquette;
+

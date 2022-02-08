@@ -155,12 +155,9 @@ def DecodePV(xml_data,structure):
             if 'notes' in bloc.keys():
                 bloc.update(bloc['notes']);
                 del bloc['notes'];
-            if 'ABI' in bloc.keys() and bloc['ABI'] in ['VAC', 'DIS']:
-                bloc['validation'] = bloc['ABI']
-            if 'ABI' in bloc.keys() and bloc['ABI'] in [None, 'VAC', 'DIS']:
-                del bloc['ABI'];
-            elif 'ABI' in bloc.keys():
-                bloc['note']=0.;
+            if 'ABI' in bloc.keys() and bloc['ABI'] in ['VAC', 'DIS', 'ABJ']: bloc['validation'] = bloc['ABI']
+            if 'ABI' in bloc.keys() and bloc['ABI'] in [None, 'VAC', 'DIS', 'ABJ']: del bloc['ABI'];
+            elif 'ABI' in bloc.keys(): bloc['note']=0.;
 
             # Bloc ID
             if 'id0' in bloc.keys() and 'id1' in bloc.keys():

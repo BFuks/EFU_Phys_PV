@@ -63,7 +63,7 @@ def MakeHeaders(semestres, parcours):
     ] + [ Paragraph('<para align="center"><b>UE #'+str(1+x)+'</b></para>', getSampleStyleSheet()["BodyText"]) for x in range(num_ue)]];
 
     # output
-    return Table(Headers, colWidths=[7*cm,3.7*cm]+[2.4*cm]*(len(Headers[0])-2), style=[
+    return Table(Headers, colWidths=[7*cm,3.7*cm]+[2.6*cm]*(len(Headers[0])-2), style=[
             ('BACKGROUND', (0,0), ( len(Headers[0]), 0),   colors.khaki),
             ('GRID',       (0,0), (-1,-1),1, colors.black),
             ('BOX',        (0,0), (-1, 0),3, colors.black),
@@ -100,19 +100,19 @@ def GetAverages(semestre, notes, blocs_maquette, moyenne_annee):
 
 
 # Formattage des notes
-from maquette import Ignore;
+from maquette import Ignore, GrosSac;
 def GetNotes(notes, ues, ncases, moyenne_annee):
 
     ## Initialisation
     notes_string = [];
     counter = 0;
-    compensation = (moyenne_annee>=50.) or float(notes['total']['note'])>50.;
+    compensation = (moyenne_annee>=10.) or float(notes['total']['note'])>10.;
 
     ## Boucle sur les UE
-    for ue in ues:
-
+    for ue in (ues+[x for x in notes.keys() if x in GrosSac.keys()]):
         ### Enlever les notes de la mineure
-        if ue in Ignore: continue
+        if ue in Ignore or ue+'_GS' in notes.keys(): continue
+        if 'UE' in notes[ue].keys() and notes[ue]['UE']=='GrosSac': continue
 
         ### Note manquante
         if not ue in notes.keys():
@@ -124,10 +124,10 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
 
         ### Note elle-meme
         my_note = notes[ue]['note'];
-        current_note = str(my_note)+'/100' if not my_note in ['ABI', 'DIS'] else my_note;
+        current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'COVID'] else my_note;
 
         ### Formattage
-        fontcolor = 'black' if my_note!='ABI' and (my_note=='DIS' or my_note>=50.) else 'red';
+        fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note=='DIS' or my_note>=50.) else 'red';
         if fontcolor=='red' and compensation: fontcolor='orange';
 
         ##  ANCIENNE MAQUETTE - - - SIMPLFICIATION EFFECTUEE - - - A SUPPRIMER A UN MOMENT - - - TAG BENJ
@@ -136,7 +136,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
 
         ### Result
         notes_string+= [ Paragraph('<para align="center"><b>' + ue + '</b><br />' + \
-             '<font color=\'grey\' size=\'8\'><super>[' + UEs[ue]['nom'].replace('0','') + ']</super></font><br />' + \
+             '<font color=\'grey\' size=\'8\'><super>[' + UEs[ue]['nom'].replace('0','') + ' - ' + str(UEs[ue]['ects']) + ' ECTS]</super></font><br />' + \
             '<font color=' + fontcolor + '>' + current_note + '</font>'+validation_tag+'</para>', getSampleStyleSheet()['BodyText'])];
         counter+=1;
 
@@ -179,15 +179,8 @@ def GetLineStyle(counter, endline):
     return line_style;
 
 
-from collections.abc import Iterable
-def flatten(l):
-    for el in l:
-        if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
-            yield from flatten(el)
-        else:
-            yield el
 
-import itertools;
+from misc import flatten, GetBlocsMaquette, GetUEsMaquette;
 def PDFWriter(pv, annee, niveau, parcours, semestres):
 
     # Title and headers
@@ -197,12 +190,9 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
     # Liste des UE et blocs par semestre
     blocs_maquette = {}; UEs_maquette = {};
     for semestre in semestres:
-        blocs_maquette[semestre] = sorted([x for x in Maquette.keys() if parcours in Maquette[x]['parcours'] and semestre.split('_')[0] in Maquette[x]['semestre']]);
-        length = len( [Maquette[x]['UE'] for x in blocs_maquette[semestre] ] );
-        UEs_maquette[semestre] = [Maquette[x]['UE'] for x in blocs_maquette[semestre] ][length-1];
-        while length>1:
-            UEs_maquette[semestre] = [sorted(list(flatten(x))) for  x in itertools.product(UEs_maquette[semestre], [Maquette[x]['UE'] for x in blocs_maquette[semestre]][length-2])];
-            length-=1;
+        # blocs_maquette[semestre] = sorted([x for x in Maquette.keys() if parcours in Maquette[x]['parcours'] and semestre.split('_')[0] in Maquette[x]['semestre']]);
+        blocs_maquette[semestre] = GetBlocsMaquette(semestre.split('_')[0], parcours);
+        UEs_maquette[semestre]   = GetUEsMaquette(blocs_maquette[semestre]);
 
     # Etudiant data
     for etu in GetList(pv.values()):
@@ -258,7 +248,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
 
             ### Adding the line to the table
             line_data   = [[etu_id, header_semestre] + etu_notes];
-            t = Table(line_data, colWidths=[7*cm,3.7*cm]+[2.4*cm]*GetLength(semestres, parcours), style=line_style);
+            t = Table(line_data, colWidths=[7*cm,3.7*cm]+[2.6*cm]*GetLength(semestres, parcours), style=line_style);
             story.append(t);
 
     ## # Summary headers

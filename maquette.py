@@ -116,12 +116,27 @@ UEs = {
     'LU2SV404': {'ects': 3, 'nom':'MinSDV1'},
     'LU2SV415': {'ects': 6, 'nom':'MinSDV2'},
 
-    'LU3PY101': {'ects': 6, 'nom':'PhysQuant1'},
+    'LU3LVAN1': {'ects': 3, 'nom':'Anglais'},
+    'LU3PY002': {'ects': 6, 'nom':'PhysNum'},
+    'LU3PY001': {'ects': 6, 'nom':'PhysQ1'},
+    'LU3PY020': {'ects': 6, 'nom':'PhysQ1'},
+    'LU3PY101': {'ects': 6, 'nom':'PhysQ1'},
+    'LU3PY101_GS': {'ects': 6, 'nom':'PhysQ1'},
+    'LU3PY021': {'ects': 9, 'nom':'OEM'},
     'LU3PY121': {'ects': 9, 'nom':'OEM'},
+    'LU3PY010': {'ects': 6, 'nom':'Math-S5'},
+    'LU3PY013': {'ects': 3, 'nom':'Math-S5'},
     'LU3PY213': {'ects': 3, 'nom':'Math-S5'},
-    'LU3PY214': {'ects': 6, 'nom':'MilieuxContinus'},
+    'LU3PY213_GS': {'ects': 3, 'nom':'Math-S5'},
+    'LU3PY214_GS': {'ects': 6, 'nom':'MilCont'},
+    'LU3PY214': {'ects': 6, 'nom':'MilCont'},
+    'LU3PY011': {'ects': 6, 'nom':'Thermo'},
+    'LU3PY015': {'ects': 6, 'nom':'PhysExp2'},
+    'LU3PY012': {'ects': 6, 'nom':'PhysExp1'},
     'LU3PY215': {'ects': 3, 'nom':'PhysExp3'},
-    'LU3PYOIP': {'ects': 3, 'nom':'OIP'}
+    'LU3PY215_GS': {'ects': 3, 'nom':'PhysExp3'},
+    'LU3PYOIP': {'ects': 3, 'nom':'OIP'},
+    'LU3PYOIP_GS': {'ects': 3, 'nom':'OIP'}
 };
 
 # Maquette MONO
@@ -207,3 +222,19 @@ Maquette = {
 Irrelevant = ['LU2LVAN1'];
 Ignore     = [item for sublist in Maquette['LK3PYMI0']['UE'] for item in sublist] + \
              [item for sublist in Maquette['LK4PYMI0']['UE'] for item in sublist];
+
+GrosSac    = {
+    'LU3PY015' : ['LU3PYOIP','LU3PY215'],
+    'LU3PY012' : ['LU3PYOIP','LU3PY215'],
+    'LU3PY011' : ['LU3PY214'],
+    'LU3PY013' : ['LU3PY213'],
+    'LU3LVAN1' : ['LU3PY121'],
+    'LU3PY002' : ['LU3PY121'],
+    'LU3PY020' : ['LU3PY101'],
+    'LU3PY021' : ['LU3PY121'],
+    'LU3PY001' : ['LU3PY101'],
+    'LU3PY001' : ['LU3PY101'],
+    'LU3PY010' : ['LU3PY214']
+};
+
+GrosSac2 = { 'LU3PY011' :['LU3PYOIP', 'LU3PY215'] };
