@@ -49,12 +49,13 @@ from reportlab.platypus      import Table
 # Nombre de colonnes du PV
 def GetLength(semestres, parcours):
     tags_semestre = [x.split('_')[0] for x in semestres];
-    num_ue = [[ x for x in Maquette.keys() if parcours in Maquette[x]['parcours'] and y in Maquette[x]['semestre']] for y in tags_semestre];
+    num_ue = [[ x for x in Maquette.keys() if parcours in Maquette[x]['parcours'] and y in Maquette[x]['semestre'] and Maquette[x]['nom']!='MIN'] for y in tags_semestre];
     return max([ sum([ max([ len(ues) for ues in bloc])  for bloc in sem] ) for sem in [[(Maquette[x]['UE'] if Maquette[x]['nom']!='MIN' else [' ']) for x in z] for z in num_ue]]);
 
 def MakeHeaders(semestres, parcours):
     # number of columns in the table
     num_ue = GetLength(semestres, parcours);
+    if parcours=='MAJ': num_ue+=1;
 
     # The header themselves
     Headers = [[
@@ -90,7 +91,9 @@ def GetAverages(semestre, notes, blocs_maquette, moyenne_annee):
 
     ## Affichage moyennes
     moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b><br />';
-    for bloc in sorted(list(blocs_maquette),reverse=True):
+    for bloc in sorted([x for x in list(blocs_maquette) if 'PY' in x],reverse=True):
+        moyennes_string += '<br />' + Maquette[bloc]['nom'] + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
+    for bloc in sorted([x for x in list(blocs_maquette) if not 'PY' in x],reverse=True):
         moyennes_string += '<br />' + Maquette[bloc]['nom'] + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
     moyennes_string += '</para>';
 
@@ -109,7 +112,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
     compensation = (moyenne_annee>=10.) or float(notes['total']['note'])>10.;
 
     ## Boucle sur les UE
-    for ue in (ues+[x for x in notes.keys() if x in GrosSac.keys()]):
+    for ue in (ues+[x for x in notes.keys() if x in GrosSac.keys()] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN']  ):
         ### Enlever les notes de la mineure
         if ue in Ignore or ue+'_GS' in notes.keys(): continue
         if 'UE' in notes[ue].keys() and notes[ue]['UE']=='GrosSac': continue
@@ -118,6 +121,9 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
         if not ue in notes.keys():
             notes_string += [Paragraph('', getSampleStyleSheet()['BodyText'])];
             continue;
+
+        # Mineure
+        if ue.startswith('LU') and not 'PY' in ue: continue;
 
         ### Redoublant deja valide
         validation_tag = "<br /><font color='grey'>("+notes[ue]['annee_val']+')</font>' if notes[ue]['annee_val']!=None else '';
@@ -190,9 +196,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
     # Liste des UE et blocs par semestre
     blocs_maquette = {}; UEs_maquette = {};
     for semestre in semestres:
-        # blocs_maquette[semestre] = sorted([x for x in Maquette.keys() if parcours in Maquette[x]['parcours'] and semestre.split('_')[0] in Maquette[x]['semestre']]);
         blocs_maquette[semestre] = GetBlocsMaquette(semestre.split('_')[0], parcours);
-        UEs_maquette[semestre]   = GetUEsMaquette(blocs_maquette[semestre]);
 
     # Etudiant data
     for etu in GetList(pv.values()):
@@ -205,9 +209,11 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
          if parcours == 'MAJ':
              MIN=[];
              for sem in semestres:
-                 try:    MIN = MIN + [UEs[x['UE']]['nom'] for x in pv[sem][etu[0]]['results'].values() if 'UE' in x.keys() and x['UE']!=None];
+                 try:    MIN = MIN + [ x for x in pv[sem][etu[0]]['results'].keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'];
                  except: MIN = [''];
-             my_parcours = 'MajPhys - ' + MIN[-1][:-1];
+             logger.debug("  > Parcours = "  + str(MIN))
+             try:    my_parcours = 'MajPhys - ' + UEs[MIN[-1]]['nom'][:-1];
+             except: my_parcours = 'MajPhys';
          logger.debug("  > Parcours = " + my_parcours);
 
          ## Header etudiant
@@ -233,6 +239,8 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
 
             ### PV individuel
             pv_ind = pv[semestre][etu[0]];
+            blocs_maq = [x for x in blocs_maquette[semestre] if not x in [x for x in UEs if x.startswith('LK')] or x in pv_ind['results'].keys()];
+            UEs_maquette[semestre]   = GetUEsMaquette(blocs_maq);
 
             ### First cell of the table
             dep = 0 if nbr_semestres==1 else 1; nbr_semestres-=1;
@@ -241,10 +249,12 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
                   '/20</font></b></para>', getSampleStyleSheet()['BodyText'])];
 
             ### Second cell of the table
-            header_semestre = GetAverages(semestre, pv_ind['results'], blocs_maquette[semestre], moyenne_annee);
+            header_semestre = GetAverages(semestre, pv_ind['results'], blocs_maq, moyenne_annee);
 
             ### Notes des UE
-            etu_notes = GetNotes(pv_ind['results'], UEs_maquette[semestre][0], GetLength(semestres,parcours), moyenne_annee);
+            num_ue = GetLength(semestres, parcours);
+            if parcours=='MAJ': num_ue+=1;
+            etu_notes = GetNotes(pv_ind['results'], UEs_maquette[semestre][0], num_ue, moyenne_annee);
 
             ### Adding the line to the table
             line_data   = [[etu_id, header_semestre] + etu_notes];

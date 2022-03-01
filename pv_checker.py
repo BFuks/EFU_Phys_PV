@@ -62,7 +62,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
     # Obtentien des blocs et verification que la liste est complete
     blocs_maquette = GetBlocsMaquette(semestre, parcours);
-    blocs_pv = sorted([x for x in data_pv.keys() if not x in UEs and not x in ['total', '999999'] and not x in GrosSac.keys()]);
+    blocs_pv = sorted([x for x in data_pv.keys() if (x.startswith('LK') or not x in UEs) and not x in ['total', '999999'] and not x in GrosSac.keys()]);
+    blocs_maquette = [x for x in blocs_maquette if not x in [x for x in UEs if x.startswith('LK')] or x in blocs_pv];
 
     # Verification qu'en cas d'UE dans le gros sac, les UE correspondent ne sont pas dans le PV
     for to_del in [x for x in data_pv.keys() if x+'_GS' in data_pv.keys()]:
@@ -77,10 +78,12 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              logger.debug("  > Adding block " + missing_bloc);
              data_pv[missing_bloc] =  {'tag': Maquette[missing_bloc]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '-1', 'annee_val': None, 'UE': None};
              blocs_pv.append(missing_bloc);
+         used_ues = [];
          for missing_ue in [x for x in GetUEsMaquette(blocs_maquette)[0] if not x in list(data_pv.keys())]:
+             logger.debug("  > Ajout de l'UE manquante " + missing_ue);
 
              # est-ce que l'UE est dans le premier gros sac ?
-             grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] ];
+             grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] and not x in used_ues];
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
 
              # test si l'UE fait partie du 1er gros sac
@@ -89,6 +92,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                  coeff = sum([UEs[ue]['ects'] for ue in grossac]);
                  note = sum( [data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in grossac] );
                  data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
+                 used_ues += grossac;
 
              # On a vraiment une UE manquante -> COVID
              elif not missing_ue+'_GS' in data_pv.keys():
@@ -98,9 +102,21 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                  logger.debug("  > Ajout de l'UE "+ missing_ue);
                  data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'GS', 'note':'DIS', 'annee_val': None, 'UE': None};
 
+
     # Verification des moyennes (blocs)
     moyenne_tot  = 0.; coeff_tot    = 0.;
     for bloc in blocs_pv:
+        ## Checking whether all UEs are present
+        first = True;
+        for missing_ue in [x for x in Maquette[bloc]['UE'][0] if not x in list(data_pv.keys())]:
+            if first:
+                logger.warning("Problemes d'UEs manquantes dans le PV de " + etu_nom + " (" + etu_id + "): bloc " + bloc);
+                first=False;
+            logger.warning("  > Ajout de l'UE manquante "+ missing_ue);
+            val = 'ADM' if float(data_pv[bloc]['note'])>=50. else 'AJ';
+            data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': val, 'note':data_pv[bloc]['note'],\
+               'annee_val': None, 'UE': None};
+
         ## Calcul de la moyenne du bloc
         bloc_ues = [x for x in Maquette[bloc]['UE'] if set(x).issubset(set(data_pv.keys())) ][0];
         moyenne_bloc = 0.; coeff_bloc   = 0.;
@@ -126,7 +142,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
 
     # Verification du nombre de credits
-    credits = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac')]);
+    credits = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac')]);
     if credits!=30: logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(credits) + " ECTS");
 
     ## Calcul de la moyenne du semestre
@@ -163,7 +179,7 @@ def SanityCheck(pv, parcours, semestre):
         # Boucle sur les elements du PV
         for label, data_UE in pv[etudiant]['results'].items():
             ## On a un element de PV, qui peut etre a ce stade soit une UE soit un bloc
-            my_label = label.split('-')[-1];
+            my_label = label.split('-')[-1].strip();
 
             ## Ici l'element est vide : on l'ignore
             if 'UE' not in data_UE.keys(): continue;
