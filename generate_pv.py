@@ -46,7 +46,7 @@ if len(PV_dico) == 0:
 
 ## Choice du niveau
 logger.warning("Choisir un niveau parmi:");
-niveaux         = [x for x in PV_dico.keys()];
+niveaux         = sorted([x for x in PV_dico.keys()]);
 allowed_answers = [str(x+1) for x in list(range(len(niveaux)))];
 for i in range(len(niveaux)):
     print('         *** ', i+1, ':', niveaux[i]);

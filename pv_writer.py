@@ -55,7 +55,8 @@ def GetLength(semestres, parcours):
 def MakeHeaders(semestres, parcours):
     # number of columns in the table
     num_ue = GetLength(semestres, parcours);
-    if parcours=='MAJ': num_ue+=1;
+    if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
+    if parcours=='MAJ' and semestres[0].startswith('S3'): num_ue+=1;
 
     # The header themselves
     Headers = [[
@@ -103,7 +104,7 @@ def GetAverages(semestre, notes, blocs_maquette, moyenne_annee):
 
 
 # Formattage des notes
-from maquette import Ignore, GrosSac;
+from maquette import GrosSac;
 def GetNotes(notes, ues, ncases, moyenne_annee):
 
     ## Initialisation
@@ -114,7 +115,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
     ## Boucle sur les UE
     for ue in (ues+[x for x in notes.keys() if x in GrosSac.keys()] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN']  ):
         ### Enlever les notes de la mineure
-        if ue in Ignore or ue+'_GS' in notes.keys(): continue
+        if ue+'_GS' in notes.keys(): continue
         if 'UE' in notes[ue].keys() and notes[ue]['UE']=='GrosSac': continue
 
         ### Note manquante
@@ -123,7 +124,8 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
             continue;
 
         # Mineure
-        if ue.startswith('LU') and not 'PY' in ue: continue;
+        if ue.startswith('LU') and not ('PY' in ue or 'LV' in ue): continue;
+        if ue.startswith('L5PH') or ue.startswith('L3LACH'): continue;
 
         ### Redoublant deja valide
         validation_tag = "<br /><font color='grey'>("+notes[ue]['annee_val']+')</font>' if notes[ue]['annee_val']!=None else '';
@@ -253,8 +255,12 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
 
             ### Notes des UE
             num_ue = GetLength(semestres, parcours);
-            if parcours=='MAJ': num_ue+=1;
-            etu_notes = GetNotes(pv_ind['results'], UEs_maquette[semestre][0], num_ue, moyenne_annee);
+            if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
+            if parcours=='MAJ' and semestres[0].startswith('S3'): num_ue+=1;
+            list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
+            list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
+            list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];
+            etu_notes = GetNotes(pv_ind['results'], list_ues, num_ue, moyenne_annee);
 
             ### Adding the line to the table
             line_data   = [[etu_id, header_semestre] + etu_notes];

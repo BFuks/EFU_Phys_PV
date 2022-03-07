@@ -79,7 +79,9 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              data_pv[missing_bloc] =  {'tag': Maquette[missing_bloc]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '-1', 'annee_val': None, 'UE': None};
              blocs_pv.append(missing_bloc);
          used_ues = [];
-         for missing_ue in [x for x in GetUEsMaquette(blocs_maquette)[0] if not x in list(data_pv.keys())]:
+         missings = [  [x for x in z if not x in list(data_pv.keys()) ] for z in GetUEsMaquette(blocs_maquette) ];
+         missings = [x for x in missings if len(x)==min([len(y) for y in missings]) ][0];
+         for missing_ue in missings:
              logger.debug("  > Ajout de l'UE manquante " + missing_ue);
 
              # est-ce que l'UE est dans le premier gros sac ?
@@ -92,7 +94,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                  coeff = sum([UEs[ue]['ects'] for ue in grossac]);
                  note = sum( [data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in grossac] );
                  data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
-                 used_ues += grossac;
+                 if parcours=='MAJ': used_ues += grossac;
 
              # On a vraiment une UE manquante -> COVID
              elif not missing_ue+'_GS' in data_pv.keys():
@@ -108,7 +110,9 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     for bloc in blocs_pv:
         ## Checking whether all UEs are present
         first = True;
-        for missing_ue in [x for x in Maquette[bloc]['UE'][0] if not x in list(data_pv.keys())]:
+        missings = [  [x for x in z if not x in list(data_pv.keys()) ] for z in  GetUEsMaquette(blocs_pv) ];
+        missings = [x for x in missings if len(x)==min([len(y) for y in missings]) ][0];
+        for missing_ue in missings:
             if first:
                 logger.warning("Problemes d'UEs manquantes dans le PV de " + etu_nom + " (" + etu_id + "): bloc " + bloc);
                 first=False;
@@ -183,6 +187,11 @@ def SanityCheck(pv, parcours, semestre):
 
             ## Ici l'element est vide : on l'ignore
             if 'UE' not in data_UE.keys(): continue;
+
+            ## Patch pour le PV des L2
+            if my_label.startswith('LY'):
+                my_label =data_UE['UE'];
+                data_UE['UE']  = None;
 
             ## DEBUG :  on print le nom de l'element et ce qu'il contient
             logger.debug('  > label = ' + my_label + "; UE = " + str(data_UE));
