@@ -56,7 +56,7 @@ def MakeHeaders(semestres, parcours):
     # number of columns in the table
     num_ue = GetLength(semestres, parcours);
     if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
-    if parcours=='MAJ' and semestres[0].startswith('S3'): num_ue+=1;
+    if parcours in ['DM', 'MAJ'] and semestres[0].startswith('S3'): num_ue+=1;
 
     # The header themselves
     Headers = [[
@@ -93,9 +93,11 @@ def GetAverages(semestre, notes, blocs_maquette, moyenne_annee):
     ## Affichage moyennes
     moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b><br />';
     for bloc in sorted([x for x in list(blocs_maquette) if 'PY' in x],reverse=True):
-        moyennes_string += '<br />' + Maquette[bloc]['nom'] + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
+        nombloc = Maquette[bloc]['nom'] if Maquette[bloc]['parcours'][0]!='DM' else Maquette[bloc]['nom'].replace("MIN","MAJ2");
+        moyennes_string += '<br />' + nombloc + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
     for bloc in sorted([x for x in list(blocs_maquette) if not 'PY' in x],reverse=True):
-        moyennes_string += '<br />' + Maquette[bloc]['nom'] + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
+        nombloc = Maquette[bloc]['nom'] if Maquette[bloc]['parcours'][0]!='DM' else Maquette[bloc]['nom'].replace("MIN","MAJ2");
+        moyennes_string += '<br />' + nombloc + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
     moyennes_string += '</para>';
 
     ## output
@@ -137,10 +139,6 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
         ### Formattage
         fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note=='DIS' or my_note>=50.) else 'red';
         if fontcolor=='red' and compensation: fontcolor='orange';
-
-        ##  ANCIENNE MAQUETTE - - - SIMPLFICIATION EFFECTUEE - - - A SUPPRIMER A UN MOMENT - - - TAG BENJ
-        ## ### Mineure
-        ## if 'PYMI0' in ue: my_note = my_note.replace('PYMI0', list(set([x[3:5] for x in maquette if not 'PY' in x and not 'LV' in x]))[0]+'M00').replace('HMM','PHM');
 
         ### Result
         notes_string+= [ Paragraph('<para align="center"><b>' + ue + '</b><br />' + \
@@ -208,14 +206,18 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
 
          ## Parcours
          my_parcours = parcours;
-         if parcours == 'MAJ':
+         if parcours in ['DM', 'MAJ']:
              MIN=[];
              for sem in semestres:
                  try:    MIN = MIN + [ x for x in pv[sem][etu[0]]['results'].keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'];
                  except: MIN = [''];
              logger.debug("  > Parcours = "  + str(MIN))
-             try:    my_parcours = 'MajPhys - ' + UEs[MIN[-1]]['nom'][:-1];
-             except: my_parcours = 'MajPhys';
+             if parcours=='MAJ':
+                 try:    my_parcours = 'MajPhys - ' + UEs[MIN[-1]]['nom'][:-1];
+                 except: my_parcours = 'MajPhys';
+             elif parcours=='DM':
+                 try:    my_parcours = 'DM Phys - ' + UEs[MIN[-1]]['nom'][3:-1];
+                 except: my_parcours = 'DM Phys';
          logger.debug("  > Parcours = " + my_parcours);
 
          ## Header etudiant
@@ -256,7 +258,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
             ### Notes des UE
             num_ue = GetLength(semestres, parcours);
             if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
-            if parcours=='MAJ' and semestres[0].startswith('S3'): num_ue+=1;
+            if parcours in ['MAJ','DM'] and semestres[0].startswith('S3'): num_ue+=1;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];

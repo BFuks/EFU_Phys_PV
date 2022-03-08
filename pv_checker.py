@@ -91,7 +91,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              # test si l'UE fait partie du 1er gros sac
              if len(grossac)>0:
                  annee = data_pv[grossac[0]]['note'];
-                 coeff = sum([UEs[ue]['ects'] for ue in grossac]);
+                 coeff = sum([UEs[ue]['ects'] for ue in grossac and not 'SX' in UEs[ue].keys()]);
                  note = sum( [data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in grossac] );
                  data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
                  if parcours=='MAJ': used_ues += grossac;
@@ -126,11 +126,12 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         moyenne_bloc = 0.; coeff_bloc   = 0.;
         for ue in bloc_ues:
             if data_pv[ue]['note']=='DIS': continue;
-            if data_pv[ue]['note'] != 'COVID':
-                moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
-                moyenne_tot  += float(data_pv[ue]['note'])*UEs[ue]['ects'];
-            coeff_tot  += UEs[ue]['ects'];
-            coeff_bloc += UEs[ue]['ects'];
+            if not 'SX' in UEs[ue].keys():
+                if data_pv[ue]['note'] != 'COVID':
+                    moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
+                    moyenne_tot  += float(data_pv[ue]['note'])*UEs[ue]['ects'];
+                coeff_tot  += UEs[ue]['ects'];
+                coeff_bloc += UEs[ue]['ects'];
         try:    moyenne_bloc = round(moyenne_bloc/coeff_bloc,3);
         except: moyenne_bloc = 0.
 
@@ -146,7 +147,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
 
     # Verification du nombre de credits
-    credits = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac')]);
+    credits = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and not 'SX' in UEs[x].keys()]);
     if credits!=30: logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(credits) + " ECTS");
 
     ## Calcul de la moyenne du semestre
@@ -187,6 +188,9 @@ def SanityCheck(pv, parcours, semestre):
 
             ## Ici l'element est vide : on l'ignore
             if 'UE' not in data_UE.keys(): continue;
+
+            ## Hack double majeure
+            if my_label in ['LK3PYDM0','LY3PYJ10']: continue;
 
             ## Patch pour le PV des L2
             if my_label.startswith('LY'):
