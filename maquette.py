@@ -211,7 +211,7 @@ Maquette = {
            ['LU2PY103', 'LU2PY110', 'LU2PY124', 'LU2LVAN1'],
            ['LU2PY103', 'LU2PY124', 'LU2PY222', 'LU2LVAN1']
         ],
-        'parcours': ['MONO', 'MAJ'],
+        'parcours': ['MONO','MAJ'],
         'nom'     : "MAJ",
         'semestre': "S3"
     },
@@ -337,3 +337,4 @@ GrosSac2 = {
   'LU3PY013' : ['LU3PYOIP']
  };
 
+IsModule = ['L3LACHCI', 'L3LACHLA'];

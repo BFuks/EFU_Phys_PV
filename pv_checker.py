@@ -29,6 +29,7 @@ logger = logging.getLogger('mylogger');
 ###        Verification et calcul de la note/100       ###
 ###                                                    ###
 ##########################################################
+from maquette import IsModule;
 def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
     # safetfy check
     if data_UE['validation']=='DIS': return 'DIS';
@@ -42,9 +43,9 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
     if nom_UE in Maquette.keys() or nom_UE=='total': return round(note,3);
 
     # Verification du statut de validation
-    if note<50. and data_UE['validation']!='AJ':
+    if not nom_UE in IsModule  and note<50. and data_UE['validation']!='AJ':
         logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + etu_nom +') : ' + nom_UE.replace('_GS','') + ' devrait etre AJ');
-    elif note>=50. and not data_UE['validation'] in ['VAC', 'ADM', 'U ADM']:
+    elif not nom_UE in IsModule  and note>=50. and not data_UE['validation'] in ['VAC', 'ADM', 'U ADM']:
         logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + etu_nom +') : ' + nom_UE.replace('_GS','') + ' devrait etre ADM');
 
     # On a un UE; retour de la note sur 100
@@ -189,7 +190,7 @@ def SanityCheck(pv, parcours, semestre):
             ## Ici l'element est vide : on l'ignore
             if 'UE' not in data_UE.keys(): continue;
 
-            ## Hack double majeure
+            ## Hack double majeure et MAJ/Min math L2
             if my_label in ['LK3PYDM0','LY3PYJ10']: continue;
 
             ## Patch pour le PV des L2
@@ -204,6 +205,7 @@ def SanityCheck(pv, parcours, semestre):
             if   my_label == 'LY5PY090': new_label = data_UE['UE'];
             elif my_label == 'LY5PY092': new_label = data_UE['UE'] + '_GS';
             else: new_label = my_label;
+            if my_label == 'LK3PYJ01': new_label = 'LK3PYJ00';
             if my_label in ['LY5PY090', 'LY5PY092']: data_UE['UE']=None;
             pv_individuel[new_label] = {'note':CheckValidation(new_label, data_UE, str(etudiant), pv[etudiant]['nom']), 'annee_val':data_UE['annee_val']};
 
