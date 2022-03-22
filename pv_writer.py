@@ -57,6 +57,7 @@ def MakeHeaders(semestres, parcours):
     num_ue = GetLength(semestres, parcours);
     if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
     if parcours in ['DM', 'MAJ'] and semestres[0].startswith('S3'): num_ue+=1;
+    if parcours in ['DM'] and semestres[0].startswith('S5'): num_ue+=1;
 
     # The header themselves
     Headers = [[
