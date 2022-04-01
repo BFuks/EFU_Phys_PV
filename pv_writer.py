@@ -92,7 +92,8 @@ def GetAverages(semestre, notes, blocs_maquette, moyenne_annee):
     else                        : my_color='red'
 
     ## Affichage moyennes
-    moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b><br />';
+    moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b>';
+    moyennes_string += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking']+')</font><br />';
     for bloc in sorted([x for x in list(blocs_maquette) if 'PY' in x],reverse=True):
         nombloc = Maquette[bloc]['nom'] if Maquette[bloc]['parcours'][0]!='DM' else Maquette[bloc]['nom'].replace("MIN","MAJ2");
         moyennes_string += '<br />' + nombloc + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
@@ -136,6 +137,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
         ### Note elle-meme
         my_note = notes[ue]['note'];
         current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'COVID'] else my_note;
+        if 'ranking' in notes[ue].keys(): current_note += '<br /><font color=\'grey\' size=\'8\'>#'+notes[ue]['ranking']+'</font>';
 
         ### Formattage
         fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note=='DIS' or my_note>=50.) else 'red';
@@ -187,7 +189,7 @@ def GetLineStyle(counter, endline):
 
 
 
-from misc import flatten, GetBlocsMaquette, GetUEsMaquette;
+from misc import GetBlocsMaquette, GetUEsMaquette;
 def PDFWriter(pv, annee, niveau, parcours, semestres):
 
     # Title and headers

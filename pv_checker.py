@@ -57,7 +57,7 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
 ###             Verification des moyennes              ###
 ###                                                    ###
 ##########################################################
-from misc import flatten, GetBlocsMaquette, GetUEsMaquette;
+from misc import GetBlocsMaquette, GetUEsMaquette;
 from maquette import GrosSac, GrosSac2;
 def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 

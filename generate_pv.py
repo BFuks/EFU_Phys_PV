@@ -105,6 +105,12 @@ for semestre in semestres:
     print("         *** Verification des moyennes du PV");
     all_PVs[semestre] = SanityCheck(PV_semestre, parcours, semestre);
 
+## Statistics
+from statistics import GetStatistics;
+for semestre in semestres:
+    logger.info("Generation des satistique du PV pour le semestre " + semestre);
+    all_PVs[semestre] = GetStatistics(all_PVs[semestre], parcours, semestre);
+
 ## Creation des PV pirates
 from pv_writer  import PDFWriter;
 logger.info("Creation de la version PDF du PV " + parcours + " (" + annee + ")");
