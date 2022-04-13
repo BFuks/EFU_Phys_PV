@@ -7,6 +7,7 @@
 # Liste des UE avec le nombre de credits
 UEs = {
     'LU2PY103': {'ects':6,  'nom':'Thermo'},
+    'LU3PY103': {'ects':6,  'nom':'Thermo'},
     'LU2PY403': {'ects':6,  'nom':'Thermo'},
     'LU2PY104': {'ects':6,  'nom':'Meca'},
     'LU2PY110': {'ects':6,  'nom':'Math-S3'},
@@ -358,7 +359,8 @@ GrosSac    = {
     'LU3PY020' : ['LU3PY101'],
     'LU3PY021' : ['LU3PY121'],
     'LU3PY001' : ['LU3PY101'],
-    'LU3PY010' : ['LU3PY214']
+    'LU3PY010' : ['LU3PY214'],
+    'LU3PY103' : ['LU3PY121']
 };
 
 GrosSac2 = { 

@@ -32,7 +32,7 @@ logger = logging.getLogger('mylogger');
 from maquette import IsModule;
 def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
     # safetfy check
-    if data_UE['validation']=='DIS': return 'DIS';
+    if data_UE['validation'] in ['ENCO', 'DIS']: return data_UE['validation'];
     if data_UE['validation']=='ABJ': data_UE['note']=0;
     if data_UE['note']==None: return -1;
 
@@ -93,7 +93,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              if len(grossac)>0:
                  annee = data_pv[grossac[0]]['note'];
                  coeff = sum([UEs[ue]['ects'] for ue in grossac if parcours!='DM' or not 'SX' in UEs[ue].keys()]);
-                 note = sum( [data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in grossac] );
+                 list_note = [ ue for ue in grossac if data_pv[ue]['note']!='ENCO'];
+                 note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
                  data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
                  if parcours=='MAJ': used_ues += grossac;
 
@@ -126,7 +127,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         bloc_ues = [x for x in Maquette[bloc]['UE'] if set(x).issubset(set(data_pv.keys())) ][0];
         moyenne_bloc = 0.; coeff_bloc   = 0.;
         for ue in bloc_ues:
-            if data_pv[ue]['note']=='DIS': continue;
+            if data_pv[ue]['note'] in ['DIS', 'ENCO']: continue;
             if parcours!='DM' or not 'SX' in UEs[ue].keys():
                 if data_pv[ue]['note'] != 'COVID':
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
@@ -154,7 +155,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     ## Calcul de la moyenne du semestre
     try:    moyenne_tot  = round(moyenne_tot/(5.*coeff_tot),3);
     except: moyenne_tot = -1;
-    if data_pv['total']['note'] ==-1:
+    if data_pv['total']['note'] in ['ENCO', -1]:
         logger.warning("Problemes de moyenne totale non calculee dans le PV de " + etu_nom + " (" + etu_id + ")");
         logger.warning("  > Moyenne calculee = " + str(moyenne_tot));
         data_pv['total']['note'] = moyenne_tot;
