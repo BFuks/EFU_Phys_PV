@@ -43,7 +43,7 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
     if nom_UE in Maquette.keys() or nom_UE=='total': return round(note,3);
 
     # Verification du statut de validation
-    if not nom_UE in IsModule  and note<50. and data_UE['validation']!='AJ':
+    if not nom_UE in IsModule  and note<50. and not data_UE['validation'] in ['AJ', 'ABJ']:
         logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + etu_nom +') : ' + nom_UE.replace('_GS','') + ' devrait etre AJ');
     elif not nom_UE in IsModule  and note>=50. and not data_UE['validation'] in ['VAC', 'ADM', 'U ADM']:
         logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + etu_nom +') : ' + nom_UE.replace('_GS','') + ' devrait etre ADM');
@@ -58,12 +58,12 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
 ###                                                    ###
 ##########################################################
 from misc import GetBlocsMaquette, GetUEsMaquette;
-from maquette import GrosSac, GrosSac2;
+from maquette import GrosSac, GrosSacP2, GrosSac2;
 def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
     # Obtentien des blocs et verification que la liste est complete
     blocs_maquette = GetBlocsMaquette(semestre, parcours);
-    blocs_pv = sorted([x for x in data_pv.keys() if (x.startswith('LK') or not x in UEs) and not x in ['total', '999999'] and not x in GrosSac.keys()]);
+    blocs_pv = sorted([x for x in data_pv.keys() if (x.startswith('LK') or not x in UEs) and not x in ['total', '999999'] and not x in GrosSac.keys() and not x in GrosSacP2.keys()]);
     blocs_maquette = [x for x in blocs_maquette if not x in [x for x in UEs if x.startswith('LK')] or x in blocs_pv];
 
     # Verification qu'en cas d'UE dans le gros sac, les UE correspondent ne sont pas dans le PV
@@ -86,7 +86,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              logger.debug("  > Ajout de l'UE manquante " + missing_ue);
 
              # est-ce que l'UE est dans le premier gros sac ?
-             grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] and not x in used_ues];
+             grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] and not x in used_ues] + \
+                 [x for x in data_pv.keys() if x in GrosSacP2.keys() and missing_ue in GrosSacP2[x] and not x in used_ues];
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
 
              # test si l'UE fait partie du 1er gros sac
@@ -192,7 +193,7 @@ def SanityCheck(pv, parcours, semestre):
             if 'UE' not in data_UE.keys(): continue;
 
             ## Hack double majeure et MAJ/Min math L2
-            if my_label in ['LK3PYDM0','LY3PYJ10']: continue;
+            if my_label in ['LK3PYDM0','LY3PYJ10', 'LK6PY090']: continue;
 
             ## Patch pour le PV des L2
             if my_label.startswith('LY'):

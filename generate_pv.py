@@ -106,10 +106,12 @@ for semestre in semestres:
     all_PVs[semestre] = SanityCheck(PV_semestre, parcours, semestre);
 
 ## Statistics
-from statistics import GetStatistics;
+from statistics import GetStatistics, GetMoyenneAnnuelle;
 for semestre in semestres:
     logger.info("Generation des satistique du PV pour le semestre " + semestre);
     all_PVs[semestre] = GetStatistics(all_PVs[semestre], parcours, semestre);
+logger.info("Calcul des moyennes annuelles");
+all_PVs = GetMoyenneAnnuelle(all_PVs);
 
 ## Creation des PV pirates
 from pv_writer  import PDFWriter;
