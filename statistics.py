@@ -49,8 +49,9 @@ def GetMoyenneAnnuelle(pv):
 def GetStatistics(pv, parcours, semestre):
 
     # UEs
-    blocs = [x for x in GetBlocsMaquette(semestre.split('_')[0], parcours) if 'PY' in x];
-    ues = list(set(functools.reduce(operator.iconcat, GetUEsMaquette(blocs), [])));
+    blocs = [x for x in GetBlocsMaquette(semestre.split('_')[0], parcours) ];
+    ues = [x for x in list(set(functools.reduce(operator.iconcat, GetUEsMaquette(blocs), []))) if 'PY' in x or 'LVAN' in x];
+    blocs = [x for x in blocs if 'PY' in blocs];
 
     # Init of the output
     notes = {};
@@ -68,7 +69,7 @@ def GetStatistics(pv, parcours, semestre):
            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
 
            # get the notes
-           if 'note' in data_UE.keys() and data_UE['note'] not in ['DIS', 'COVID']: notes[key].append(data_UE['note']);
+           if 'note' in data_UE.keys() and data_UE['note'] not in ['DIS', 'COVID', 'ENCO']: notes[key].append(data_UE['note']);
 
     # formatting
     for key in notes.keys():
@@ -85,7 +86,7 @@ def GetStatistics(pv, parcours, semestre):
            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
 
            # get the notes
-           if 'note' in data_UE.keys() and data_UE['note'] not in ['DIS', 'COVID']:
+           if 'note' in data_UE.keys() and data_UE['note'] not in ['ENCO', 'DIS', 'COVID']:
                pv[etudiant]['results'][label]['ranking'] = str(notes[key].index(float(data_UE['note']))+1)+'/'+str(len(notes[key]));
 
     # output

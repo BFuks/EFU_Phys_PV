@@ -56,6 +56,9 @@ def GetPVList():
         parcours = pv_data[-1].split('.')[0];
         session  = pv_data[3]+'_'+pv_data[4];
 
+        # Patch L3 - S6
+        if parcours[0:2]=='DM': parcours = 'DM';
+
         # sauvegarde des infos
         if not niveau in dico.keys():
             dico[niveau] = {};

@@ -214,6 +214,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
          if parcours in ['DM', 'MAJ']:
              MIN=[];
              for sem in semestres:
+                 if not etu[0] in pv[sem].keys():continue;
                  try:    MIN = MIN + [ x for x in pv[sem][etu[0]]['results'].keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'];
                  except: MIN = [''];
              logger.debug("  > Parcours = "  + str(MIN))
@@ -267,6 +268,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
             if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
             if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
             if parcours in ['MAJ','DM'] and semestres[0].startswith('S3'): num_ue+=1;
+            if parcours in ['DM'] and semestres[0].startswith('S5'): num_ue+=1;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];

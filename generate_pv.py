@@ -100,8 +100,21 @@ all_PVs = {};
 for semestre in semestres:
     logger.info("Lecture da la version XML du PV pour le semestre " + semestre);
     print("         *** Decodage des infos dans le PV");
-    PV_semestre = GetXML(niveau, annee, semestre, parcours);
-    PV_semestre = DecodeXML(PV_semestre);
+    if 'S6' in semestre and parcours =='DM':
+        PV_semestre = {};
+        for i in range(2,7):
+            PV_tmp = GetXML(niveau, annee, semestre, parcours+str(i));
+            PV_tmp = DecodeXML(PV_tmp);
+            for key in PV_tmp.keys():
+                if key=='resume': continue;
+                if not key in PV_semestre.keys(): PV_semestre[key] = PV_tmp[key];
+                else:
+                   old_keys = [x for x in PV_semestre[key]['results'].keys() if 'note' in PV_semestre[key]['results'][x].keys()];
+                   new_keys = [x for x in PV_tmp[key]['results'].keys() if 'note' in PV_tmp[key]['results'][x].keys()];
+                   if len(new_keys)>len(old_keys): PV_semestre[key] = PV_tmp[key];
+    else:
+        PV_semestre = GetXML(niveau, annee, semestre, parcours);
+        PV_semestre = DecodeXML(PV_semestre);
     print("         *** Verification des moyennes du PV");
     all_PVs[semestre] = SanityCheck(PV_semestre, parcours, semestre);
 
