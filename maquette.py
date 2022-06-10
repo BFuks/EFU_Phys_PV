@@ -25,6 +25,7 @@ UEs = {
     'LU2PY121': {'ects':12, 'nom':'OEM'},
     'LU2PY421': {'ects':12, 'nom':'OEM'},
     'LU2PY123': {'ects':3,  'nom':'Math-S4'},
+    'LU2PY423': {'ects':3,  'nom':'Math-S4'},
     'LU2PY124': {'ects':3,  'nom':'Relat'},
     'LU3PY124': {'ects':6,  'nom':'ProjExp'},
     'LU2PY424': {'ects':3,  'nom':'Relat'},
@@ -35,12 +36,14 @@ UEs = {
     'LU3PY23X': {'ects':6,  'nom':'Option'},
     'LU3PY235': {'ects':6,  'nom':'MecaAnl'},
     'LU3PY234': {'ects':6,  'nom':'OcnAtm'},
+    'LU3PY537': {'ects':6,  'nom':'InfoQ', 'SX':True},
     'LU3PY233': {'ects':6,  'nom':'PhysTheo'},
     'LU3PY031': {'ects':6,  'nom':'Astro'},
     'LU3PY232': {'ects':6,  'nom':'Astro'},
     'LU3PY231': {'ects':6,  'nom':'MatMat'},
     'LU3PY205': {'ects':3,  'nom':'Stage'},
     'LU2PY222': {'ects':6,  'nom':'PhysNum'},
+    'LU2PY531': {'ects':6,  'nom':'Astro', 'SX':True},
     'LU2PY041': {'ects':6,  'nom':'PhysAct'},
     'LK3CIM00': {'ects':12, 'nom':'MinChim0'},
     'LK3CID00': {'ects':12, 'nom':'MajChim0'},
@@ -321,10 +324,13 @@ UEs = {
     'LU3PY010': {'ects': 6, 'nom':'Math-S5'},
     'LU3PY013': {'ects': 3, 'nom':'Math-S5'},
     'LU3PY213': {'ects': 3, 'nom':'Math-S5'},
+    'LU3PY513': {'ects': 3, 'nom':'Math-S5'},
     'LU3PY213_GS': {'ects': 3, 'nom':'Math-S5'},
     'LU3PY214_GS': {'ects': 6, 'nom':'MilCont'},
     'LU3PY034': {'ects': 6, 'nom':'MilCont'},
     'LU3PY214': {'ects': 6, 'nom':'MilCont'},
+    'LU3PY514': {'ects': 6, 'nom':'MilCont'},
+    'LU3PY536': {'ects': 6, 'nom':'MecaRel', 'SX':True},
     'LU3PY011': {'ects': 6, 'nom':'Thermo'},
     'LU3PY303': {'ects': 6, 'nom':'Thermo'},
     'LU3PY303_GS': {'ects': 6, 'nom':'Thermo'},
@@ -357,6 +363,14 @@ Maquette = {
         'nom'     : "MAJ",
         'semestre': "S3"
     },
+    'LK3PYJ03': {
+        'UE'      : [ 
+           ['LU2PY403', 'LU2PY424', 'LU2PY222', 'LU2LVAN1']
+        ],
+        'parcours': ['SPRINT'],
+        'nom'     : "MAJ",
+        'semestre': "S3"
+    },
 
     'LK4PYJ00': {
         'UE'      : [
@@ -377,6 +391,14 @@ Maquette = {
         'nom'     : "MAJ",
         'semestre': "S4"
     },
+    'LK4PYJ03': {
+        'UE'      : [
+           ['LU2PY404', 'LU2PY421', 'LU2PY423']
+        ],
+        'parcours': ['SPRINT'],
+        'nom'     : "MAJ",
+        'semestre': "S4"
+    },
 
     'LK5PYJ00' : {
         'UE'      : [
@@ -384,6 +406,14 @@ Maquette = {
            ['LU3PY401', 'LU3PY421', 'LU3PYOIP']
         ],
         'parcours': ['MONO', 'MAJ', 'DM'],
+        'nom'     : "MAJ",
+        'semestre': "S5"
+    },
+    'LK5PYJ03' : {
+        'UE'      : [
+           ['LU3PY401', 'LU3PY421', 'LU3PYOIP']
+        ],
+        'parcours': ['SPRINT'],
         'nom'     : "MAJ",
         'semestre': "S5"
     },
@@ -399,6 +429,16 @@ Maquette = {
         'nom'     : "MAJ",
         'semestre': "S6"
     },
+    'LK6PYJ01' : {
+        'UE'      : [
+           ['LU3PY403', 'LU3PY411', 'LU3PY124','LU3LVAN2'],
+           ['LU3PY403', 'LU3PY411', 'LU3PY125','LU3LVAN2']
+        ],
+        'parcours': ['SPRINT'],
+        'nom'     : "MAJ",
+        'semestre': "S6"
+    },
+
 
     'LK6PYJ10' : {
         'UE'      : [
@@ -430,6 +470,12 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S4"
     },
+    'LK4PYC01': {
+        'UE'      : [['LU2PY215', 'LU2PY222', 'LU2PY531']],
+        'parcours': ['SPRINT'],
+        'nom'     : "CMP",
+        'semestre': "S4"
+    },
 
     'LK5PYC00': {
         'UE'      : [['LU3PY213', 'LU3PY214', 'LU3PY215']],
@@ -437,7 +483,12 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S5"
     },
-
+    'LK5PYC01': {
+        'UE'      : [['LU3PY513', 'LU3PY514', 'LU3PY215', 'LU3PY536']],
+        'parcours': ['SPRINT'],
+        'nom'     : "CMP",
+        'semestre': "S5"
+    },
     'LK6PYC00': {
         'UE'      : [ 
            ['LU3PY23X', 'LU3PY205'],
@@ -451,7 +502,17 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S6"
     },
-
+    'LK6PYC01': {
+        'UE'      : [ 
+           ['LU3PY234', 'LU3PY205', 'LU3PY537'],
+           ['LU3PY233', 'LU3PY205', 'LU3PY537'],
+           ['LU3PY232', 'LU3PY205', 'LU3PY537'],
+           ['LU3PY231', 'LU3PY205', 'LU3PY537']
+        ],
+        'parcours': ['SPRINT'],
+        'nom'     : "CMP",
+        'semestre': "S6"
+    },
     'LK3CIM00' : { 'UE' : [ ['LU2CI012', 'LU2CI011']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S3" },
     'LK4CIM00' : { 'UE' : [ ['LU2CI101', 'LU2CI102']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
     'LK3CID00' : { 'UE' : [ ['LU2CI012', 'LU2CI011', 'LU2CI031'] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S3" },

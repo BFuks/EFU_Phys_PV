@@ -74,7 +74,7 @@ annee    = annees[int(answer)-1];
 
 ## Choice du parcours
 logger.warning("Choisir un parcours parmi:");
-parcours        = [x for x in PV_dico[niveau][annee].keys()];
+parcours        = sorted([x for x in PV_dico[niveau][annee].keys()]);
 allowed_answers = [str(x+1) for x in list(range(len(parcours)))];
 for i in range(len(parcours)):
     print('         *** ', i+1, ':', parcours[i]);
