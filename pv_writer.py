@@ -88,13 +88,18 @@ from pv_checker              import CheckValidation
 def GetAverages(semestre, notes, blocs_maquette, moyenne_annee):
 
     ## Formatting (colour)
-    if notes['total']['note']>=10.: my_color='black';
+    if notes['total']['note']=='ENCO': my_color='black';
+    elif notes['total']['note']>=10.: my_color='black';
     elif moyenne_annee > 10.    : my_color='orange'; 
     else                        : my_color='red'
 
     ## Affichage moyennes
-    moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b>';
-    moyennes_string += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking']+')</font><br />';
+    if notes['total']['note']!='ENCO':
+        moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b>';
+        moyennes_string += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking']+')</font><br />';
+    else:
+        moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>ENCO</font></b><br />';
+
     for bloc in sorted([x for x in list(blocs_maquette) if 'PY' in x],reverse=True):
         nombloc = Maquette[bloc]['nom'] if Maquette[bloc]['parcours'][0]!='DM' else Maquette[bloc]['nom'].replace("MIN","MAJ2");
         moyennes_string += '<br />' + nombloc + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
@@ -115,7 +120,9 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
     ## Initialisation
     notes_string = [];
     counter = 0;
-    compensation = (moyenne_annee>=10.) or float(notes['total']['note'])>10.;
+    if notes['total']['note']!= 'ENCO':
+        compensation = (moyenne_annee>=10.) or float(notes['total']['note'])>10.;
+    else: compensation = False;
 
     ## Boucle sur les UE
     for ue in (ues+[x for x in notes.keys() if (x in GrosSac.keys() or x in GrosSacP2.keys())and not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN']  ):
@@ -234,8 +241,10 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
 
          ## Calcul de la moyenne annuelle
          moyennes = {};
-         moyenne_annee = full[str(etu[0])][0];
-         colour_annee      = 'red' if moyenne_annee<10 else 'black';
+         colour_annee = 'black';
+         if full[str(etu[0])] !='ENCO':
+             moyenne_annee = full[str(etu[0])][0];
+             colour_annee      = 'red' if moyenne_annee<10 else 'black';
          logger.debug("  > " + str(moyenne_annee) + ' (' + colour_annee + ')');
 
          ## Real loop over the semesters
@@ -251,14 +260,22 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
             ### First cell of the table
             dep = 0 if nbr_semestres==1 else 1; nbr_semestres-=1;
             line_style = GetLineStyle(dep, semestre==semestres[-1] and etu == GetList(pv.values())[-1]);
-            if dep==0 and nbr_semestres==(max_semestres-1):
-                etu_id = [etu_id, Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>' + '{:.3f}'.format(moyenne_annee) + \
-                  '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full[str(etu[0])][1] + ')</font></para>', getSampleStyleSheet()['BodyText'])];
-            elif dep==0:
-                etu_id = [Paragraph('<para align="center"><br /></para>',getSampleStyleSheet()['BodyText']), \
-                          Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>' + '{:.3f}'.format(moyenne_annee) + \
-                          '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full[str(etu[0])][1] + ')</font></para>', getSampleStyleSheet()['BodyText'])
-                ];
+            if full[str(etu[0])] !='ENCO':
+                if dep==0 and nbr_semestres==(max_semestres-1):
+                    etu_id = [etu_id, Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>' + '{:.3f}'.format(moyenne_annee) + \
+                      '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full[str(etu[0])][1] + ')</font></para>', getSampleStyleSheet()['BodyText'])];
+                elif dep==0:
+                    etu_id = [Paragraph('<para align="center"><br /></para>',getSampleStyleSheet()['BodyText']), \
+                              Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>' + '{:.3f}'.format(moyenne_annee) + \
+                              '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full[str(etu[0])][1] + ')</font></para>', getSampleStyleSheet()['BodyText'])
+                    ];
+            else:
+                if dep==0 and nbr_semestres==(max_semestres-1):
+                    etu_id = [etu_id, Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>ENCO</font></b></para>', getSampleStyleSheet()['BodyText'])];
+                elif dep==0:
+                    etu_id = [Paragraph('<para align="center"><br /></para>',getSampleStyleSheet()['BodyText']), \
+                              Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>ENCO</font></b></para>', getSampleStyleSheet()['BodyText'])
+                    ];
 
             ### Second cell of the table
             header_semestre = GetAverages(semestre, pv_ind['results'], blocs_maq, moyenne_annee);

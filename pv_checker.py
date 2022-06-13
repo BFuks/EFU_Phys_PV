@@ -78,7 +78,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
        logger.warning("Problemes d'UE a supprimer dans le PV de " + etu_nom + " (" + etu_id + "): " + to_del);
        del data_pv[to_del];
 
-    # Le POV est noettye, cest parti
+    # Le checking
     if blocs_maquette != blocs_pv:
          from misc     import Bye;
          logger.warning("Problemes de blocs sans notes dans le PV de " + etu_nom + " (" + etu_id + ")");
@@ -117,10 +117,11 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
     # Verification des moyennes (blocs)
     moyenne_tot  = 0.; coeff_tot    = 0.;
+    no120 = False
     for bloc in blocs_pv:
         ## Checking whether all UEs are present
         first = True;
-        missings = [  [x for x in z if not x in list(data_pv.keys()) ] for z in  GetUEsMaquette(blocs_pv) ];
+        missings = [  [x for x in z if not x in list(data_pv.keys()) ] for z in GetUEsMaquette(blocs_pv) ];
         missings = [x for x in missings if len(x)==min([len(y) for y in missings]) ][0];
         for missing_ue in missings:
             if first:
@@ -136,6 +137,9 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         moyenne_bloc = 0.; coeff_bloc   = 0.;
         for ue in bloc_ues:
             if data_pv[ue]['note'] in ['DIS', 'ENCO']: continue;
+            if ('LK6EED00' in list(data_pv.keys()) or 'LK6STD00' in list(data_pv.keys())) and ue in ['LU3PY105', 'LU3PY122', 'LU3PY124', 'LU3PY125']:
+                no120=True;
+                continue
             if not parcours in ['DM', 'SPRINT'] or (not 'SX' in UEs[ue].keys() and not (ue=='LU2PY123' and no123)):
                 if data_pv[ue]['note'] != 'COVID':
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
@@ -158,12 +162,14 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
     # Verification du nombre de credits
     credits = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) ]);
+    if no120: credits = credits-6;
     if credits!=30: logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(credits) + " ECTS");
 
     ## Calcul de la moyenne du semestre
     try:    moyenne_tot  = round(moyenne_tot/(5.*coeff_tot),3);
     except: moyenne_tot = -1;
-    if data_pv['total']['note'] in ['ENCO', -1]:
+    if data_pv['total']['note'] == 'ENCO': return;
+    if data_pv['total']['note'] in [-1]:
         logger.warning("Problemes de moyenne totale non calculee dans le PV de " + etu_nom + " (" + etu_id + ")");
         logger.warning("  > Moyenne calculee = " + str(moyenne_tot));
         data_pv['total']['note'] = moyenne_tot;

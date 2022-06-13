@@ -33,16 +33,17 @@ def GetMoyenneAnnuelle(pv):
          moyenne_annee = 0.;
          nbr_semestres = len([y for y in [etu[0] in pv[x].keys() for x in pv.keys()] if y]);
          for semestre in pv.keys():
-             if not etu[0] in pv[semestre].keys(): continue;
+             if not etu[0] in pv[semestre].keys() or moyenne_annee == 'ENCO': continue;
+             if pv[semestre][etu[0]]['results']['total']['note'] == 'ENCO': moyenne_annee = 'ENCO'; continue;
              moyenne_annee += pv[semestre][etu[0]]['results']['total']['note']/nbr_semestres;
          logger.debug("  -> " + str(moyenne_annee))
          pv["full"][str(etu[0])] = moyenne_annee;
 
     # Rankings
-    all_notes = sorted(list(pv["full"].values()), reverse=True);
+    all_notes = sorted([x for x in list(pv["full"].values()) if x!='ENCO'], reverse=True);
     for etu in pv["full"].keys():
-        pv["full"][etu] = [pv["full"][etu], str(all_notes.index(pv["full"][etu])+1) + \
-            '/' + str(len(all_notes))];
+        if pv["full"][etu]!='ENCO':
+            pv["full"][etu] = [pv["full"][etu], str(all_notes.index(pv["full"][etu])+1) + '/' + str(len(all_notes))];
 
     return pv;
 
