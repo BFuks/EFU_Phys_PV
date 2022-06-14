@@ -21,6 +21,7 @@ UEs = {
     'LU2PY404': {'ects':6,  'nom':'Meca'},
     'LU2PY104': {'ects':6,  'nom':'Meca'},
     'LU2PY110': {'ects':6,  'nom':'Math-S3'},
+    'LU2PY410': {'ects':6,  'nom':'Math-S3'},
     'LU2LVAN1': {'ects':3,  'nom':'Anglais'},
     'LU2PY121': {'ects':12, 'nom':'OEM'},
     'LU2PY421': {'ects':12, 'nom':'OEM'},
@@ -32,6 +33,8 @@ UEs = {
     'LU2PY212': {'ects':6,  'nom':'PhysExp1'},
     'LU2PY215': {'ects':3,  'nom':'PhysExp2'},
     'LU2PY220': {'ects':6,  'nom':'MathCmp'},
+    'LU2PY520': {'ects':6,  'nom':'MathCmp'},
+    'LU2PY532': {'ects':6,  'nom':'ML', 'SX':True},
     'LU3PY033': {'ects':6,  'nom':'OcnAtm'},
     'LU3PY23X': {'ects':6,  'nom':'Option'},
     'LU3PY235': {'ects':6,  'nom':'MecaAnl'},
@@ -365,7 +368,7 @@ Maquette = {
     },
     'LK3PYJ03': {
         'UE'      : [ 
-           ['LU2PY403', 'LU2PY424', 'LU2PY222', 'LU2LVAN1']
+           ['LU2PY403', 'LU2PY424', 'LU2PY410', 'LU2LVAN1']
         ],
         'parcours': ['SPRINT'],
         'nom'     : "MAJ",
@@ -461,6 +464,12 @@ Maquette = {
     'LK3PYC00': {
         'UE'      : [['LU2PY212', 'LU2PY220'], ['LU2PY041', 'LU2PY220']],
         'parcours': ['MONO'],
+        'nom'     : "CMP",
+        'semestre': "S3"
+    },
+    'LK3PYC01': {
+        'UE'      : [['LU2PY212', 'LU2PY520', 'LU2PY532'] ],
+        'parcours': ['SPRINT'],
         'nom'     : "CMP",
         'semestre': "S3"
     },
