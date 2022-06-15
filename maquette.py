@@ -443,7 +443,7 @@ Maquette = {
     },
 
 
-    'LK6PYJ10' : {
+    'LK6PYJ20' : {
         'UE'      : [
            ['LU3PY403', 'LU3PY411', 'LU3MA120','LU3LVAN2'],
            ['LU3PY103', 'LU3PY111', 'LU3ST061','LU3LVAN2'],
@@ -641,7 +641,8 @@ GrosSac2 = {
   'LU3PY012' : ['LU3PY101'],
   'LU3PY013' : ['LU3PYOIP'],
   'LU3PY022' : ['LU3PY23X'],
-  'LU3PY024' : ['LU3PY23X']
+  'LU3PY024' : ['LU3PY23X'],
+  'LU3PY033' : ['LU3PY122']
  };
 
 IsModule = ['L3LACHCI', 'L3LACHLA', 'L4LACHCI', 'L4LACHLA'];

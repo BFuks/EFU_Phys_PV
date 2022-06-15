@@ -81,9 +81,10 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     # Le checking
     if blocs_maquette != blocs_pv:
          from misc     import Bye;
-         logger.warning("Problemes de blocs sans notes dans le PV de " + etu_nom + " (" + etu_id + ")");
+         if not(parcours=='MONO' and semestre in ['S5', 'S6']):
+             logger.warning("Problemes de blocs sans notes dans le PV de " + etu_nom + " (" + etu_id + ")");
          for missing_bloc in [x for x in blocs_maquette if not x in blocs_pv]:
-             logger.debug("  > Adding block " + missing_bloc);
+             if not(parcours=='MONO' and semestre in ['S5', 'S6']): logger.debug("  > Adding block " + missing_bloc);
              data_pv[missing_bloc] =  {'tag': Maquette[missing_bloc]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '-1', 'annee_val': None, 'UE': None};
              blocs_pv.append(missing_bloc);
          used_ues = [];
@@ -96,6 +97,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] and not x in used_ues] + \
                  [x for x in data_pv.keys() if x in GrosSacP2.keys() and missing_ue in GrosSacP2[x] and not x in used_ues];
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
+             if missing_ue=='LU3PY122' and not any([ (x in data_pv.keys()) for x in ['LU3PY231', 'LU3PY232', 'LU3PY233', 'LU3PY234', 'LU3PY235']]) and 'LU3PY033' in data_pv.keys(): grossac=['LU3PY033']
 
              # test si l'UE fait partie du 1er gros sac
              if len(grossac)>0:
@@ -104,7 +106,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                  list_note = [ ue for ue in grossac if data_pv[ue]['note']!='ENCO'];
                  note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
                  data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
-                 if parcours=='MAJ': used_ues += grossac;
+                 if parcours in['MAJ']: used_ues += grossac;
 
              # On a vraiment une UE manquante -> COVID
              elif not missing_ue+'_GS' in data_pv.keys():
@@ -151,7 +153,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
         ## Output and save if necessary
         if data_pv[bloc]['note']=='-1':
-            logger.warning('  > Bloc ' + bloc + ' : moyenne calculee = ' + str(moyenne_bloc));
+            if not(parcours=='MONO' and semestre in ['S5', 'S6']): logger.warning('  > Bloc ' + bloc + ' : moyenne calculee = ' + str(moyenne_bloc));
             data_pv[bloc]['note']=moyenne_bloc;
 
         ## Verification de la moyenne du bloc
@@ -173,7 +175,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         logger.warning("Problemes de moyenne totale non calculee dans le PV de " + etu_nom + " (" + etu_id + ")");
         logger.warning("  > Moyenne calculee = " + str(moyenne_tot));
         data_pv['total']['note'] = moyenne_tot;
-    if(moyenne_tot != float(data_pv['total']['note'])):
+    if (moyenne_tot-float(data_pv['total']['note'])) > 0.01:
         logger.error("Problemes de moyenne totale dans le PV de "  + etu_nom + " (" + etu_id + "):");
         logger.error("  *** Moyenne calculee : " + str(moyenne_tot));
         logger.error("  *** Moyenne Apogee   : " + str(data_pv['total']['note']));
@@ -226,7 +228,6 @@ def SanityCheck(pv, parcours, semestre):
             if my_label == 'LK5PYJ01' and parcours=='SPRINT': new_label = 'LK5PYJ03';
             if my_label == 'LK4PYJ22': new_label = 'LK4PYJ21';
             if my_label == 'LK4PYJ23': new_label = 'LK4PYJ21';
-            if my_label == 'LK6PYJ20': new_label = 'LK6PYJ10';
             if my_label in ['LY5PY090', 'LY5PY092']: data_UE['UE']=None;
             pv_individuel[new_label] = {'note':CheckValidation(new_label, data_UE, str(etudiant), pv[etudiant]['nom']), 'annee_val':data_UE['annee_val']};
 
