@@ -32,7 +32,7 @@ logger = logging.getLogger('mylogger');
 from maquette import IsModule;
 def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
     # safetfy check
-    if data_UE['validation'] in ['ENCO', 'DIS']: return data_UE['validation'];
+    if data_UE['validation'] in ['ENCO', 'DIS', 'U VAC']: return data_UE['validation'];
     if data_UE['validation']=='ABJ': data_UE['note']=0;
     if data_UE['note']==None: return -1;
 
@@ -45,7 +45,7 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
     # Verification du statut de validation
     if not nom_UE in IsModule  and note<50. and not data_UE['validation'] in ['AJ', 'ABJ']:
         logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + etu_nom +') : ' + nom_UE.replace('_GS','') + ' devrait etre AJ');
-    elif not nom_UE in IsModule  and note>=50. and not data_UE['validation'] in ['VAC', 'U VAC', 'ADM', 'U ADM']:
+    elif not nom_UE in IsModule  and note>=50. and not data_UE['validation'] in ['VAC', 'ADM', 'U ADM']:
         logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + etu_nom +') : ' + nom_UE.replace('_GS','') + ' devrait etre ADM');
 
     # On a un UE; retour de la note sur 100
@@ -105,7 +105,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                  annee = data_pv[grossac[0]]['note'];
                  coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
                  list_note = [ ue for ue in grossac if data_pv[ue]['note']!='ENCO'];
-                 if [ data_pv[ue]['note'] for ue in list_note ] == ['DIS']: note = 'DIS';
+                 if   [ data_pv[ue]['note'] for ue in list_note ] in ['DIS']: note = 'DIS';
+                 elif [ data_pv[ue]['note'] for ue in list_note ] in ['U VAC']: note = 'U VAC';
                  else: note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
                  data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
                  if parcours in ['MAJ']:
@@ -138,15 +139,17 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
             if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3.keys() and missing_ue in GrosSac3[x] ];
 
-
             # test si l'UE fait partie du 1er gros sac
             if len(grossac)>0:
                 annee = data_pv[grossac[0]]['note'];
                 coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
-                list_note = [ ue for ue in grossac if data_pv[ue]['note']!='ENCO'];
-                note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
+                list_note = [ ue for ue in grossac if not data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO'] ];
+                if [data_pv[ue]['note'] for ue in grossac] == ['DIS']: note = 'DIS';
+                else: note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
                 data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
-                if parcours in['MAJ']: used_ues += grossac;
+                if parcours in['MAJ']:
+                     if grossac[0] in GrosSac.keys() and missing_ue == GrosSac[grossac[0]][-1]: used_ues += grossac;
+                     elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
             else:
                 val = 'ADM' if float(data_pv[bloc]['note'])>=50. else 'AJ';
                 data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': val, 'note':data_pv[bloc]['note'],\
@@ -156,7 +159,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         bloc_ues = [x for x in Maquette[bloc]['UE'] if set(x).issubset(set(data_pv.keys())) ][0];
         moyenne_bloc = 0.; coeff_bloc   = 0.;
         for ue in bloc_ues:
-            if data_pv[ue]['note'] in ['DIS', 'ENCO']: continue;
+            if data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO']: continue;
             if ('LK6EED00' in list(data_pv.keys()) or 'LK6STD00' in list(data_pv.keys())) and ue in ['LU3PY105', 'LU3PY122', 'LU3PY124', 'LU3PY125']:
                 no120=True;
                 continue

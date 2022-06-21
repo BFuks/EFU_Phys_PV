@@ -70,7 +70,7 @@ def GetStatistics(pv, parcours, semestre):
            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
 
            # get the notes
-           if 'note' in data_UE.keys() and data_UE['note'] not in ['DIS', 'COVID', 'ENCO']: notes[key].append(data_UE['note']);
+           if 'note' in data_UE.keys() and data_UE['note'] not in ['U VAC', 'DIS', 'COVID', 'ENCO']: notes[key].append(data_UE['note']);
 
     # formatting
     for key in notes.keys():
@@ -87,7 +87,7 @@ def GetStatistics(pv, parcours, semestre):
            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
 
            # get the notes
-           if 'note' in data_UE.keys() and data_UE['note'] not in ['ENCO', 'DIS', 'COVID']:
+           if 'note' in data_UE.keys() and data_UE['note'] not in ['ENCO', 'U VAC', 'DIS', 'COVID']:
                pv[etudiant]['results'][label]['ranking'] = str(notes[key].index(float(data_UE['note']))+1)+'/'+str(len(notes[key]));
 
     # output

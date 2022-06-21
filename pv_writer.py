@@ -144,11 +144,11 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
 
         ### Note elle-meme
         my_note = notes[ue]['note'];
-        current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'COVID', 'ENCO'] else my_note.replace('COVID','???');
+        current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'COVID', 'ENCO', 'U VAC'] else my_note.replace('COVID','???');
         if 'ranking' in notes[ue].keys(): current_note += '<br /><font color=\'grey\' size=\'8\'>#'+notes[ue]['ranking']+'</font>';
 
         ### Formattage
-        fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note in ['ENCO', 'DIS'] or my_note>=50.) else 'red';
+        fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note in ['ENCO', 'DIS', 'U VAC'] or my_note>=50.) else 'red';
         if fontcolor=='red' and compensation: fontcolor='orange';
 
         ### Result
