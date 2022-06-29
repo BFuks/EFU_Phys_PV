@@ -57,7 +57,7 @@ def MakeHeaders(semestres, parcours):
     num_ue = GetLength(semestres, parcours);
     if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
     if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
-    if parcours in ['DM', 'MAJ'] and semestres[0].startswith('S3'): num_ue+=1;
+    if parcours in ['DM', 'MAJ', 'DK'] and semestres[0].startswith('S3'): num_ue+=1;
     if parcours in ['DM'] and semestres[0].startswith('S5'): num_ue+=1;
 
     # The header themselves
@@ -256,7 +256,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
 
          ## Parcours
          my_parcours = parcours;
-         if parcours in ['DM', 'MAJ']:
+         if parcours in ['DM', 'MAJ', 'DK']:
              MIN=[];
              for sem in semestres:
                  if not etu[0] in pv[sem].keys():continue;
@@ -266,14 +266,14 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
              if parcours=='MAJ':
                  try:    my_parcours = 'MajPhys - ' + UEs[MIN[-1]]['nom'][:-1];
                  except: my_parcours = 'MajPhys';
-             elif parcours=='DM':
-                 try:    my_parcours = 'DM Phys - ' + UEs[MIN[-1]]['nom'][3:-1];
-                 except: my_parcours = 'DM Phys';
+             elif parcours in ['DK', 'DM']:
+                 try:    my_parcours = parcours + ' Phys - ' + UEs[MIN[-1]]['nom'][3:-1];
+                 except: my_parcours = parcours + ' Phys';
          logger.debug("  > Parcours = " + my_parcours);
 
          ## Blocs disciplinaire
          disc = '';
-         if parcours == 'DM':
+         if parcours in 'DM':
              all_sems = [x for x in pv.keys() if etu[0] in pv[x].keys() and 'Session1' in x];
              maj1=0; maj2=0;
              coe1=0; coe2=0;
@@ -287,6 +287,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
              col2 = 'red' if maj2 < 50 else 'black';
              if maj1 < 50: logger.warning(etu[1] + " (" + str(etu[0]) + ")] : Bloc Phys non valide [" + '{:.3f}'.format(maj1) + '/100]');
              if maj2 < 50: logger.warning(etu[1] + " (" + str(etu[0]) + ")] : Bloc " +  UEs[MIN[-1]]['nom'][3:-1] + " non valide [" + '{:.3f}'.format(maj2) + '/100]');
+
              disc =  '<br />MAJ1 : <font color=' + col1 + '> ' + '{:.3f}'.format(maj1) + '/100</font>' + \
                      '<br />MAJ2 : <font color=' + col2 + '> ' + '{:.3f}'.format(maj2) + '/100</font>';
 
@@ -352,7 +353,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
             num_ue = GetLength(semestres, parcours);
             if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
             if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
-            if parcours in ['MAJ','DM'] and semestres[0].startswith('S3'): num_ue+=1;
+            if parcours in ['MAJ','DM', 'DK'] and semestres[0].startswith('S3'): num_ue+=1;
             if parcours in ['DM'] and semestres[0].startswith('S5'): num_ue+=1;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];

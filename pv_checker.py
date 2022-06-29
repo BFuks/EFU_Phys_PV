@@ -65,6 +65,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     no123=False;
     if 'LU2SXPH2' in data_pv.keys():no123=True;
     if 'LU2SXHI2' in data_pv.keys():no123=True;
+    if 'LK4EWK00' in data_pv.keys():no123=True;
+    if 'LK4SSK00' in data_pv.keys():no123=True;
 
     # Obtentien des blocs et verification que la liste est complete
     blocs_maquette = GetBlocsMaquette(semestre, parcours);
@@ -105,7 +107,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              # test si l'UE fait partie du 1er gros sac
              if len(grossac)>0:
                  annee = data_pv[grossac[0]]['note'];
-                 coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
+                 coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
                  list_note = [ ue for ue in grossac if data_pv[ue]['note']!='ENCO'];
                  if   [ data_pv[ue]['note'] for ue in list_note ] in ['DIS']: note = 'DIS';
                  elif [ data_pv[ue]['note'] for ue in list_note ] in ['U VAC']: note = 'U VAC';
@@ -146,7 +148,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             # test si l'UE fait partie du 1er gros sac
             if len(grossac)>0:
                 annee = data_pv[grossac[0]]['note'];
-                coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
+                coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
                 list_note = [ ue for ue in grossac if not data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO'] ];
                 if [data_pv[ue]['note'] for ue in grossac] == ['DIS']: note = 'DIS';
                 else: note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
@@ -169,7 +171,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             if ('LK6EED00' in list(data_pv.keys()) or 'LK6STD00' in list(data_pv.keys())) and ue in ['LU3PY105', 'LU3PY122', 'LU3PY124', 'LU3PY125']:
                 no120=True;
                 continue
-            if not parcours in ['DM', 'SPRINT'] or (not 'SX' in UEs[ue].keys() and not (ue=='LU2PY123' and no123)):
+            if not parcours in ['DK', 'DM', 'SPRINT'] or (not 'SX' in UEs[ue].keys() and not (ue=='LU2PY123' and no123)):
                 if data_pv[ue]['note'] != 'COVID':
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
                     moyenne_tot  += float(data_pv[ue]['note'])*UEs[ue]['ects'];
@@ -192,7 +194,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
 
     # Verification du nombre de credits
-    credits = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) ]);
+    credits = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) ]);
     if no120: credits = credits-6;
     if credits!=30: logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(credits) + " ECTS");
 
@@ -262,7 +264,7 @@ def SanityCheck(pv, parcours, semestre):
             if 'UE' not in data_UE.keys(): continue;
 
             ## Hack double majeure et MAJ/Min math L2
-            if my_label in ['LK3PYDM0', 'LK4PYDM0', 'LY3PYJ10', 'LK4PYJ10', 'LK4PYJ20', 'LK6PY090']: continue;
+            if my_label in ['LK3PYDM0', 'LK4PYDM0', 'LY3PYJ10', 'LK4PYJ10', 'LK4PYJ20', 'LK6PY090', 'LK3PYDK0']: continue;
 
             ## Patch pour le PV des L2
             if my_label.startswith('LY'):
@@ -300,7 +302,7 @@ def SanityCheck(pv, parcours, semestre):
         CheckMoyennes(pv_individuel, parcours, semestre.split('_')[0], str(etudiant), pv[etudiant]['nom']);
 
         # Verification des blocs disciplinaires
-        if parcours=='DM': pv_individuel[semestre] = CalculBlocsDisc(pv_individuel, semestre.split('_')[0]);
+        if parcours in ['DM']: pv_individuel[semestre] = CalculBlocsDisc(pv_individuel, semestre.split('_')[0]);
 
         # Saving
         new_pv[etudiant] = { 'nom': pv[etudiant]['nom'], 'results':pv_individuel};

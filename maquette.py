@@ -87,6 +87,14 @@ UEs = {
     'LU2IN005': {'ects': 6, 'nom':'MinInfo1', 'SX':True},
     'LU2IN018': {'ects': 3, 'nom':'MinInfo2'},
     'LU2IN019': {'ects': 3, 'nom':'MinInfo3'},
+    'LK3SSK00': {'ects':12, 'nom':'MinSS0'},
+    'LU2SXSS1': {'ects':12, 'nom':'MinSS0'},
+    'LK4SSK00': {'ects':12, 'nom':'MinSS0'},
+    'LU2SXSS2': {'ects':12, 'nom':'MinSS0'},
+    'LK3EWK00': {'ects':12, 'nom':'MinJourn0'},
+    'LU2SXEW1': {'ects':12, 'nom':'MinJourn0'},
+    'LK4EWK00': {'ects':12, 'nom':'MinJourn0'},
+    'LU2SXEW2': {'ects':12, 'nom':'MinJourn0'},
     'LK3MAM00': {'ects':12, 'nom':'MinMath0'},
     'LK3MAD00': {'ects':12, 'nom':'MajMath0'},
     'LU2MA221': {'ects':6,  'nom':'MinMath1'},
@@ -372,7 +380,7 @@ Maquette = {
            ['LU2PY103', 'LU2PY110', 'LU2PY124', 'LU2LVAN1'],
            ['LU2PY403', 'LU2PY424', 'LU2PY222', 'LU2LVAN1']
         ],
-        'parcours': ['DM'],
+        'parcours': ['DM', 'DK'],
         'nom'     : "MAJ",
         'semestre': "S3"
     },
@@ -398,9 +406,10 @@ Maquette = {
         'UE'      : [
            ['LU2PY104', 'LU2PY121'],
            ['LU2PY404', 'LU2PY421'],
+           ['LU2PY104', 'LU2PY121', 'LU2PY123'],
            ['LU2PY215', 'LU2PY121', 'LU2PY123']
         ],
-        'parcours': ['DM'],
+        'parcours': ['DK', 'DM'],
         'nom'     : "MAJ",
         'semestre': "S4"
     },
@@ -607,7 +616,12 @@ Maquette = {
     'LK6HSM00' : { 'UE' : [ ['LU3HS015', 'LU3HS009'            ] ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
     'LK5EVM00' : { 'UE' : [ ['LU3EV001', 'LU3EV002', 'LU3EV003'] ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
     'LK6EVM00' : { 'UE' : [ ['LU3EV004'                        ] ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
-    'LK6GSM00' : { 'UE' : [ ['LU3GSG61', 'LU3GSG62']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" }
+    'LK6GSM00' : { 'UE' : [ ['LU3GSG61', 'LU3GSG62']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
+    'LK3SSK00' : { 'UE' : [ ['LU2SXSS1'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S3" },
+    'LK4SSK00' : { 'UE' : [ ['LU2SXSS2'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S4" },
+    'LK3EWK00' : { 'UE' : [ ['LU2SXEW1'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S3" },
+    'LK4EWK00' : { 'UE' : [ ['LU2SXEW2'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S4" }
+
 
 };
 
