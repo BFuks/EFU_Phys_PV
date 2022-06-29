@@ -289,6 +289,8 @@ UEs = {
     'LU3ST060': {'ects': 6, 'nom':'SdT1'},
     'LU3ST061': {'ects': 3, 'nom':'SdT2'},
     'LU3ST062': {'ects': 3, 'nom':'SdT2'},
+    'LU3ST066': {'ects': 6, 'nom':'SdT2'},
+    'LU3ST069': {'ects': 6, 'nom':'SdT2'},
     'LU3ST057': {'ects': 6, 'nom':'SdT1'},
     'LU3ST059': {'ects': 6, 'nom':'SdT2'},
     'LU3ST507': {'ects': 6, 'nom':'SdT2', 'SX':True},
@@ -592,7 +594,7 @@ Maquette = {
     'LK6INM00' : { 'UE' : [ ['LU2IN009', 'LU2IN023']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
     'LK5STM00' : { 'UE' : [ ['LU3ST057', 'LU3ST059'], ['LU3ST053', 'LU3ST056'], ['LU3ST056', 'LU3ST057'], ['LU3ST055', 'LU3ST057'] ],
           'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
-    'LK6STM01' : { 'UE' : [ ['LU3ST060', 'LU3ST061'], ['LU3ST060', 'LU3ST062'] ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
+    'LK6STM01' : { 'UE' : [ ['LU3ST060', 'LU3ST061'], ['LU3ST060', 'LU3ST062'], ['LU3ST069', 'LU3ST062'], ['LU3ST066', 'LU3ST062'] ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
     'LK5STD00' : { 'UE' : [ ['LU3ST057', 'LU3ST059', 'LU3ST507'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S5" },
     'LK6STD00' : { 'UE' : [ ['LU3ST060', 'LU3ST603', 'LU3ST605', 'LU3PY105'], ['LU3ST060', 'LU3ST603', 'LU3ST605', 'LU3PY124'], ['LU3ST060', 'LU3ST603', 'LU3ST605', 'LU3PY125'], ['LU3ST060', 'LU3ST603', 'LU3ST605', 'LU3PY122'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S6" },
     'LK5IAM00' : { 'UE' : [ ['LU3IAS54', 'LU3IAS53']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
@@ -667,4 +669,52 @@ GrosSac3 = {
     'LU3PY024' : ['LU3LVAN2','LU3PY205']
 }
 
-IsModule = ['L3LACHCI', 'L3LACHLA', 'L4LACHCI', 'L4LACHLA'];
+IsModule = ['L3LACHCI', 'L3LACHLA', 'L4LACHCI', 'L4LACHLA', 'L5PHM3A1', 'L5PHM510', 'L6PHM011', 'L6PHM3A1'];
+
+BlocsDisc = {
+  'S3': {
+     'PY': [ ['LU2PY103', 'LU2PY110', 'LU2PY124'], ['LU2PY403', 'LU2PY222', 'LU2PY424'] ],
+     'CI': [ ['LU2CI011', 'LU2CI012', 'LU2CI031'] ],
+     'EE': [ ['LU2EE100', 'LU2EE200', 'LU2EE105', 'LU2EE11A'] ],
+     'IN': [ ['LU2IN002', 'LU2IN005', 'LU2IN018', 'LU2IN019', 'LU2IN005'] ],
+     'HI': [ ['LU2SXHI1'] ],
+     'MA': [ ['LU2MA260', 'LU2MA221', 'LU2MA216'] ],
+     'ME': [ ['LU2ME001', 'LU2ME005', 'LU2ME006'] ],
+     'PH': [ ['LU2SXPH1'] ],
+     'ST': [ ['LU2ST301', 'LU2ST303', 'LU2ST035', 'LU2ST302'] ]
+   },
+  'S4': {
+     'PY': [ ['LU2PY121', 'LU2PY104', 'LU2PY123'], ['LU2PY121', 'LU2PY104'], ['LU2PY421', 'LU2PY404'], ['LU2PY121', 'LU2PY123', 'LU2PY215'] ],
+     'CI': [ ['LU2CI101', 'LU2CI102', 'LU2CI105'] ],
+     'EE': [ ['LU2EE201', 'LU2EE204', 'LU2EE203'] ],
+     'HI': [ ['LU2SXHI2'] ],
+     'IN': [ ['LU2IN003', 'LU2IN006', 'LU2IN009'] ],
+     'MA': [ ['LU2MA122', 'LU2MA241', 'LU2MA211'] ],
+     'ME': [ ['LU2ME004', 'LU2ME002', 'LU2ME003'] ],
+     'PH': [ ['LU2SXPH2'] ],
+     'ST': [ ['LU2ST402', 'LU2ST045', 'LU2ST403'] ]
+   },
+  'S5': {
+     'PY': [ ['LU3PY101', 'LU3PY121'], ['LU3PY101', 'LU3PY121', 'LU2PY532'], ['LU3PY401', 'LU3PY421'] ],
+     'CI': [ ['LU3CI011', 'LU3CI032', 'LU3CI003', 'LU3CI035'] ],
+     'EE': [ ['LU3EE100', 'LU3EE101', 'LU3EE105'] ],
+     'IN': [ ['LU3IN029', 'LU3IN033' ] ],
+     'MA': [ ['LU3MA260', 'LU3MA263', 'LU3MA232'] ],
+     'ME': [ ['LU3ME004', 'LU3ME103', 'LU3ME008'] ],
+     'ST': [ ['LU3ST057', 'LU3ST059', 'LU3ST507'] ]
+   },
+  'S6': {
+     'PY': [
+       ['LU3PY111', 'LU3PY103', 'LU3PY105'], ['LU3PY111', 'LU3PY103', 'LU3PY122'], ['LU3PY111', 'LU3PY103', 'LU3PY124'], ['LU3PY111', 'LU3PY103', 'LU3PY125'],
+       ['LU3PY111', 'LU3PY103', 'LU3PY105', 'LU2PY537'], ['LU3PY111', 'LU3PY103', 'LU3PY122', 'LU2PY537'], ['LU3PY111', 'LU3PY103', 'LU3PY124', 'LU2PY537'], ['LU3PY111', 'LU3PY103', 'LU3PY125', 'LU3PY537'] ,
+       ['LU3PY111', 'LU3PY105'], ['LU3PY111', 'LU3PY122'], ['LU3PY111', 'LU3PY124'], ['LU3PY111', 'LU3PY125'],
+       ['LU3PY411', 'LU3PY403', 'LU3PY105'], ['LU3PY411', 'LU3PY403', 'LU3PY122'], ['LU3PY411', 'LU3PY403', 'LU3PY124'], ['LU3PY411', 'LU3PY403', 'LU3PY125']
+      ],
+     'CI': [ ['LU3CI113', 'LU3CI121', 'LU3CI101'] ],
+     'EE': [ ['LU3EE203', 'LU3EE200', 'LU3EE210', 'LU3EE204'] ],
+     'IN': [ ['LU3IN024', 'LU3IN010'] ],
+     'MA': [ ['LU3MA120', 'LU3MA210', 'LU3MA261'], ['LU3MA120', 'LU3MA210', 'LU3MA290'] ],
+     'ME': [ ['LU3ME010', 'LU3ME007', 'LU3ME006', 'LU3ME009'] ],
+     'ST': [ ['LU3ST060', 'LU3ST603', 'LU3ST605'] ]
+   }
+}

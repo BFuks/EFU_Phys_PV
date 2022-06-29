@@ -48,7 +48,7 @@ def GetPVList():
     dico = {};
 
     # liste des ficheirs disponibles
-    for pv in glob.glob(os.path.join(os.getcwd(), 'data/*')):
+    for pv in glob.glob(os.path.join(os.getcwd(), 'data/L*')):
         # infos generales sur le PV
         pv_data  = pv.split('/')[-1].split('_');
         niveau   = pv_data[0];

@@ -78,10 +78,12 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
        logger.warning("Problemes d'UE a supprimer dans le PV de " + etu_nom + " (" + etu_id + "): " + to_del);
        del data_pv[to_del];
 
-    # Le checking
+    # UE checking
+    printed = False;
     if blocs_maquette != blocs_pv:
          from misc     import Bye;
          if not(parcours=='MONO' and semestre in ['S5', 'S6']):
+             printed = True
              logger.warning("Problemes de blocs sans notes dans le PV de " + etu_nom + " (" + etu_id + ")");
          for missing_bloc in [x for x in blocs_maquette if not x in blocs_pv]:
              if not(parcours=='MONO' and semestre in ['S5', 'S6']): logger.debug("  > Adding block " + missing_bloc);
@@ -112,6 +114,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                  if parcours in ['MAJ']:
                      if grossac[0] in GrosSac.keys() and missing_ue == GrosSac[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
+                     elif grossac[0] in GrosSac2.keys() and missing_ue == GrosSac2[grossac[0]][-1]: used_ues += grossac;
+                     elif grossac[0] in GrosSac3.keys() and missing_ue == GrosSac3[grossac[0]][-1]: used_ues += grossac;
 
              # On a vraiment une UE manquante -> COVID
              elif not missing_ue+'_GS' in data_pv.keys():
@@ -147,9 +151,11 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                 if [data_pv[ue]['note'] for ue in grossac] == ['DIS']: note = 'DIS';
                 else: note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
                 data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
-                if parcours in['MAJ']:
+                if parcours in ['MAJ']:
                      if grossac[0] in GrosSac.keys() and missing_ue == GrosSac[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
+                     elif grossac[0] in GrosSac2.keys() and missing_ue == GrosSac2[grossac[0]][-1]: used_ues += grossac;
+                     elif grossac[0] in GrosSac3.keys() and missing_ue == GrosSac3[grossac[0]][-1]: used_ues += grossac;
             else:
                 val = 'ADM' if float(data_pv[bloc]['note'])>=50. else 'AJ';
                 data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': val, 'note':data_pv[bloc]['note'],\
@@ -174,7 +180,9 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
         ## Output and save if necessary
         if data_pv[bloc]['note']=='-1':
-            if not(parcours=='MONO' and semestre in ['S5', 'S6']): logger.warning('  > Bloc ' + bloc + ' : moyenne calculee = ' + str(moyenne_bloc));
+            if not(parcours=='MONO' and semestre in ['S5', 'S6']):
+                if not printed: logger.warning("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
+                logger.warning('  > Bloc ' + bloc + ' : moyenne calculee = ' + str(moyenne_bloc));
             data_pv[bloc]['note']=moyenne_bloc;
 
         ## Verification de la moyenne du bloc
@@ -205,6 +213,30 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     # output
     return;
 
+
+##########################################################
+###                                                    ###
+###             Verification blocs disc.               ###
+###                                                    ###
+##########################################################
+from maquette import BlocsDisc;
+def CalculBlocsDisc(pv_etu, semestre):
+    # list UEs
+    ues = [x for x in pv_etu.keys() if 'LU' in x and not 'LV' in x and not 'OIP' in x];
+    phys= [x for x in BlocsDisc[semestre]['PY'] if all([y in ues for y in x])][0];
+    tag = list(set([x[3:5] for x in [y.replace('SX','') for y in ues] if x[3:5]!='PY']))[0];
+    MIN = [x for x in BlocsDisc[semestre][tag] if all([y in ues for y in x])][0];
+
+    # calcul de la moyenne
+    MAJ1 = [ [float(str(pv_etu[x]['note']).replace('COVID','0')), UEs[x]['ects']] for x in phys if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];
+    MAJ2 = [ [float(str(pv_etu[x]['note']).replace('COVID','0')), UEs[x]['ects']] for x in MIN  if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];
+    logger.debug("  > Bloc Disc Phys = " + str(MAJ1));
+    logger.debug("  > Bloc Disc " + tag+ " = " + str(MAJ2));
+
+    return {
+     'MAJ1':[sum([x[0]*x[1] for x in MAJ1]), sum([x[1] for x in MAJ1])],
+     'MAJ2':[sum([x[0]*x[1] for x in MAJ2]), sum([x[1] for x in MAJ2])]
+    };
 
 ##########################################################
 ###                                                    ###
@@ -266,6 +298,9 @@ def SanityCheck(pv, parcours, semestre):
 
         # Verification des moyennes (blocs et semestre)
         CheckMoyennes(pv_individuel, parcours, semestre.split('_')[0], str(etudiant), pv[etudiant]['nom']);
+
+        # Verification des blocs disciplinaires
+        if parcours=='DM': pv_individuel[semestre] = CalculBlocsDisc(pv_individuel, semestre.split('_')[0]);
 
         # Saving
         new_pv[etudiant] = { 'nom': pv[etudiant]['nom'], 'results':pv_individuel};

@@ -30,7 +30,7 @@ def MakeTitle(annee, niveau, parcours, semestres):
 
     # title
     story = [Paragraph('<para align="center"> PV ' + niveau + ' - ' + parcours + ' (' + \
-       annee.replace('_','-') + ') : ' + ', '.join(semestres) + '</para>',  getSampleStyleSheet()['Heading1'])];
+       annee.replace('_','-') + ') : ' + ', '.join([x.split('_')[0] for x in semestres]) + '</para>',  getSampleStyleSheet()['Heading1'])];
     story.append(Spacer(1, 0.5*cm));
 
     # output
@@ -83,29 +83,49 @@ def MakeHeaders(semestres, parcours):
 ###                                                    ###
 ##########################################################
 from pv_checker              import CheckValidation
-
 # Calcul et formattage des moyennes semestrielles
-def GetAverages(semestre, notes, blocs_maquette, moyenne_annee):
+def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee):
 
-    ## Formatting (colour)
+    ## Formatting session 1(colour)
     if notes['total']['note']=='ENCO': my_color='black';
-    elif notes['total']['note']>=10.: my_color='black';
-    elif moyenne_annee > 10.    : my_color='orange'; 
-    else                        : my_color='red'
+    elif notes['total']['note']>=10. : my_color='black';
+    elif moyenne_annee[0] > 10.      : my_color='orange'; 
+    else                             : my_color='red'
+
+    ## Formatting session 2 (colour)
+    if 'note2'in notes['total'].keys():
+        if notes['total']['note2']=='ENCO': my_color2='black';
+        elif notes['total']['note2']>=10. : my_color2='black';
+        elif moyenne_annee[1] > 10.       : my_color2='orange'; 
+        else                              : my_color2='red'
+    else: my_color2='black';
 
     ## Affichage moyennes
+    sess1 = ''; sess2 = '';
     if notes['total']['note']!='ENCO':
-        moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b>';
-        moyennes_string += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking']+')</font><br />';
+        sess1  = '<b>' + semestre.replace('_Session1','') + ' :<br />  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b>';
+        sess1 += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking']+')</font>';
     else:
-        moyennes_string = '<para align="center"><b>' + semestre + ':  <font color=' + my_color + '>ENCO</font></b><br />';
+        sess1 = '<b>' + semestre.replace('_Session1','')  + ' :<br />  <font color=' + my_color + '>ENCO</font></b>';
+    if 'note2' in notes['total'].keys():
+        if notes['total']['note2']!='ENCO':
+            sess2  = '<br /><b><font color=' + my_color2 + '>'+ '{:.3f}'.format(notes['total']['note2']) + '/20</font></b>';
+            sess2 += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking2']+')</font>';
+        else:
+            sess2 = '<br /><b><font color=' + my_color2 + '>ENCO</font></b>';
 
-    for bloc in sorted([x for x in list(blocs_maquette) if 'PY' in x],reverse=True):
-        nombloc = Maquette[bloc]['nom'] if Maquette[bloc]['parcours'][0]!='DM' else Maquette[bloc]['nom'].replace("MIN","MAJ2");
-        moyennes_string += '<br />' + nombloc + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
-    for bloc in sorted([x for x in list(blocs_maquette) if not 'PY' in x],reverse=True):
-        nombloc = Maquette[bloc]['nom'] if Maquette[bloc]['parcours'][0]!='DM' else Maquette[bloc]['nom'].replace("MIN","MAJ2");
-        moyennes_string += '<br />' + nombloc + ' :  ' + '{:.3f}'.format(notes[bloc]['note']) + '/100';
+    moyennes_string = '<para align="center">' + sess1 +  sess2 + '<br />';
+
+    for bloc in sorted([x for x in list(blocs_maquette)],reverse=True):
+        if parcours!='DM':
+            nombloc  = Maquette[bloc]['nom'];
+            notebloc = notes[bloc]['note'];
+            if 'note2' in notes[bloc].keys(): notebloc = notes[bloc]['note2'];
+        else:
+            nombloc  = 'MAJ1' if 'PY' in bloc else 'MAJ2';
+            notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
+        colour = 'red' if notebloc<50 else 'black';
+        moyennes_string += '<br />' + nombloc + ' :  <font color=\'' + colour + '\'>' + '{:.3f}'.format(notebloc) + '/100</font>';
     moyennes_string += '</para>';
 
     ## output
@@ -120,9 +140,9 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
     ## Initialisation
     notes_string = [];
     counter = 0;
-    if notes['total']['note']!= 'ENCO':
-        compensation = (moyenne_annee>=10.) or float(notes['total']['note'])>10.;
-    else: compensation = False;
+    compensation = ( moyenne_annee>=10. or float(notes['total']['note'])>10.) if notes['total']['note']!= 'ENCO' else False;
+    compensation2 = False;
+    if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee>=10. or float(notes['total']['note2'])>10.) if notes['total']['note']!= 'ENCO' else False;
 
     ## Boucle sur les UE
     for ue in (ues+[x for x in notes.keys() if (x in GrosSac.keys() or x in GrosSacP2.keys())and not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN']  ):
@@ -136,25 +156,42 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
             continue;
 
         # Mineure
-        if ue.startswith('LU') and not ('PY' in ue or 'LV' in ue): continue;
+        if ue.startswith('LU') and not ('PY' in ue or 'LV' in ue or ue in ['LU3ME010']): continue;
         if ue.startswith('L5PH') or ue.startswith('L3LACH') or ue.startswith('L6PH'): continue;
 
         ### Redoublant deja valide
         validation_tag = "<br /><font color='grey' size='8'>("+notes[ue]['annee_val']+')</font>' if notes[ue]['annee_val']!=None else '';
 
-        ### Note elle-meme
+        ### Note session 2 + formattage
+        current_note2='';
+        if 'note2' in notes[ue].keys():
+            my_note2 = notes[ue]['note2'];
+            current_note2 = '{:.2f}'.format(my_note2)+'/100' if not my_note2 in ['ABI', 'DIS', 'COVID', 'ENCO', 'U VAC'] else my_note2.replace('COVID','???');
+            if 'ranking2' in notes[ue].keys(): current_note2 += '<font color=\'grey\' size=\'7\'> [#'+notes[ue]['ranking2']+']</font>';
+
+            fontcolor2 = 'black' if not my_note2 in ['ABI', 'COVID'] and (my_note2 in ['ENCO', 'DIS', 'U VAC'] or my_note2>=50.) else 'red';
+            if fontcolor2=='red' and compensation2: fontcolor2='orange';
+
+        ### Note session 1 + formattage
         my_note = notes[ue]['note'];
         current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'COVID', 'ENCO', 'U VAC'] else my_note.replace('COVID','???');
         if 'ranking' in notes[ue].keys(): current_note += '<br /><font color=\'grey\' size=\'8\'>#'+notes[ue]['ranking']+'</font>';
 
-        ### Formattage
         fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note in ['ENCO', 'DIS', 'U VAC'] or my_note>=50.) else 'red';
         if fontcolor=='red' and compensation: fontcolor='orange';
 
         ### Result
-        notes_string+= [ Paragraph('<para align="center"><b>' + ue + '</b><br />' + \
-             '<font color=\'grey\' size=\'8\'><super>[' + UEs[ue]['nom'].replace('0','') + ' - ' + str(UEs[ue]['ects']) + ' ECTS]</super></font><br />' + \
-            '<font color=' + fontcolor + '>' + current_note + '</font>'+validation_tag+'</para>', getSampleStyleSheet()['BodyText'])];
+        tmp_string= '<para align="center"><b>' + ue + '</b><br />' + \
+             '<font color=\'grey\' size=\'8\'><super>[' + UEs[ue]['nom'].replace('0','') + ' - ' + str(UEs[ue]['ects']) + ' ECTS]</super></font><br />';
+        if 'note2' in notes[ue].keys():
+            current_note =  current_note.replace('<br />',' ').replace('#','[#').replace('</font>',']</font>').replace('8','7');
+            tmp_string = tmp_string + '<font color=' + fontcolor + ' size=\'7\'>' + current_note + '</font><br />';
+            tmp_string = tmp_string + '<font size = \'7\' color=' + fontcolor2 + '>' + current_note2 + '</font>'
+        else:
+            tmp_string = tmp_string + '<font color=' + fontcolor + '>' + current_note + '</font>';
+        tmp_string = tmp_string + validation_tag + '</para>';
+
+        notes_string+= [ Paragraph(tmp_string, getSampleStyleSheet()['BodyText'])];
         counter+=1;
 
     ## Ajout de cases blanches
@@ -211,10 +248,11 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
 
     # Etudiant data
     full = pv["full"]; del pv["full"];
+    full2= pv["full2"]; del pv["full2"];
     for etu in GetList(pv.values()):
          # initialisation etudiant
          logger.debug("etudiant = " + str(etu));
-         moyenne_annee = 0.;
+         moyenne_annee = 0.; moyenne_annee2= 0.;
 
          ## Parcours
          my_parcours = parcours;
@@ -233,6 +271,26 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
                  except: my_parcours = 'DM Phys';
          logger.debug("  > Parcours = " + my_parcours);
 
+         ## Blocs disciplinaire
+         disc = '';
+         if parcours == 'DM':
+             all_sems = [x for x in pv.keys() if etu[0] in pv[x].keys() and 'Session1' in x];
+             maj1=0; maj2=0;
+             coe1=0; coe2=0;
+             for sem in all_sems:
+                 maj1 = maj1 + pv[sem][etu[0]]['results'][sem]['MAJ1'][0];
+                 maj2 = maj2 + pv[sem][etu[0]]['results'][sem]['MAJ2'][0];
+                 coe1 = coe1 + pv[sem][etu[0]]['results'][sem]['MAJ1'][1];
+                 coe2 = coe2 + pv[sem][etu[0]]['results'][sem]['MAJ2'][1];
+             maj1 = maj1/coe1; maj2 = maj2/coe2;
+             col1 = 'red' if maj1 < 50 else 'black';
+             col2 = 'red' if maj2 < 50 else 'black';
+             if maj1 < 50: logger.warning(etu[1] + " (" + str(etu[0]) + ")] : Bloc Phys non valide [" + '{:.3f}'.format(maj1) + '/100]');
+             if maj2 < 50: logger.warning(etu[1] + " (" + str(etu[0]) + ")] : Bloc " +  UEs[MIN[-1]]['nom'][3:-1] + " non valide [" + '{:.3f}'.format(maj2) + '/100]');
+             disc =  '<br />MAJ1 : <font color=' + col1 + '> ' + '{:.3f}'.format(maj1) + '/100</font>' + \
+                     '<br />MAJ2 : <font color=' + col2 + '> ' + '{:.3f}'.format(maj2) + '/100</font>';
+
+
          ## Header etudiant
          etu_id = Paragraph('<para align="center"><b>' + etu[1] + '<br />' + str(etu[0]) + '</b><br /><br />' + my_parcours + '</para>',getSampleStyleSheet()['BodyText']);
          nbr_semestres = len([y for y in [etu[0] in pv[x].keys() for x in semestres] if y]);
@@ -245,7 +303,11 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
          if full[str(etu[0])] !='ENCO':
              moyenne_annee = full[str(etu[0])][0];
              colour_annee      = 'red' if moyenne_annee<10 else 'black';
-         logger.debug("  > " + str(moyenne_annee) + ' (' + colour_annee + ')');
+         logger.debug("  > Session1 : " + str(moyenne_annee) + ' (' + colour_annee + ')');
+         if full2[str(etu[0])] !='ENCO':
+             moyenne_annee2 = full2[str(etu[0])][0];
+             colour_annee2      = 'red' if moyenne_annee2<10 else 'black';
+         if moyenne_annee!=moyenne_annee2: logger.debug("  Session 2 : > " + str(moyenne_annee2) + ' (' + colour_annee2 + ')');
 
          ## Real loop over the semesters
          for semestre in semestres:
@@ -260,25 +322,31 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
             ### First cell of the table
             dep = 0 if nbr_semestres==1 else 1; nbr_semestres-=1;
             line_style = GetLineStyle(dep, semestre==semestres[-1] and etu == GetList(pv.values())[-1]);
-            if full[str(etu[0])] !='ENCO':
-                if dep==0 and nbr_semestres==(max_semestres-1):
-                    etu_id = [etu_id, Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>' + '{:.3f}'.format(moyenne_annee) + \
-                      '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full[str(etu[0])][1] + ')</font></para>', getSampleStyleSheet()['BodyText'])];
-                elif dep==0:
-                    etu_id = [Paragraph('<para align="center"><br /></para>',getSampleStyleSheet()['BodyText']), \
-                              Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>' + '{:.3f}'.format(moyenne_annee) + \
-                              '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full[str(etu[0])][1] + ')</font></para>', getSampleStyleSheet()['BodyText'])
-                    ];
+
+            sess1=''; sess2='';
+            if full[str(etu[0])]=='ENCO':
+                sess1 = '<b>Session1 = <font color=' + colour_annee + '>ENCO</font></b>';
             else:
-                if dep==0 and nbr_semestres==(max_semestres-1):
-                    etu_id = [etu_id, Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>ENCO</font></b></para>', getSampleStyleSheet()['BodyText'])];
-                elif dep==0:
-                    etu_id = [Paragraph('<para align="center"><br /></para>',getSampleStyleSheet()['BodyText']), \
-                              Paragraph('<para align="center"><b>Session1 = <font color=' + colour_annee + '>ENCO</font></b></para>', getSampleStyleSheet()['BodyText'])
-                    ];
+                sess1 =  '<b>Session1 = <font color=' + colour_annee + '>' + \
+                     '{:.3f}'.format(moyenne_annee) + '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full[str(etu[0])][1] +\
+                     ')</font>';
+
+            if moyenne_annee!=moyenne_annee2 and full2[str(etu[0])]=='ENCO':
+                sess2 = '<b>Session2 = <font color=' + colour_annee + '>' + 'ENCO</font></b>';
+            elif moyenne_annee!=moyenne_annee2:
+                sess2 =  '<b>Session2 = <font color=' + colour_annee2 + '>' + \
+                     '{:.3f}'.format(moyenne_annee2) + '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full2[str(etu[0])][1] +\
+                     ')</font>';
+
+            if dep==0 and nbr_semestres==(max_semestres-1):
+                etu_id = [etu_id, Paragraph('<para align="center">' + sess1 + '<br />' + sess2 + disc + '</para>', getSampleStyleSheet()['BodyText'])];
+            elif dep==0:
+                etu_id = [Paragraph('<para align="center"><br /></para>',getSampleStyleSheet()['BodyText']), \
+                          Paragraph('<para align="center">' + sess1 + '<br />' + sess2 + disc + '</para>', getSampleStyleSheet()['BodyText'])];
+
 
             ### Second cell of the table
-            header_semestre = GetAverages(semestre, pv_ind['results'], blocs_maq, moyenne_annee);
+            header_semestre = GetAverages(parcours, semestre, pv_ind['results'], blocs_maq, [moyenne_annee, moyenne_annee2]);
 
             ### Notes des UE
             num_ue = GetLength(semestres, parcours);
@@ -297,41 +365,5 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
             t = Table(line_data, colWidths=[7*cm,3.7*cm]+[2.6*cm]*GetLength(semestres, parcours), style=line_style);
             story.append(t);
 
-    ## # Summary headers
-    ## story.append(Spacer(1, 1*cm));
-    ## story.append(Paragraph('<u>Statistiques</u>', getSampleStyleSheet()['Heading2']));
-    ## Headers = [[ Paragraph('<para align="center"><b>'+ x + '</b></para>', getSampleStyleSheet()["BodyText"]) for x in semestres]];
-    ## story.append(Table(Headers, [7.5*cm]*len(semestres), style=[
-    ##         ('BACKGROUND', (0,0), (-1, 0),   colors.khaki),
-    ##         ('BOX',        (0,0), (-1, 0),2, colors.black),
-    ##         ('BOX',        (1,0), ( 1,-1),2, colors.black),
-    ##         ('VALIGN',     (0,0), (-1, -1),  'MIDDLE'),
-    ##         ('ALIGN',      (0,0), (-1, -1),  'CENTER')
-    ## ]));
-
-    ## # getting summary data
-    ## sums_str = []; adm_str = []; comp_str = []; fail_str = []; null_str = [];
-    ## for s in semestres:
-    ##     sums = [[pv[s][x]['results']['00-total']['note'], compensation[s][x] ] for x in pv[s].keys() if isinstance(x, int)];
-    ##     adm  = len ([x for x in sums if x[0]!=None and float(x[0])>=10. and not x[1] ]);
-    ##     comp = len ([x for x in sums if x[0]!=None and float(x[0])>=10. and x[1] ]);
-    ##     fail = len ([x for x in sums if x[0]!=None and float(x[0])<10.]);
-    ##     null = len(sums)-adm-comp-fail;
-
-    ##     # formatting
-    ##     adm_str.append (Paragraph('  * ' + str(adm) + ' admis ('          + '{:.2f}'.format(100* adm/len(sums))+'%)', getSampleStyleSheet()['Heading4']));
-    ##     comp_str.append(Paragraph('  * ' + str(comp)+ ' compenses ('      + '{:.2f}'.format(100*comp/len(sums))+'%)', getSampleStyleSheet()['Heading4']));
-    ##     fail_str.append(Paragraph('  * ' + str(fail)+ ' ajournes ('       + '{:.2f}'.format(100*fail/len(sums))+'%)', getSampleStyleSheet()['Heading4']));
-    ##     null_str.append(Paragraph('  * ' + str(null)+ ' sans resultats (' + '{:.2f}'.format(100*null/len(sums))+'%)', getSampleStyleSheet()['Heading4']));
-
-    ## # adding the lines to the table
-    ## my_style =  [ ('LINEAFTER', (0,0), (-1,-1),2, colors.black), ('LINEBEFORE', (0,0), (-1,-1),2, colors.black) ];
-    ## story.append(Table([ adm_str], [7.5*cm]*len(semestres),style=my_style));
-    ## story.append(Table([comp_str], [7.5*cm]*len(semestres),style=my_style));
-    ## story.append(Table([fail_str], [7.5*cm]*len(semestres),style=my_style));
-    ## my_style.append(('LINEBELOW', (0,0), (-1,-1),2, colors.black));
-    ## story.append(Table([null_str], [7.5*cm]*len(semestres),style=my_style));
-
-    # printing 
     pv_file.build(story);
 

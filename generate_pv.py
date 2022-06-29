@@ -96,6 +96,7 @@ else:
 ## Obtention des infos et verifications
 from xml_reader import GetXML, DecodeXML;
 from pv_checker import SanityCheck;
+from session_merger import Merge;
 all_PVs = {};
 for semestre in semestres:
     logger.info("Lecture da la version XML du PV pour le semestre " + semestre);
@@ -117,6 +118,17 @@ for semestre in semestres:
         PV_semestre = DecodeXML(PV_semestre);
     print("         *** Verification des moyennes du PV");
     all_PVs[semestre] = SanityCheck(PV_semestre, parcours, semestre);
+
+## Merging 1st and 2nd session
+for sess2 in [x for x in all_PVs.keys() if "Session2" in x]:
+    # safety
+    if not sess2.replace('2', '1') in all_PVs.keys():
+        logger.error('2nde session disponible (' + sess2+') pour un semestre sans 1ere session');
+        all_PVs[sess2.replace('2','1')] = all_PVs[sess2];
+    # merging 
+    all_PVs[sess2.replace('2','1')] = Merge(all_PVs[sess2.replace('2','1')], all_PVs[sess2]);
+    del all_PVs[sess2];
+semestres = [x for x in semestres if not 'Session2' in x];
 
 ## Statistics
 from statistics import GetStatistics, GetMoyenneAnnuelle;
