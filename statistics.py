@@ -96,8 +96,8 @@ def GetStatistics(pv, parcours, semestre):
            mynote2 = data_UE['note2'] if ('note2' in data_UE.keys() and data_UE['note2'] not in ['U VAC', 'DIS', 'COVID', 'ENCO']) else '';
            if 'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO']:
                notes[key].append(data_UE['note']);
-               if mynote2!='': notes2[key].append(mynote2);
-               else          : notes2[key].append(data_UE['note']);
+           if mynote2!='': notes2[key].append(mynote2);
+           elif  'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO']: notes2[key].append(data_UE['note']);
 
     # formatting
     for key in notes.keys() : notes[key]  = sorted([float(x) for x in  notes[key]],reverse=True);

@@ -107,7 +107,7 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee):
         sess1 += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking']+')</font>';
     else:
         sess1 = '<b>' + semestre.replace('_Session1','')  + ' :<br />  <font color=' + my_color + '>ENCO</font></b>';
-    if 'note2' in notes['total'].keys():
+    if 'note2' in notes['total'].keys() and notes['total']['note2'] != notes['total']['note']:
         if notes['total']['note2']!='ENCO':
             sess2  = '<br /><b><font color=' + my_color2 + '>'+ '{:.3f}'.format(notes['total']['note2']) + '/20</font></b>';
             sess2 += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking2']+')</font>';
@@ -183,7 +183,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
         ### Result
         tmp_string= '<para align="center"><b>' + ue + '</b><br />' + \
              '<font color=\'grey\' size=\'8\'><super>[' + UEs[ue]['nom'].replace('0','') + ' - ' + str(UEs[ue]['ects']) + ' ECTS]</super></font><br />';
-        if 'note2' in notes[ue].keys():
+        if 'note2' in notes[ue].keys() and current_note.split('<')[0] != current_note2.split('<')[0]:
             current_note =  current_note.replace('<br />',' ').replace('#','[#').replace('</font>',']</font>').replace('8','7');
             tmp_string = tmp_string + '<font color=' + fontcolor + ' size=\'7\'>' + current_note + '</font><br />';
             tmp_string = tmp_string + '<font size = \'7\' color=' + fontcolor2 + '>' + current_note2 + '</font>'
