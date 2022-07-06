@@ -140,9 +140,9 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
     ## Initialisation
     notes_string = [];
     counter = 0;
-    compensation = ( moyenne_annee>=10. or float(notes['total']['note'])>10.) if notes['total']['note']!= 'ENCO' else False;
+    compensation = ( moyenne_annee[0]>=10. or float(notes['total']['note'])>10.) if notes['total']['note']!= 'ENCO' else False;
     compensation2 = False;
-    if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee>=10. or float(notes['total']['note2'])>10.) if notes['total']['note']!= 'ENCO' else False;
+    if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee[1]>=10. or float(notes['total']['note2'])>10.) if notes['total']['note']!= 'ENCO' else False;
 
     ## Boucle sur les UE
     for ue in (ues+[x for x in notes.keys() if (x in GrosSac.keys() or x in GrosSacP2.keys())and not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN']  ):
@@ -157,13 +157,13 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
 
         # Mineure
         if ue.startswith('LU') and not ('PY' in ue or 'LV' in ue or ue in ['LU3ME010']): continue;
-        if ue.startswith('L5PH') or ue.startswith('L3LACH') or ue.startswith('L6PH'): continue;
+        if ue.startswith('L5PH') or ue.startswith('L3LACH') or ue.startswith('L4LACH') or ue.startswith('L6PH'): continue;
 
         ### Redoublant deja valide
         validation_tag = "<br /><font color='grey' size='8'>("+notes[ue]['annee_val']+')</font>' if notes[ue]['annee_val']!=None else '';
 
         ### Note session 2 + formattage
-        current_note2='';
+        current_note2=''; fontcolor2='black';
         if 'note2' in notes[ue].keys():
             my_note2 = notes[ue]['note2'];
             current_note2 = '{:.2f}'.format(my_note2)+'/100' if not my_note2 in ['ABI', 'DIS', 'COVID', 'ENCO', 'U VAC'] else my_note2.replace('COVID','???');
@@ -179,6 +179,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
 
         fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note in ['ENCO', 'DIS', 'U VAC'] or my_note>=50.) else 'red';
         if fontcolor=='red' and compensation: fontcolor='orange';
+        if (not 'note2' in notes[ue].keys() or current_note.split('<')[0] == current_note2.split('<')[0]) and compensation2 and fontcolor=='red': fontcolor='orange';
 
         ### Result
         tmp_string= '<para align="center"><b>' + ue + '</b><br />' + \
@@ -359,7 +360,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];
             logger.debug("  > List UEs = " + str(list_ues));
-            etu_notes = GetNotes(pv_ind['results'], list_ues, num_ue, moyenne_annee);
+            etu_notes = GetNotes(pv_ind['results'], list_ues, num_ue, [moyenne_annee, moyenne_annee2]);
 
             ### Adding the line to the table
             line_data = [[etu_id, header_semestre] + etu_notes];

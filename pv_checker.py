@@ -104,6 +104,9 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3.keys() and missing_ue in GrosSac3[x] ];
              if missing_ue=='LU3PY122' and not any([ (x in data_pv.keys()) for x in ['LU3PY231', 'LU3PY232', 'LU3PY233', 'LU3PY234', 'LU3PY235']]) and 'LU3PY033' in data_pv.keys(): grossac=['LU3PY033']
 
+             # specific patch
+             if etu_id =='28716431' and semestre=='S5' and missing_ue=='LU3PY121': grossac=['LU3PY011', 'LU3LVAN1'];
+
              # test si l'UE fait partie du 1er gros sac
              if len(grossac)>0:
                  annee = data_pv[grossac[0]]['note'];
@@ -118,6 +121,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                      elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSac2.keys() and missing_ue == GrosSac2[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSac3.keys() and missing_ue == GrosSac3[grossac[0]][-1]: used_ues += grossac;
+
 
              # On a vraiment une UE manquante -> COVID
              elif not missing_ue+'_GS' in data_pv.keys():
@@ -264,7 +268,7 @@ def SanityCheck(pv, parcours, semestre):
             if 'UE' not in data_UE.keys(): continue;
 
             ## Hack double majeure et MAJ/Min math L2
-            if my_label in ['LK3PYDM0', 'LK4PYDM0', 'LY3PYJ10', 'LK4PYJ10', 'LK4PYJ20', 'LK6PY090', 'LK3PYDK0']: continue;
+            if my_label in ['LK3PYMI0', 'LK3PYDM0', 'LK4PYDM0', 'LY3PYJ10', 'LK4PYJ10', 'LK4PYJ20', 'LK6PY090', 'LK3PYDK0']: continue;
 
             ## Patch pour le PV des L2
             if my_label.startswith('LY'):

@@ -44,6 +44,9 @@ def Merge(session1, session2):
                 del results[etudiant]['results'][to_remove[0]];
 
             # no second session
+            if not ue in session2[etudiant]['results'].keys():
+                logger.warning(ue + ' manquant dans le PV de ' + results[etudiant]['nom'] + ' (' + str(etudiant) + ')')
+                session2[etudiant]['results'][ue] = session1[etudiant]['results'][ue]
             if session2[etudiant]['results'][ue]['annee_val']!=None: continue;
 
             # saving information
