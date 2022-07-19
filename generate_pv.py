@@ -131,7 +131,7 @@ for sess2 in [x for x in all_PVs.keys() if "Session2" in x]:
 semestres = [x for x in semestres if not 'Session2' in x];
 
 ## Statistics
-from statistics import GetStatistics, GetMoyenneAnnuelle;
+from stat_efu import GetStatistics, GetMoyenneAnnuelle;
 for semestre in semestres:
     logger.info("Generation des satistique du PV pour le semestre " + semestre);
     all_PVs[semestre] = GetStatistics(all_PVs[semestre], parcours, semestre);
@@ -142,4 +142,9 @@ all_PVs = GetMoyenneAnnuelle(all_PVs);
 from pv_writer  import PDFWriter;
 logger.info("Creation de la version PDF du PV " + parcours + " (" + annee + ")");
 PDFWriter(all_PVs, annee, niveau, parcours, semestres);
+
+# CSV writer
+from csv_converter import merge
+merged_pvs = merge(all_PVs);
+
 

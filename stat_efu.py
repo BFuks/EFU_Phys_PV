@@ -69,6 +69,8 @@ def GetMoyenneAnnuelle(pv):
 
     return pv;
 
+
+
 def GetStatistics(pv, parcours, semestre):
 
     # UEs
