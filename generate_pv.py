@@ -144,7 +144,6 @@ logger.info("Creation de la version PDF du PV " + parcours + " (" + annee + ")")
 PDFWriter(all_PVs, annee, niveau, parcours, semestres);
 
 # CSV writer
-from csv_converter import merge
-merged_pvs = merge(all_PVs);
-
-
+from csv_converter import merge, convert
+merged_pvs = convert(merge(all_PVs));
+print(merged_pvs)

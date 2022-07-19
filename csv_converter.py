@@ -16,7 +16,7 @@ logger = logging.getLogger('mylogger');
 
 ##########################################################
 ###                                                    ###
-###                 Core function                      ###
+###                Cleaning and merging                ###
 ###                                                    ###
 ##########################################################
 def clean(ue):
@@ -45,5 +45,25 @@ def merge(pv):
             if student in new_pv.keys(): new_pv[student] = {**new_pv[student], **new_individual_pv};
             else                       : new_pv[student] = new_individual_pv;
 
-    return students;
+    return new_pv;
+
+import pandas;
+def convert(pv):
+
+    # Convert nest dictionaries into tuples
+    reformed_dict = {}
+    for outerKey, innerDict in pv.items():
+        for innerKey, value in innerDict.items():
+            if innerKey=='nom':  reformed_dict[(outerKey, innerKey, 0)] = value
+            else:
+                for mykey, myvalue in value.items():
+                    reformed_dict[(outerKey, innerKey, mykey)] = myvalue
+
+    print(reformed_dict)
+
+    # Tp Panda dataframe
+    multiIndex_df = pandas.DataFrame(reformed_dict)
+
+    # exit
+    return multiIndex_df
 
