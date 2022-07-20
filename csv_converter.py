@@ -53,17 +53,22 @@ def convert(pv):
     # Convert nest dictionaries into tuples
     reformed_dict = {}
     for outerKey, innerDict in pv.items():
+        individual_pv = {}
         for innerKey, value in innerDict.items():
-            if innerKey=='nom':  reformed_dict[(outerKey, innerKey, 0)] = value
+            if innerKey=='nom':
+                individual_pv[(innerKey,innerKey)]=value
+#reformed_dict[(outerKey, innerKey, 0)] = value
             else:
                 for mykey, myvalue in value.items():
-                    reformed_dict[(outerKey, innerKey, mykey)] = myvalue
+                    individual_pv[(innerKey,mykey)] = myvalue
+        reformed_dict[outerKey] = individual_pv
 
-    print(reformed_dict)
+#    print(reformed_dict)
 
     # Tp Panda dataframe
     multiIndex_df = pandas.DataFrame(reformed_dict)
+    multiIndex_dfT = multiIndex_df.transpose()
 
     # exit
-    return multiIndex_df
+    return multiIndex_dfT
 
