@@ -57,7 +57,6 @@ def convert(pv):
         for innerKey, value in innerDict.items():
             if innerKey=='nom':
                 individual_pv[(innerKey,innerKey)]=value
-#reformed_dict[(outerKey, innerKey, 0)] = value
             else:
                 for mykey, myvalue in value.items():
                     individual_pv[(innerKey,mykey)] = myvalue
