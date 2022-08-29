@@ -131,7 +131,7 @@ def DecodeXMLStats(xml_data, structure=apogee_stats):
         else: logger.warning('VET inconnue : ' + stats_individuel['parcours'] + ' (' + stats_individuel['nom'] + ')');
 
         # Numero etudiant  = key du dico
-        id_su = stats_individuel['id_su'];
+        id_su = int(stats_individuel['id_su']);
         del stats_individuel['id_su'];
 
         # Etudiant avec deux inscriptions -> fusion des blocs
@@ -143,6 +143,7 @@ def DecodeXMLStats(xml_data, structure=apogee_stats):
               # cleaning (UE isolees != parcours
               if k=='parcours':
                   decoded_data[id_su][k] = [x for x in decoded_data[id_su][k] if x !='UE isolee'];
+                  if any([ 'DM' in x for x in decoded_data[id_su][k] ]) and any([ 'DK' in x for x in decoded_data[id_su][k] ]): decoded_data[id_su][k] = [x for x in decoded_data[id_su][k] if 'DK' in x];
                   if len(decoded_data[id_su][k])==1: decoded_data[id_su][k] = decoded_data[id_su][k][0];
 
               # cleaning : etre boursier n'est pas une superposition

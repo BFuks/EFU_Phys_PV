@@ -46,15 +46,35 @@ if len(years) == 0:
   Bye();
 
 ## Obtention des infos et verifications
-from xml_reader import GetXMLStats, DecodeXMLStats;
-# from pv_checker import SanityCheck;
-# from session_merger import Merge;
+from xml_reader     import GetXMLStats, DecodeXMLStats, GetXML, DecodeXML;
+from pv_stat_merger import PVtoStats;
+from pv_checker import SanityCheck;
+import glob;
+import os;
 all_stats = {};
 for year in years:
     logger.info("Lecture da la version XML des stats pour l'annee " + year);
+    # traitement 24
     print("         *** Decodage des infos dans le traitement 24");
     ind_stats = GetXMLStats(year);
     ind_stats = DecodeXMLStats(ind_stats);
+
+    # PVs
+    print("         *** Extraction de l'information des PVs");
+    pvs = [x.split('/')[-1] for x in glob.glob(os.path.join(os.getcwd(), 'data/L*')) if year in x ];
+    i=0
+    for pv_name in pvs:
+        print(pv_name);
+        niveau = pv_name.split('_')[0];
+        semestre = pv_name.split('_')[3] + '_' +pv_name.split('_')[4];
+        parcours = pv_name.split('_')[5].split('.')[0];
+        PV = GetXML(niveau, year, semestre, parcours);
+        PV = SanityCheck(DecodeXML(PV),parcours,semestre);
+        ind_stats = PVtoStats(ind_stats, PV, semestre);
+        if i!=2:i+=1;
+        else: break;
+
+    # save 
     all_stats[year] = ind_stats;
 
 # en attendant, a fixer plus tard
