@@ -31,6 +31,16 @@ def GetXML(niveau, annee, semestre, parcours):
     # output
     return tree;
 
+def GetXMLStats(annee):
+
+    # reading
+    data = open(os.path.join(os.getcwd(),'data', 'stats_'+annee+'.dat'), encoding='ISO-8859-1');
+    for line in data: tree = ET.parse(data).getroot();
+    data.close();
+
+    # output
+    return tree;
+
 
 ##########################################################
 ###                                                    ###
@@ -80,6 +90,73 @@ def DecodeXML(xml_data, structure=Struct):
     #output
     return decoded_data;
 
+
+
+from apogee_config import apogee_stats, apogee_bloc_stats;
+def DecodeXMLStats(xml_data, structure=apogee_stats):
+    # Initialisation
+    decoded_data = {};
+
+    # Navigation dans l'arbre XML
+    for child in xml_data:
+
+        # Elements de structure generaux
+        if 'irrelevant' in structure.keys() and child.tag in structure['irrelevant']: continue;
+        elif not child.tag in structure.keys():
+            logger.error("Element Apogee inconnu (a ajouter dans apogee_stats) : " + child.tag)
+            Bye();
+        elif child.tag in structure.keys() and structure[child.tag] != {}:
+            decoded_data.update(DecodeXMLStats(child, structure[child.tag]));
+            continue;
+
+        # stats individuelles pour un etudiant
+        elif child.tag in ['G_COD_ETU']: stats_individuel = DecodeBlocStats(child, apogee_bloc_stats);
+
+        # Boursier ?
+        stats_individuel['bourse']='non' if stats_individuel['bourse']==None else 'oui';
+
+        # Parcours
+        if   stats_individuel['parcours'] == 'L2PY01(20)': stats_individuel['parcours'] = 'L2 MONO';
+        elif stats_individuel['parcours'] == 'L3PY01(21)': stats_individuel['parcours'] = 'L3 MONO';
+        elif stats_individuel['parcours'] == 'V2PY01(20)': stats_individuel['parcours'] = 'L2 Bi-Di';
+        elif stats_individuel['parcours'] == 'V3PY01(21)': stats_individuel['parcours'] = 'L3 Bi-Di';
+        elif stats_individuel['parcours'] == 'Q2PYDM(21)': stats_individuel['parcours'] = 'L2 DM';
+        elif stats_individuel['parcours'] == 'Q3PYDM(21)': stats_individuel['parcours'] = 'L3 DM';
+        elif stats_individuel['parcours'] in ['Q2PYDK(20)', 'Q2PHSX(19)']: stats_individuel['parcours'] = 'L2 DK';
+        elif stats_individuel['parcours'] in ['Q3PYDK(21)', 'Q3PHSX(19)']: stats_individuel['parcours'] = 'L3 DK';
+        elif stats_individuel['parcours'] == 'L2PY51(20)': stats_individuel['parcours'] = 'L2 CMI';
+        elif stats_individuel['parcours'] == 'L3PY51(21)': stats_individuel['parcours'] = 'L3 CMI';
+        elif stats_individuel['parcours'] == 'P3PY01(19)': stats_individuel['parcours'] = 'L3 LIOVIS';
+        elif stats_individuel['parcours'] == 'W1SX03(19)': stats_individuel['parcours'] = 'UE isolee';
+        else: logger.warning('VET inconnue : ' + stats_individuel['parcours'] + ' (' + stats_individuel['nom'] + ')');
+
+        # Numero etudiant  = key du dico
+        id_su = stats_individuel['id_su'];
+        del stats_individuel['id_su'];
+
+        # Etudiant avec deux inscriptions -> fusion des blocs
+        if id_su in decoded_data.keys():
+          for k,v in stats_individuel.items():
+              if v==decoded_data[id_su][k]: continue;
+              decoded_data[id_su][k] = [ decoded_data[id_su][k], v ];
+
+              # cleaning (UE isolees != parcours
+              if k=='parcours':
+                  decoded_data[id_su][k] = [x for x in decoded_data[id_su][k] if x !='UE isolee'];
+                  if len(decoded_data[id_su][k])==1: decoded_data[id_su][k] = decoded_data[id_su][k][0];
+
+              # cleaning : etre boursier n'est pas une superposition
+              if k=='bourse':
+                  decoded_data[id_su][k]='oui'if 'oui' in decoded_data[id_su][k] else 'non';
+
+        # Cas standard
+        else: decoded_data[id_su] = stats_individuel;
+
+    #output
+    return decoded_data;
+
+
+
 ##########################################################
 ###                                                    ###
 ###          Decodage d'un bloc d'information          ###
@@ -110,6 +187,35 @@ def DecodeBloc(xml_data, structure):
 
     # output
     return bloc_individuel;
+
+
+
+def DecodeBlocStats(xml_data, structure):
+    # init
+    bloc_individuel = {};
+
+    # decoding the data
+    for child in xml_data:
+        # elements inutiles
+        if child.tag in structure['irrelevant']: continue;
+
+        # element a sauvegarder
+        elif child.tag in structure['relevant'].keys():
+            # name defined through NOM_USUEL -> safety
+            if child.tag=='NOM' and 'nom' in bloc_individuel.keys() and not bloc_individuel['nom']!=None: continue;
+            if child.tag=='NOM_USUEL' and child.text==None: continue;
+            #  general case -> saving information
+            bloc_individuel[structure['relevant'][child.tag]] = child.text;
+
+        # safety check
+        else:
+            logger.error('Tag XML inconnu (au sein d\'un bloc XML) : ' + child.tag);
+            Bye();
+
+    # output
+    return bloc_individuel;
+
+
 
 
 ##########################################################

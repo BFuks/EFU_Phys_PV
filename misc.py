@@ -76,6 +76,29 @@ def GetPVList():
 
 ##########################################################
 ###                                                    ###
+###    Liste des annees disponibles pour les stats     ###
+###                                                    ###
+##########################################################
+def GetStatList():
+    # Init
+    dico = [];
+
+    # liste des ficheirs disponibles
+    for myfile in glob.glob(os.path.join(os.getcwd(), 'data/stat*')):
+
+        # infos generales sur le PV
+        stat_data = myfile.split('/')[-1].split('.')[0].split('_');
+        year     = stat_data[-2]+'_'+stat_data[-1];
+
+        # sauvegarde des infos
+        dico.append(year);
+
+    # Output
+    return dico;
+
+
+##########################################################
+###                                                    ###
 ###                List flattening                     ###
 ###                                                    ###
 ##########################################################

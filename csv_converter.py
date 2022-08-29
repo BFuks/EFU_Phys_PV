@@ -47,6 +47,13 @@ def merge(pv):
 
     return new_pv;
 
+
+
+##########################################################
+###                                                    ###
+###             Main function: dic -> CSV              ###
+###                                                    ###
+##########################################################
 import pandas;
 def convert(pv):
 
@@ -62,12 +69,44 @@ def convert(pv):
                     individual_pv[(innerKey,mykey)] = myvalue
         reformed_dict[outerKey] = individual_pv
 
-#    print(reformed_dict)
-
-    # Tp Panda dataframe
+    # To Panda dataframe
     multiIndex_df = pandas.DataFrame(reformed_dict)
     multiIndex_dfT = multiIndex_df.transpose()
 
     # exit
     return multiIndex_dfT
+
+
+def StatConverter(stats):
+    multiIndex_df = pandas.DataFrame(stats);
+    multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annees', 'parcours', 'bourse', 'mail']];
+    return multiIndex_dfT
+
+
+
+##########################################################
+###                                                    ###
+###            Excel sheet generation                  ###
+###                                                    ###
+##########################################################
+def ToExcel(stats):
+
+    # From dictionnary to Excel
+    writer = pandas.ExcelWriter('output/stats_2021_2022.xlsx');
+    stats.to_excel(writer, sheet_name='Statistiques 2021_2022', index=True, header=True);
+
+    # Column size
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['A'].width = 12;
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['B'].width = 25;
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['C'].width = 25;
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['D'].width =  6;
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['E'].width = 12;
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['F'].width = 11;
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['G'].width = 13;
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['H'].width =  6;
+    writer.sheets['Statistiques 2021_2022'].column_dimensions['I'].width = 25;
+
+    #save and exit
+    writer.save();
+    return;
 
