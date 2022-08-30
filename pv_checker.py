@@ -231,7 +231,8 @@ def CalculBlocsDisc(pv_etu, semestre):
     ues = [x for x in pv_etu.keys() if 'LU' in x and not 'LV' in x and not 'OIP' in x];
     phys= [x for x in BlocsDisc[semestre]['PY'] if all([y in ues for y in x])][0];
     tag = list(set([x[3:5] for x in [y.replace('SX','') for y in ues] if x[3:5]!='PY']))[0];
-    MIN = [x for x in BlocsDisc[semestre][tag] if all([y in ues for y in x])][0];
+    try:    MIN = [x for x in BlocsDisc[semestre][tag] if all([y in ues for y in x])][0];
+    except: MIN = '';
 
     # calcul de la moyenne
     MAJ1 = [ [float(str(pv_etu[x]['note']).replace('COVID','0')), UEs[x]['ects']] for x in phys if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];

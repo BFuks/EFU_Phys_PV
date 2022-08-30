@@ -87,6 +87,7 @@ def StatConverter(stats):
             else:
                 for mykey, myvalue in value.items(): 
                    val = 0. if myvalue=='COVID' else myvalue;
+                   if val in ['DIS', 'ENCO']: continue;
                    individual_stats[(innerKey,mykey.replace('_Session1','').replace('_Session2',''))] = "{:5.2f}".format(round(val,2));
         reformed_dict[str(outerKey)] = individual_stats;
 

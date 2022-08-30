@@ -21,11 +21,10 @@ logger = logging.getLogger('mylogger');
 ###                                                    ###
 ##########################################################
 Relevant = {
-  'LU2PY041': 'Ph.Act.',
-  'LU2PY103': 'Thermo ',
+  'LU2PY103': 'Thermo1',
   'LU2PY104': 'MecaAv ',
   'LU2PY110': 'Math-1 ',
-  'LU2PY121': 'OEM    ',
+  'LU2PY121': 'OEM-1  ',
   'LU2PY123': 'Math-3 ',
   'LU2PY124': 'Relat  ',
   'LU2PY212': 'Ph.Ex-1',
@@ -40,9 +39,39 @@ Relevant = {
   'LU2PY424': 'Relat  ',
   'LU2PY520': 'Math-2 ',
   'LU2PY531': 'Astro  ',
-  'LU2PY532': 'ML     '
+  'LU2PY532': 'ML     ',
+  'LU3PY101': 'Ph.Qu-1',
+  'LU3PY103': 'Thermo2',
+  'LU3PY105': 'Stage  ',
+  'LU3PY111': 'Ph.Qu-2',
+  'LU3PY121': 'OEM-2  ',
+  'LU3PY122': 'PhExNum',
+  'LU3PY124': 'PrExNum',
+  'LU3PY125': 'ProjInt',
+  'LU3PY205': 'Stage  ',
+  'LU3PY213': 'Math-4 ',
+  'LU3PY214': 'MilCont',
+  'LU3PY215': 'Ph.Ex-3',
+  'LU3PY231': 'Mat.Mat',
+  'LU3PY232': 'Astro  ',
+  'LU3PY233': 'Ph.Theo',
+  'LU3PY234': 'OcAtRen',
+  'LU3PY235': 'MecAnal',
+  'LU3PY401': 'Ph.Qu-1',
+  'LU3PY403': 'Thermo2',
+  'LU3PY411': 'Ph.Qu-2',
+  'LU3PY421': 'OEM-2  ',
+  'LU3PY513': 'Math-4 ',
+  'LU3PY514': 'MilCont',
+  'LU3PY536': 'MecaApp',
+  'LU3PY537': 'InfoQu '
 }
-Irrelevant = [];
+Irrelevant = [
+  'LU2PY041', 'LU3PYOIP', 'LU3PY012', 'LU3PY013', 'LU3PY303', 'LU3PY020', 'LU3PY001',
+  'LU3PY015', 'LU3PY002', 'LU3PY021', 'LU3PY011', 'LU3PY010', 'LU3PY024', 'LU3PYSO3',
+  'LU3PY004', 'LU3PY022', 'LU3PY23X', 'LU3PYSO5', 'LU3PY033', 'LU3PY034', 'LU3PY031',
+  'LU3PY014'
+];
 
 ##########################################################
 ###                                                    ###
