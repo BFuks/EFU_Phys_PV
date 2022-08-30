@@ -21,6 +21,7 @@ logger = logging.getLogger('mylogger');
 ###                                                    ###
 ##########################################################
 Relevant = {
+  'LU2PY041': 'Ph.Act.',
   'LU2PY103': 'Thermo ',
   'LU2PY104': 'MecaAv ',
   'LU2PY110': 'Math-1 ',
@@ -35,17 +36,20 @@ Relevant = {
   'LU2PY404': 'MecaAv ',
   'LU2PY410': 'Math-1 ',
   'LU2PY421': 'OEM    ',
+  'LU2PY423': 'Math-3 ',
   'LU2PY424': 'Relat  ',
-  'LU2PY520': 'Math-2 '
+  'LU2PY520': 'Math-2 ',
+  'LU2PY531': 'Astro  ',
+  'LU2PY532': 'ML     '
 }
-Irrelevant = ['LU2PY532'];
+Irrelevant = [];
 
 ##########################################################
 ###                                                    ###
 ###                       Merger                       ###
 ###                                                    ###
 ##########################################################
-def PVtoStats(stats, pv, session):
+def PVtoStats(stats, pv, session, parcours):
 
     # init
     results = stats;
@@ -56,14 +60,17 @@ def PVtoStats(stats, pv, session):
         # no info on the student in this pv
         if not etudiant in stats.keys(): continue;
 
+        # Fix for SPRINT
+        if 'SPRINT' in parcours and 'MONO' in stats[etudiant]['parcours']: results[etudiant]['parcours']=stats[etudiant]['parcours'].replace('MONO','SPRINT');
+
         # Resultats
+        keyword = 'Session1' if 'Session1' in session else 'Session2';
         notes =  pv[etudiant]['results'];
-        results[etudiant]['notes'] = {};
+        if not 'notes ' + keyword in results[etudiant].keys(): results[etudiant]['notes ' + keyword] = {};
         for ue, details in notes.items():
-            if ue in Relevant:  results[etudiant]['notes'][Relevant[ue]]=details['note'];
-            elif ue == 'total': results[etudiant]['notes'][session] = details['note'];
-            elif not (ue in Irrelevant or not 'PY' in ue or 'LK' in ue):
-                logger.warning('UE a inclure dans les stats ? -> ' + ue);
+            if ue in Relevant:  results[etudiant]['notes ' + keyword][ue]=details['note'];
+            elif ue == 'total': results[etudiant]['notes ' + keyword][session] = details['note'];
+            elif not (ue in Irrelevant or not 'PY' in ue or 'LK' in ue): logger.warning('UE a inclure dans les stats ? -> ' + ue);
 
     # Exit
     return results;

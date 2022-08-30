@@ -63,15 +63,15 @@ for year in years:
     print("         *** Extraction de l'information des PVs");
     pvs = [x.split('/')[-1] for x in glob.glob(os.path.join(os.getcwd(), 'data/L*')) if year in x ];
     i=0
-    for pv_name in pvs:
+    for pv_name in sorted(pvs):
         print(pv_name);
         niveau = pv_name.split('_')[0];
         semestre = pv_name.split('_')[3] + '_' +pv_name.split('_')[4];
         parcours = pv_name.split('_')[5].split('.')[0];
         PV = GetXML(niveau, year, semestre, parcours);
         PV = SanityCheck(DecodeXML(PV),parcours,semestre);
-        ind_stats = PVtoStats(ind_stats, PV, semestre);
-        if i!=2:i+=1;
+        ind_stats = PVtoStats(ind_stats, PV, semestre, parcours);
+        if i!=17:i+=1;
         else: break;
 
     # save 
