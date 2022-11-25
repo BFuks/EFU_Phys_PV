@@ -77,12 +77,44 @@ for year in years:
     all_stats[year] = ind_stats;
 
 # en attendant, a fixer plus tard
-logger.warning('Attention : merging a implementer lorsqu\'on aura le traitement 24 de deux annees');
-for k in all_stats.keys(): all_stats = all_stats[k];
+from pv_stat_merger import MergeStats;
+logger.info('Fusion des differentes annees disponibles');
+new_stats = MergeStats(all_stats);
+known_ids = [];
+for k in all_stats.keys(): known_ids =  known_ids + list(all_stats[k].keys());
+
+# Reader des stats de Marion
+from csv_provenance import MergeProvenance;
+print("Fusion de l'information \"provenance\"");
+years, new_stats = MergeProvenance(years, new_stats, known_ids);
+
+# Selection of the year to generate the file for
+years = sorted(years);
+logger.warning("Choisir une annee parmi:");
+allowed_answers = [str(x+1) for x in list(range(len(years)))];
+for i in range(len(years)): print('         *** ', i+1, ':', years[i].replace('_',' - '));
+answer = ""
+answer = input("INFO   : Choix ? ")
+while answer not in allowed_answers:
+    logger.error('Reponse non pertinente');
+    answer = input("INFO   : Choix parmi [" + ', '.join(allowed_answers) + "]: ")
+my_year = years[int(answer)-1];
 
 # CSV / xlsx writer
 from csv_converter import StatConverter, ToExcel;
-csv_stats = ToExcel(StatConverter(all_stats));
+output_stats = {};
+for etu, value in new_stats.items():
+    # no register for the current student and the year considered
+    if not my_year in value['parcours'].keys(): continue;
+    # we need to record the student
+    output_stats[etu] = {};
+    for key, keyvalue in new_stats[etu].items():
+        if key in ['sexe', 'nom', 'prenom', 'date_naissance', 'mail', 'bourse', 'annee_bac', 'pays_bac', 'inscr_SU']: output_stats[etu][key] = keyvalue;
+        elif key == 'parcours': output_stats[etu][key] = keyvalue[my_year];
+        elif key == 'N-1': output_stats[etu][key] = keyvalue[my_year];
+    if my_year in new_stats[etu].keys(): output_stats[etu] = {**output_stats[etu], **new_stats[etu][my_year]};
+    else: output_stats[etu]['notes Session1'] = {};
+csv_stats = ToExcel(StatConverter(output_stats),my_year);
 
 # bye bye
 Bye();

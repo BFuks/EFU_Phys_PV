@@ -92,10 +92,10 @@ def StatConverter(stats):
         reformed_dict[str(outerKey)] = individual_stats;
 
     multiIndex_df = pandas.DataFrame(reformed_dict);
-    try:
-        multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annees', 'parcours', 'bourse', 'notes Session1', 'notes Session2', 'mail']];
+    try: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'notes Session1', 'notes Session2', 'mail']];
     except:
-        multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annees', 'parcours', 'bourse', 'notes Session1', 'mail']];
+        try: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'notes Session1', 'mail']];
+        except: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'mail']];
     return multiIndex_dfT
 
 
@@ -105,7 +105,7 @@ def StatConverter(stats):
 ###            Excel sheet generation                  ###
 ###                                                    ###
 ##########################################################
-def ToExcel(stats):
+def ToExcel(stats, year):
     # Ordering of the notes
     heads0 = [x for x in list(stats.columns) if not ('notes Session1' in x or 'notes Session2' in x)];
     heads = {};
@@ -120,21 +120,24 @@ def ToExcel(stats):
 
     #print(stats);
     # From dictionnary to Excel
-    writer = pandas.ExcelWriter('output/stats_2021_2022.xlsx', engine='xlsxwriter');
-    stats.to_excel(writer, sheet_name='Statistiques 2021_2022', index=True, header=True);
+    writer = pandas.ExcelWriter('output/stats_'+year+'.xlsx', engine='xlsxwriter');
+    stats.to_excel(writer, sheet_name='Statistiques ' + year, index=True, header=True);
 
     # Column size and format
     ix = len(stats.columns)-1;
-    sheet = writer.sheets['Statistiques 2021_2022'];
-    sheet.set_column(0, 0, 12);
-    sheet.set_column(1, 2, 25);
-    sheet.set_column(3, 3,  6);
-    sheet.set_column(4, 4, 12);
-    sheet.set_column(5, 5, 11);
-    sheet.set_column(6, 6, 13);
-    sheet.set_column(7, 7,  6);
-    sheet.set_column(8,ix,  8);
-    sheet.set_column(ix+1,ix+1,30);
+    sheet = writer.sheets['Statistiques ' + year];
+    sheet.set_column(0,   0, 12); # ID
+    sheet.set_column(1,   2, 25); # Non/prenom
+    sheet.set_column(3,   3,  6); # Sexe
+    sheet.set_column(4,   4, 12); # Date naissance
+    sheet.set_column(5,   5,  9); # annee bac
+    sheet.set_column(6,   6,  7); # pays bac
+    sheet.set_column(7,   7,  8); # inscription SU
+    sheet.set_column(8,   8, 13); # Parcours
+    sheet.set_column(9,   9, 10); # N-1
+    sheet.set_column(10, 10,  6); # Boruse
+    if ix>10: sheet.set_column(11, ix,  8);   # notes
+    sheet.set_column(ix+1,ix+1,30); #mail
 
     #save and exit
     writer.save();

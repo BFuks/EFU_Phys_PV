@@ -103,3 +103,35 @@ def PVtoStats(stats, pv, session, parcours):
 
     # Exit
     return results;
+
+
+##########################################################
+###                                                    ###
+###        Big dictionary with everything in it        ###
+###                                                    ###
+##########################################################
+def MergeStats(stats):
+
+    # available years
+    all_years = stats.keys();
+
+    # liste d'etudiants
+    known_ids = [];
+    for k in stats.keys(): known_ids =  known_ids + list(stats[k].keys());
+
+    # Combination
+    new_stats = {};
+    for etu in known_ids:
+        new_stats[int(etu)] = {};
+        for year in all_years:
+            if etu in stats[year].keys():
+                new_stats[int(etu)][year] = {};
+                for old_key in [kk for kk in stats[year][etu].keys() if not 'notes' in kk and not kk in ['parcours','annees'] ]:
+                    if not old_key in new_stats[int(etu)].keys(): new_stats[int(etu)][old_key] = stats[year][etu][old_key];
+                for old_key in [kk for kk in stats[year][etu].keys() if 'notes' in kk]: new_stats[int(etu)][year][old_key] = stats[year][etu][old_key];
+                if not 'parcours' in new_stats[int(etu)].keys(): new_stats[int(etu)]['parcours'] = {};
+                new_stats[int(etu)]['parcours'][year]=stats[year][etu]['parcours'];
+
+    # output
+    return new_stats;
+
