@@ -95,7 +95,7 @@ def MergeProvenance(old_years, old_stats, known_ids):
 
             ## existing student
             else:
-                for new in new_infos: results[etu][new] = v[new];
+                for new in new_infos: results[etu][new] = v[new]; muf = False;
                 if not year in results[etu]['parcours'].keys(): results[etu]['parcours'][year] = v['parcours'];
                 if not 'N-1' in results[etu].keys(): results[etu]['N-1'] = {year:v['N-1']};
                 else                                 : results[etu]['N-1'][year] = v['N-1'];

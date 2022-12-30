@@ -21,6 +21,9 @@ logger = logging.getLogger('mylogger');
 ###                                                    ###
 ##########################################################
 Relevant = {
+  'LU2PY041': 'PhysAct',
+  'LU2PY102': 'Stage',
+  'LU2PY105': 'Stage',
   'LU2PY103': 'Thermo1',
   'LU2PY104': 'MecaAv ',
   'LU2PY110': 'Math-1 ',
@@ -48,7 +51,9 @@ Relevant = {
   'LU3PY122': 'PhExNum',
   'LU3PY124': 'PrExNum',
   'LU3PY125': 'ProjInt',
+  'LU3PY126': 'ProjNum',
   'LU3PY205': 'Stage  ',
+  'LU3PY206': 'HistMec',
   'LU3PY213': 'Math-4 ',
   'LU3PY214': 'MilCont',
   'LU3PY215': 'Ph.Ex-3',
@@ -57,6 +62,7 @@ Relevant = {
   'LU3PY233': 'Ph.Theo',
   'LU3PY234': 'OcAtRen',
   'LU3PY235': 'MecAnal',
+  'LU3PY238': 'MesPhys',
   'LU3PY401': 'Ph.Qu-1',
   'LU3PY403': 'Thermo2',
   'LU3PY411': 'Ph.Qu-2',
@@ -101,6 +107,9 @@ def PVtoStats(stats, pv, session, parcours):
             elif ue == 'total': results[etudiant]['notes ' + keyword][session] = details['note'];
             elif not (ue in Irrelevant or not 'PY' in ue or 'LK' in ue): logger.warning('UE a inclure dans les stats ? -> ' + ue);
 
+        # PAD
+        if 'PAD' in parcours: results[etudiant]['parcours']=stats[etudiant]['parcours'][:3]+parcours;
+
     # Exit
     return results;
 
@@ -134,4 +143,135 @@ def MergeStats(stats):
 
     # output
     return new_stats;
+
+
+
+##########################################################
+###                                                    ###
+###        Formatting the stat dictionary -> UFR       ###
+###                                                    ###
+##########################################################
+import datetime;
+import pandas
+def FormatiseStats(stats, year):
+    # Init (results = notes; ACN = admin/compense/non-admis
+    results = {}; ACN = {};
+    results['session1'] = {}; results['session2'] = {}; results['all'] = {};
+    ACN['session1']     = {}; ACN['session2']     = {}; ACN['all']     = {};
+
+    # Loop over all data
+    for etu,data in stats.items():
+
+        # Safety
+        if len( [ k for k in data.keys() if 'notes' in k and data[k]!={}] ) == 0: continue;
+
+        # loop over all student data
+        if isinstance(data['parcours'],list): parcours = data['parcours'][-1].replace('L2 ','').replace('L3 ','');
+        else : parcours = data['parcours'].replace('L2 ','').replace('L3 ','');
+        all_sessions = {}; all_average = 0;
+        for key,info in data.items():
+
+            # Safety
+            if not 'notes' in key: continue;
+
+            # session
+            if   'Session1' in key: session = 'session1';
+            elif 'Session2' in key: session = 'session2';
+
+            # get into the marks
+            average=-1;
+            for ue, note in info.items():
+
+                # Safety
+                if isinstance(note,str): continue;
+                if not ue.startswith('L'):
+                    average = note;
+                    if session=='session1': all_average = note;
+                    elif session=='session2' and all_average < note: all_average=note;
+                    continue;
+                if not ue in results[session].keys(): results[session][ue] = {}; ACN[session][ue] = {};
+                if not ue in results['all'].keys():   results['all'][ue] = {}; ACN['all'][ue] = {};
+                if not parcours in results[session][ue].keys(): results[session][ue][parcours] = []; ACN[session][ue][parcours] = [0,0,0];
+                if not parcours in results['all'][ue].keys():   results['all'][ue][parcours] = [];   ACN['all'][ue][parcours]   = [0,0,0];
+
+                # Saving current session
+                results[session][ue][parcours].append(note);
+                if note < 50   and average >= 10: ACN[session][ue][parcours][1]+=1;
+                elif note < 50 and average < 10: ACN[session][ue][parcours][2]+=1;
+                else:  ACN[session][ue][parcours][0]+=1;
+                if not ue in all_sessions.keys(): all_sessions[ue] = note;
+                elif session=='session2' and all_sessions[ue] < note: all_sessions[ue] = note;
+
+        # All sessions
+        for ue,note in all_sessions.items():
+            results['all'][ue][parcours].append(note);
+            if note < 50   and all_average >= 10: ACN['all'][ue][parcours][1]+=1;
+            elif note < 50 and all_average < 10: ACN['all'][ue][parcours][2]+=1;
+            else:  ACN['all'][ue][parcours][0]+=1;
+
+
+    # get the final dictionary
+    all_ues = [];
+    for data in results.values():
+        for ue in data.keys(): all_ues.append(ue);
+    all_ues = sorted(set(all_ues));
+
+    data_dict = {};
+    for ue in all_ues:
+        data_dict[ue] = {};
+        ue_sessions = [k for k in results.keys() if ue in results[k].keys()];
+        for k in ue_sessions:
+            total_ue = 0.; n_ue = 0; acn_ue = [0,0,0]
+            if not k in data_dict[ue].keys(): data_dict[ue][k] = {};
+            for parc in results[k][ue].keys():
+                myparc=parc.replace('Bi-Di','MAJ');
+                moyenne = round(sum(results[k][ue][parc])/len(results[k][ue][parc]),2);
+                total_ue+=sum(results[k][ue][parc]);
+                n_ue+=len(results[k][ue][parc]);
+                if len(results[k][ue][parc])==0:continue;
+                reussite = ['{:.2f}%'.format(100.*float(x)/sum(ACN[k][ue][parc])) + ' (' + str(x) +'/' + str(sum(ACN[k][ue][parc])) + ')' for x in ACN[k][ue][parc]];
+                data_dict[ue][k][myparc + ' / 100'] = moyenne;
+                data_dict[ue][k][myparc + ' ADM'] = reussite[0];
+                data_dict[ue][k][myparc + ' CMP'] = reussite[1];
+                data_dict[ue][k][myparc + ' AJO'] = reussite[2];
+                acn_ue[0]+=ACN[k][ue][parc][0];
+                acn_ue[1]+=ACN[k][ue][parc][1];
+                acn_ue[2]+=ACN[k][ue][parc][2];
+            reussite = ['{:.2f}%'.format(100.*float(x)/sum(acn_ue)) + ' (' + str(x) +'/' + str(sum(acn_ue)) + ')' for x in acn_ue];
+            data_dict[ue][k]['total / 100'] = round(total_ue/n_ue,2);
+            data_dict[ue][k]['total ADM'] = reussite[0];
+            data_dict[ue][k]['total CMP'] = reussite[1];
+            data_dict[ue][k]['total AJO'] = reussite[2];
+
+    # Convert nest dictionaries into tuples
+    reformed_dict = {}
+    for outerKey, innerDict in data_dict.items():
+        individual = {}
+        for innerKey, value in innerDict.items():
+            for mykey, myvalue in value.items():
+                individual[(innerKey,mykey)] = myvalue
+        reformed_dict[outerKey] = individual
+    multiIndex_df = pandas.DataFrame(reformed_dict)
+    effectifs = multiIndex_df.transpose()
+
+    # ordering 
+    heads1 = [x for x in list(effectifs.columns) if x[0]=='all'];
+    heads2 = [x for x in list(effectifs.columns) if x[0]=='session1'];
+    heads3 = [x for x in list(effectifs.columns) if x[0]=='session2'];
+    heads1.sort(key=lambda y:y[1]);
+    heads2.sort(key=lambda y:y[1]);
+    heads3.sort(key=lambda y:y[1]);
+    heads = heads1+heads2+heads3;
+    effectifs = effectifs.reindex(columns=heads);
+
+    # From dictionnary to Excel
+    date = str(datetime.datetime.now().year*10000+datetime.datetime.now().month*100+datetime.datetime.now().day);
+    writer = pandas.ExcelWriter('output/effectifs_'+year+'_v' + date +'.xlsx', engine='xlsxwriter');
+    effectifs.to_excel(writer, sheet_name='Effectifs ' + year, index=True, header=True);
+    sheet = writer.sheets['Effectifs ' + year];
+    sheet.set_column(0,len(effectifs.columns),13);
+    writer.close();
+
+    # exit
+    return ;
 

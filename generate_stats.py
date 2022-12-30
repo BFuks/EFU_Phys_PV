@@ -67,7 +67,7 @@ for year in years:
         semestre = pv_name.split('_')[3] + '_' +pv_name.split('_')[4];
         parcours = pv_name.split('_')[5].split('.')[0];
         PV = DecodeXML(GetXML(niveau, year, semestre, parcours));
-        if 'DM' in parcours: parcours='DM';
+        if 'DM' in parcours and not 'PAD' in parcours: parcours='DM';
         logger.disabled = True;
         PV = SanityCheck(PV,parcours,semestre);
         logger.disabled = False;
@@ -115,6 +115,12 @@ for etu, value in new_stats.items():
     if my_year in new_stats[etu].keys(): output_stats[etu] = {**output_stats[etu], **new_stats[etu][my_year]};
     else: output_stats[etu]['notes Session1'] = {};
 csv_stats = ToExcel(StatConverter(output_stats),my_year);
+
+
+# Data pour Edouard
+from pv_stat_merger import FormatiseStats;
+logger.warning('Infos pour Edouard');
+output_stats = FormatiseStats(output_stats,my_year);
 
 # bye bye
 Bye();

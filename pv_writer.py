@@ -23,9 +23,11 @@ from reportlab.lib.pagesizes import A4, landscape;
 from reportlab.lib.units     import cm
 from reportlab.platypus      import Paragraph, SimpleDocTemplate, Spacer
 from reportlab.lib.styles    import getSampleStyleSheet
+import datetime
 def MakeTitle(annee, niveau, parcours, semestres):
     # file
-    pv_file    = SimpleDocTemplate('output/'+annee+'_'+niveau+'_'+parcours + ".pdf", pagesize=landscape(A4),
+    date = str(datetime.datetime.now().year*10000+datetime.datetime.now().month*100+datetime.datetime.now().day);
+    pv_file    = SimpleDocTemplate('output/'+annee+'_'+niveau+'_'+parcours + '_v' + date + ".pdf", pagesize=landscape(A4),
       leftMargin=1.5*cm, rightMargin=1.5*cm, topMargin=1.5*cm, bottomMargin=1.5*cm);
 
     # title
@@ -56,9 +58,13 @@ def MakeHeaders(semestres, parcours):
     # number of columns in the table
     num_ue = GetLength(semestres, parcours);
     if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
+    if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
     if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
-    if parcours in ['DM', 'MAJ', 'DK'] and semestres[0].startswith('S3'): num_ue+=1;
-    if parcours in ['DM'] and semestres[0].startswith('S5'): num_ue+=1;
+    if parcours in ['DM', 'MAJ', 'DK', 'PADMAJ'] and semestres[0].startswith('S3'): num_ue+=1;
+    if parcours in ['DM', 'DK'] and semestres[0].startswith('S5'): num_ue+=1;
+    if parcours=='CMI' and semestres[0].startswith('S3'):num_ue-=2;
+    if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
+    if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
 
     # The header themselves
     Headers = [[
@@ -145,7 +151,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
     if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee[1]>=10. or float(notes['total']['note2'])>10.) if notes['total']['note']!= 'ENCO' else False;
 
     ## Boucle sur les UE
-    for ue in (ues+[x for x in notes.keys() if (x in GrosSac.keys() or x in GrosSacP2.keys())and not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN']  ):
+    for ue in (ues+[x for x in notes.keys() if (x in GrosSac.keys() or x in GrosSacP2.keys())and not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'] + [x for x in notes.keys() if x in ['LK3PYC03', 'LK4PYC03', 'LK5PYMI0', 'LK6PYMI0'] ] ):
         ### Enlever les notes de la mineure
         if ue+'_GS' in notes.keys(): continue
         if 'UE' in notes[ue].keys() and notes[ue]['UE']=='GrosSac': continue
@@ -354,8 +360,12 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
             num_ue = GetLength(semestres, parcours);
             if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
             if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
-            if parcours in ['MAJ','DM', 'DK'] and semestres[0].startswith('S3'): num_ue+=1;
-            if parcours in ['DM'] and semestres[0].startswith('S5'): num_ue+=1;
+            if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
+            if parcours in ['MAJ','DM', 'DK', 'PADMAJ'] and semestres[0].startswith('S3'): num_ue+=1;
+            if parcours in ['DM', 'DK'] and semestres[0].startswith('S5'): num_ue+=1;
+            if parcours=='CMI' and semestres[0].startswith('S3'):num_ue-=2;
+            if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
+            if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];

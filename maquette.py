@@ -15,6 +15,7 @@ UEs = {
     'LU3PY024': {'ects':6,  'nom':'Projet'},
     'LU3PY122': {'ects':6,  'nom':'Projet'},
     'LU3PY125': {'ects':6,  'nom':'Projet'},
+    'LU3PY126': {'ects':6,  'nom':'Projet'},
     'LU3PY105': {'ects':6,  'nom':'Stage'},
     'LU3PYSO3': {'ects':6,  'nom':'Stage'},
     'LU3PYSO5': {'ects':3,  'nom':'Stage'},
@@ -24,6 +25,8 @@ UEs = {
     'LU2PY110': {'ects':6,  'nom':'Math-S3'},
     'LU2PY410': {'ects':6,  'nom':'Math-S3'},
     'LU2LVAN1': {'ects':3,  'nom':'Anglais'},
+    'LU2PY102': {'ects':6,  'nom':'Stage'},
+    'LU2PY105': {'ects':6,  'nom':'Stage'},
     'LU2PY121': {'ects':12, 'nom':'OEM'},
     'LU2PY421': {'ects':12, 'nom':'OEM'},
     'LU2PY123': {'ects':3,  'nom':'Math-S4'},
@@ -39,6 +42,7 @@ UEs = {
     'LU3PY033': {'ects':6,  'nom':'OcnAtm'},
     'LU3PY23X': {'ects':6,  'nom':'Option'},
     'LU3PY235': {'ects':6,  'nom':'MecaAnl'},
+    'LU3PY238': {'ects':6,  'nom':'MesuPhys'},
     'LU3PY234': {'ects':6,  'nom':'OcnAtm'},
     'LU3PY537': {'ects':6,  'nom':'InfoQ', 'SX':True},
     'LU3PY233': {'ects':6,  'nom':'PhysTheo'},
@@ -46,9 +50,15 @@ UEs = {
     'LU3PY232': {'ects':6,  'nom':'Astro'},
     'LU3PY231': {'ects':6,  'nom':'MatMat'},
     'LU3PY205': {'ects':3,  'nom':'Stage'},
+    'LU3PY206': {'ects':3,  'nom':'HistMeca'},
     'LU2PY222': {'ects':6,  'nom':'PhysNum'},
+    'LU2PY215': {'ects':6,  'nom':'PhysNum'},
+    'LU2PY022': {'ects':3,  'nom':'PhysNum'},
     'LU2PY531': {'ects':6,  'nom':'Astro', 'SX':True},
     'LU2PY041': {'ects':6,  'nom':'PhysAct'},
+    'LU3PY041': {'ects':6,  'nom':'PhysAct'},
+    'LU3PY043': {'ects':6,  'nom':'Transp'},
+    'LU3PY042': {'ects':6,  'nom':'HistMeca'},
     'LK3CIM00': {'ects':12, 'nom':'MinChim0'},
     'LK3CID00': {'ects':12, 'nom':'MajChim0'},
     'LK4CID00': {'ects':12, 'nom':'MajChim0'},
@@ -68,6 +78,7 @@ UEs = {
     'LU2EVE03': {'ects': 6, 'nom':'MinEnv3'},
     'LK3GSM00': {'ects':12, 'nom':'MinGestion0'},
     'LU2GSG31': {'ects': 6, 'nom':'MinGestion1'},
+    'LU3GSG51': {'ects': 6, 'nom':'MinGestion1'},
     'LU2GSG32': {'ects': 6, 'nom':'MinGestion2'},
     'LK3HNM00': {'ects':12, 'nom':'MinHistNat0'},
     'LU2HNP31': {'ects': 3, 'nom':'MinHistNat1'},
@@ -92,9 +103,17 @@ UEs = {
     'LK4SSK00': {'ects':12, 'nom':'MinSS0'},
     'LU2SXSS2': {'ects':12, 'nom':'MinSS0'},
     'LK3EWK00': {'ects':12, 'nom':'MinJourn0'},
+    'LK3DRKK0': {'ects':12, 'nom':'MinDroit0'},
     'LU2SXEW1': {'ects':12, 'nom':'MinJourn0'},
+    'LU2SXDR1': {'ects':12, 'nom':'MinJourn0'},
     'LK4EWK00': {'ects':12, 'nom':'MinJourn0'},
+    'LK4DRK00': {'ects':12, 'nom':'MinDroit0'},
     'LU2SXEW2': {'ects':12, 'nom':'MinJourn0'},
+    'LU2SXDR2': {'ects':12, 'nom':'MinJourn0'},
+    'LU3SXSS1': {'ects':12, 'nom':'MinDroit0'},
+    'LU3SXDR1': {'ects':12, 'nom':'MinDroit0'},
+    'LU3SXSS2': {'ects':12, 'nom':'MinDroit0'},
+    'LU3SXDR2': {'ects':12, 'nom':'MinDroit0'},
     'LK3MAM00': {'ects':12, 'nom':'MinMath0'},
     'LK3MAD00': {'ects':12, 'nom':'MajMath0'},
     'LU2MA221': {'ects':6,  'nom':'MinMath1'},
@@ -103,7 +122,9 @@ UEs = {
     'LK3MED00': {'ects':12, 'nom':'MajMeca0'},
     'LK4MED00': {'ects':12, 'nom':'MajMeca0'},
     'LK3MEM03': {'ects':12, 'nom':'MinMeca0'},
+    'LK3MEM02': {'ects':12, 'nom':'MinMeca0'},
     'LK4MEM04': {'ects': 9, 'nom':'MinMeca0'},
+    'LK4MEM06': {'ects': 9, 'nom':'MinMeca0'},
     'LU2ME001': {'ects': 6, 'nom':'MinMeca1'},
     'LU2ME002': {'ects': 6, 'nom':'MinMeca1'},
     'LU2ME003': {'ects': 6, 'nom':'MinMeca2', 'SX':True},
@@ -211,8 +232,12 @@ UEs = {
     'LU2SV415': {'ects': 6, 'nom':'MinSDV2'},
     'LK5MED00': {'ects': 12,'nom':'MajMeca0'},
     'LK6MED00': {'ects': 12,'nom':'MajMeca0'},
+    'LK5PYDK0': {'ects': 12,'nom':'DK0'},
+    'LK6PYDK0': {'ects': 12,'nom':'DK0'},
     'LK5MEM00': {'ects': 12,'nom':'MinMeca0'},
+    'LK5MEM02': {'ects': 12,'nom':'MinMeca0'},
     'LK6MEM00': {'ects': 9,'nom':'MinMeca0'},
+    'LK6MEM03': {'ects': 9,'nom':'MinMeca0'},
     'LU3ME004': {'ects': 6, 'nom':'MinMeca1'},
     'LU3ME006': {'ects': 6, 'nom':'MinMeca1'},
     'LU3ME007': {'ects': 6, 'nom':'MinMeca1'},
@@ -328,6 +353,10 @@ UEs = {
     'LU3EV002': {'ects': 3, 'nom':'Env2'},
     'LU3EV003': {'ects': 6, 'nom':'Env3'},
     'LU3EV004': {'ects': 9, 'nom':'Env3'},
+    'LK3PYC03': {'ects': 18,'nom':'MinCMI0'},
+    'LK4PYC03': {'ects': 18,'nom':'MinCMI0'},
+    'LK5PYMI0': {'ects': 18,'nom':'MinCMI0'},
+    'LK6PYMI0': {'ects': 18,'nom':'MinCMI0'},
 
     'LU3LVAN1': {'ects': 3, 'nom':'Anglais'},
     'LU3LVAN2': {'ects': 3, 'nom':'Anglais'},
@@ -372,7 +401,7 @@ Maquette = {
            ['LU2PY103', 'LU2PY110', 'LU2PY124', 'LU2LVAN1'],
            ['LU2PY103', 'LU2PY124', 'LU2PY222', 'LU2LVAN1']
         ],
-        'parcours': ['MONO','MAJ'],
+        'parcours': ['MONO','MAJ', 'PADMONO', 'PADMAJ', 'CMI'],
         'nom'     : "MAJ",
         'semestre': "S3"
     },
@@ -399,7 +428,7 @@ Maquette = {
            ['LU2PY104', 'LU2PY121', 'LU2PY123'],
            ['LU2PY104', 'LU2PY121', 'LU2PY215']
         ],
-        'parcours': ['MONO', 'MAJ'],
+        'parcours': ['MONO', 'MAJ', 'PADMONO', 'PADMAJ', 'CMI'],
         'nom'     : "MAJ",
         'semestre': "S4"
     },
@@ -428,7 +457,7 @@ Maquette = {
            ['LU3PY101', 'LU3PY121', 'LU3PYOIP'],
            ['LU3PY401', 'LU3PY421', 'LU3PYOIP']
         ],
-        'parcours': ['MONO', 'MAJ', 'DM'],
+        'parcours': ['MONO', 'MAJ', 'DM', 'PADMONO', 'PADMAJ', 'CMI', 'DK'],
         'nom'     : "MAJ",
         'semestre': "S5"
     },
@@ -441,14 +470,22 @@ Maquette = {
         'semestre': "S5"
     },
 
+    'LK6PY120' : {
+        'UE'      : [
+           ['LU3PY103', 'LU3PY111', 'LU3PY122']
+        ],
+        'parcours': ['DK'],
+        'nom'     : "MAJ",
+        'semestre': "S6"
+    },
     'LK6PYJ00' : {
         'UE'      : [
            ['LU3PY103', 'LU3PY111', 'LU3PY122','LU3LVAN2'],
            ['LU3PY103', 'LU3PY111', 'LU3PY124','LU3LVAN2'],
            ['LU3PY103', 'LU3PY111', 'LU3PY125','LU3LVAN2'],
-           ['LU3PY103', 'LU3PY111', 'LU3PY105','LU3LVAN2']
+           ['LU3PY103', 'LU3PY111', 'LU3PY126','LU3LVAN2']
         ],
-        'parcours': ['MONO', 'MAJ'],
+        'parcours': ['MONO', 'MAJ', 'PADMONO', 'PADMAJ', 'CMI'],
         'nom'     : "MAJ",
         'semestre': "S6"
     },
@@ -493,9 +530,27 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S3"
     },
+    'LK3PYC02': {
+        'UE'      : [['LU2PY041', 'LU2PY220'] ],
+        'parcours': ['PADMONO'],
+        'nom'     : "CMP",
+        'semestre': "S3"
+    },
+    'LK3PYC03': {
+        'UE'      : [['LU2CI011', 'LU2CI012', 'LU2GSG31'], ['LU2EE100', 'LU2EE200', 'LU2GSG31'] ],
+        'parcours': ['CMI'],
+        'nom'     : "CMP",
+        'semestre': "S3"
+    },
+    'LK4PYC03': {
+        'UE'      : [['LU2CI101', 'LU2CI102', 'LU2PY102'], ['LU2EE201', 'LU2EE204', 'LU2PY102'] ],
+        'parcours': ['CMI'],
+        'nom'     : "CMP",
+        'semestre': "S4"
+    },
     'LK4PYC00': {
         'UE'      : [['LU2PY215', 'LU2PY222']],
-        'parcours': ['MONO'],
+        'parcours': ['MONO', 'PADMONO'],
         'nom'     : "CMP",
         'semestre': "S4"
     },
@@ -508,7 +563,7 @@ Maquette = {
 
     'LK5PYC00': {
         'UE'      : [['LU3PY213', 'LU3PY214', 'LU3PY215']],
-        'parcours': ['MONO'],
+        'parcours': ['MONO', 'PADMONO'],
         'nom'     : "CMP",
         'semestre': "S5"
     },
@@ -518,6 +573,20 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S5"
     },
+    'LK5PYMI0': {
+        'UE'      : [['LU3CI052', 'LU3CI011', 'LU3GSG51'], ['LU3EE100', 'LU3EE101', 'LU3GSG51'] ],
+        'parcours': ['CMI'],
+        'nom'     : "CMP",
+        'semestre': "S5"
+    },
+
+    'LK6PYMI0': {
+        'UE'      : [['LU3CI141', 'LU3CI113', 'LU3PY105'], ['LU3EE204', 'LU3EE200', 'LU3PY105'] ],
+        'parcours': ['CMI'],
+        'nom'     : "CMP",
+        'semestre': "S6"
+    },
+
     'LK6PYC00': {
         'UE'      : [ 
            ['LU3PY23X', 'LU3PY205'],
@@ -542,6 +611,17 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S6"
     },
+    'LK6PYC02': {
+        'UE'      : [ 
+           ['LU3PY234', 'LU3PY205'], ['LU3PY234', 'LU3PY206'],
+           ['LU3PY233', 'LU3PY205'], ['LU3PY233', 'LU3PY206'],
+           ['LU3PY232', 'LU3PY205'], ['LU3PY232', 'LU3PY206'],
+           ['LU3PY231', 'LU3PY205'], ['LU3PY231', 'LU3PY206']
+        ],
+        'parcours': ['PADMONO'],
+        'nom'     : "CMP",
+        'semestre': "S6"
+    },
     'LK3CIM00' : { 'UE' : [ ['LU2CI012', 'LU2CI011']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S3" },
     'LK4CIM00' : { 'UE' : [ ['LU2CI101', 'LU2CI102']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
     'LK3CID00' : { 'UE' : [ ['LU2CI012', 'LU2CI011', 'LU2CI031'] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S3" },
@@ -550,8 +630,10 @@ Maquette = {
     'LK4MAM00' : { 'UE' : [ ['LU2MA122', 'LU2MA241']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
     'LK3MAD00' : { 'UE' : [ ['LU2MA221', 'LU2MA260', 'LU2MA216'] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S3" },
     'LK4MAD00' : { 'UE' : [ ['LU2MA122', 'LU2MA211', 'LU2MA241', 'LU2PY215'] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S4" },
+    'LK3MEM02' : { 'UE' : [ ['LU2ME001', 'LU2ME005']             ], 'parcours': ['PADMAJ'], 'nom' : "MIN", 'semestre': "S3" },
     'LK3MEM03' : { 'UE' : [ ['LU2ME001', 'LU2ME006']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S3" },
     'LK4MEM04' : { 'UE' : [ ['LU2ME004', 'LU2ME102']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
+    'LK4MEM06' : { 'UE' : [ ['LU2ME004', 'LU2ME102']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
     'LK3MED00' : { 'UE' : [ ['LU2ME001', 'LU2ME005',           ] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S3" },
     'LK4MED00' : { 'UE' : [ ['LU2ME002', 'LU2ME003', 'LU2ME004'  ] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S4" },
     'LK3EEM00' : { 'UE' : [ ['LU2EE100', 'LU2EE200']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S3" },
@@ -584,7 +666,9 @@ Maquette = {
     'LK4HID00' : { 'UE' : [ ['LU2SXHI2', 'LU2PY123']                         ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S4" },
 
     'LK5MEM00' : { 'UE' : [ ['LU3ME103', 'LU3ME004']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
+    'LK5MEM02' : { 'UE' : [ ['LU3ME103', 'LU3ME004']             ], 'parcours': ['PADMAJ'], 'nom' : "MIN", 'semestre': "S5" },
     'LK6MEM00' : { 'UE' : [ ['LU3ME105', 'LU3ME007'],  ['LU3ME108', 'LU3ME007'],  ['LU3ME111', 'LU3ME007'], ['LU3ME109', 'LU3ME007'] ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
+    'LK6MEM03' : { 'UE' : [ ['LU3ME105', 'LU3ME006'] ], 'parcours': ['PADMAJ'], 'nom' : "MIN", 'semestre': "S6" },
     'LK5MED00' : { 'UE' : [ ['LU3ME103', 'LU3ME004', 'LU3ME008'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S5" },
     'LK6MED00' : { 'UE' : [ ['LU3ME006', 'LU3ME007', 'LU3ME009'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S6" },
     'LK5MAM00' : { 'UE' : [ ['LU2MA216', 'LU2MA220']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
@@ -622,7 +706,11 @@ Maquette = {
     'LK3SSK00' : { 'UE' : [ ['LU2SXSS1'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S3" },
     'LK4SSK00' : { 'UE' : [ ['LU2SXSS2'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S4" },
     'LK3EWK00' : { 'UE' : [ ['LU2SXEW1'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S3" },
-    'LK4EWK00' : { 'UE' : [ ['LU2SXEW2'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S4" }
+    'LK4EWK00' : { 'UE' : [ ['LU2SXEW2'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S4" },
+    'LK3DRKK0' : { 'UE' : [ ['LU2SXDR1'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S3" },
+    'LK4DRK00' : { 'UE' : [ ['LU2SXDR2'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S4" },
+    'LK5PYDK0' : { 'UE' : [ ['LU3SXSS1'], ['LU3SXDR1'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S5" },
+    'LK6PYDK0' : { 'UE' : [ ['LU3SXSS2'], ['LU3SXDR2'] ], 'parcours': ['DK'], 'nom' : "MIN", 'semestre': "S6" }
 
 
 };
@@ -642,7 +730,8 @@ GrosSac    = {
     'LU3PY021' : ['LU3PY121'],
     'LU3PY001' : ['LU3PY101'],
     'LU3PY010' : ['LU3PY214'],
-    'LU3PY103' : ['LU3PY121']
+    'LU3PY103' : ['LU3PY121'],
+    'LU3PY042' : ['LU3PY121']
 };
 
 GrosSacP2    = {
@@ -666,7 +755,10 @@ GrosSacP2    = {
     'LU3PY015' : ['LU3PY122'],
     'LU3PY031' : ['LU3PY23X'],
     'LU3PY012' : ['LU3PY111'],
-    'LU3PYOIP' : ['LU3LVAN2']
+    'LU3PYOIP' : ['LU3LVAN2'],
+    'LU2PY022' : ['LU2PY215'],
+    'LU2PY212' : ['LU2PY222'],
+    'LU3PY043' : ['LU3PY111']
 };
 
 GrosSac2 = { 

@@ -68,6 +68,11 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     if 'LK4EWK00' in data_pv.keys():no123=True;
     if 'LK4SSK00' in data_pv.keys():no123=True;
 
+    # SX CMI
+    sxcmi=False;
+    if parcours=='CMI': sxcmi=True;
+    #sxcmi=True if parcours=='CMI' else False;
+
     # Obtentien des blocs et verification que la liste est complete
     blocs_maquette = GetBlocsMaquette(semestre, parcours);
     blocs_pv = sorted([x for x in data_pv.keys() if (x.startswith('LK') or not x in UEs) and not x in ['total', '999999'] and not x in GrosSac.keys() and not x in GrosSacP2.keys()]);
@@ -103,6 +108,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3.keys() and missing_ue in GrosSac3[x] ];
              if missing_ue=='LU3PY122' and not any([ (x in data_pv.keys()) for x in ['LU3PY231', 'LU3PY232', 'LU3PY233', 'LU3PY234', 'LU3PY235']]) and 'LU3PY033' in data_pv.keys(): grossac=['LU3PY033']
+             logger.debug("  > grossac = "+ str(grossac));
 
              # specific patch
              if etu_id =='28716431' and semestre=='S5' and missing_ue=='LU3PY121': grossac=['LU3PY011', 'LU3LVAN1'];
@@ -111,7 +117,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              if len(grossac)>0:
                  annee = data_pv[grossac[0]]['note'];
                  coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
-                 list_note = [ ue for ue in grossac if data_pv[ue]['note']!='ENCO'];
+                 list_note = [ ue for ue in grossac if not data_pv[ue]['note'] in ['DIS', 'ENCO'] ];
                  if   [ data_pv[ue]['note'] for ue in list_note ] in ['DIS']: note = 'DIS';
                  elif [ data_pv[ue]['note'] for ue in list_note ] in ['U VAC']: note = 'U VAC';
                  else: note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
@@ -176,6 +182,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                 no120=True;
                 continue
             if not parcours in ['DK', 'DM', 'SPRINT'] or (not 'SX' in UEs[ue].keys() and not (ue=='LU2PY123' and no123)):
+                if ue in ['LU2PY102', 'LU2GSG31', 'LU3GSG51', 'LU3PY105'] and sxcmi: continue;
                 if data_pv[ue]['note'] != 'COVID':
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
                     moyenne_tot  += float(data_pv[ue]['note'])*UEs[ue]['ects'];
@@ -197,10 +204,10 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             logger.error("  *** Moyenne calculee " + bloc + " : " + str(moyenne_bloc));
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
 
-    # Verification du nombre de credits
-    credits = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) ]);
-    if no120: credits = credits-6;
-    if credits!=30: logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(credits) + " ECTS");
+    # Verification du nombre de creds
+    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51'] and sxcmi)]);
+    if no120: creds = creds-6;
+    if creds!=30: logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(creds) + " ECTS");
 
     ## Calcul de la moyenne du semestre
     try:    moyenne_tot  = round(moyenne_tot/(5.*coeff_tot),3);
@@ -287,6 +294,7 @@ def SanityCheck(pv, parcours, semestre):
             if my_label == 'LK4PYJ01': new_label = 'LK4PYJ00';
             if my_label == 'LK5PYJ01' and parcours!='SPRINT': new_label = 'LK5PYJ00';
             if my_label == 'LK5PYJ01' and parcours=='SPRINT': new_label = 'LK5PYJ03';
+            if my_label == 'LK6PYJ20' and parcours=='DK': new_label = 'LK6PYDK0';
             if my_label == 'LK4PYJ22': new_label = 'LK4PYJ21';
             if my_label == 'LK4PYJ23': new_label = 'LK4PYJ21';
             if my_label in ['LY5PY090', 'LY5PY092']: data_UE['UE']=None;

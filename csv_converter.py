@@ -22,7 +22,9 @@ logger = logging.getLogger('mylogger');
 def clean(ue):
     new_ue = {};
     for key in ue.keys():
-        if not 'rank' in key: new_ue[key] = ue[key];
+        if key=='note':  new_ue['session1' ]=ue[key];
+        elif key=='note2': new_ue['session2' ]=ue[key];
+        elif not 'rank' in key: new_ue[key] = ue[key];
     return new_ue;
 
 
@@ -118,7 +120,6 @@ def ToExcel(stats, year):
     heads = heads0[:-1] + heads['Session1'] + heads['Session2'] + [heads0[-1]];
     stats = stats.reindex(columns=heads);
 
-    #print(stats);
     # From dictionnary to Excel
     writer = pandas.ExcelWriter('output/stats_'+year+'.xlsx', engine='xlsxwriter');
     stats.to_excel(writer, sheet_name='Statistiques ' + year, index=True, header=True);
@@ -135,11 +136,42 @@ def ToExcel(stats, year):
     sheet.set_column(7,   7,  8); # inscription SU
     sheet.set_column(8,   8, 13); # Parcours
     sheet.set_column(9,   9, 10); # N-1
-    sheet.set_column(10, 10,  6); # Boruse
+    sheet.set_column(10, 10,  6); # Bourse
     if ix>10: sheet.set_column(11, ix,  8);   # notes
     sheet.set_column(ix+1,ix+1,30); #mail
 
     #save and exit
-    writer.save();
+    writer.close();
     return;
+
+import datetime;
+def ToExcelPV(pv, year, niveau, parcours):
+    # Ordering of the notes
+    heads0 = [x for x in list(pv.columns) if x[0][0]=='S'];
+    heads1 = [x for x in list(pv.columns) if 'LK' in x[0] and not x[1] in ['bareme', 'UE', 'tag', 'validation', 'annee_val']];
+    heads2 = [x for x in list(pv.columns) if not 'LK' in x[0] and x[0][0]!='S' and x[0]!='nom' and not x[1] in ['bareme', 'UE', 'tag', 'validation']];
+    heads1.sort(key=lambda y:y[0]);
+    heads2.sort(key=lambda y:y[0]);
+    heads2 = [ (x[0],x[1].replace('note2','session2').replace('note','session1')) for x in heads2];
+    heads = [('nom', 'nom')] + heads0 + heads1 + heads2;
+    pv = pv.reindex(columns=heads);
+    pv = pv.sort_values(by = ('nom', 'nom'))
+
+    # From dictionnary to Excel
+    date = str(datetime.datetime.now().year*10000+datetime.datetime.now().month*100+datetime.datetime.now().day);
+    SheetID = 'PV ' + niveau + ' ' + parcours + ' ('+year+')';
+    writer = pandas.ExcelWriter('output/' + year + '_' + niveau + '_' + parcours + '_v' + date + '.xlsx', engine='xlsxwriter');
+    pv.to_excel(writer, sheet_name=SheetID, index=True, header=True);
+
+    # Column size and format
+    ix = len(pv.columns)-1;
+    sheet = writer.sheets[SheetID];
+    sheet.set_column(0,   0, 12); # ID
+    sheet.set_column(1,   1, 35); # Non/prenom
+
+    #save and exit
+    writer.close();
+    return;
+
+
 
