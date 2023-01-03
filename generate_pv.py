@@ -141,7 +141,7 @@ all_PVs = GetMoyenneAnnuelle(all_PVs);
 ## Creation des PV pirates
 from pv_writer  import PDFWriter;
 logger.info("Creation de la version PDF du PV " + parcours + " (" + annee + ")");
-PDFWriter(all_PVs, annee, niveau, parcours, semestres);
+PDFWriter(all_PVs, annee, niveau, parcours, semestres,redoublants=True);
 
 # CSV writer
 from csv_converter import merge, convert, ToExcelPV

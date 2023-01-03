@@ -242,7 +242,7 @@ def GetLineStyle(counter, endline):
 
 
 from misc import GetBlocsMaquette, GetUEsMaquette;
-def PDFWriter(pv, annee, niveau, parcours, semestres):
+def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
 
     # Title and headers
     pv_file, story =  MakeTitle(annee, niveau, parcours, semestres);
@@ -316,6 +316,8 @@ def PDFWriter(pv, annee, niveau, parcours, semestres):
              moyenne_annee2 = full2[str(etu[0])][0];
              colour_annee2      = 'red' if moyenne_annee2<10 else 'black';
          if moyenne_annee!=moyenne_annee2: logger.debug("  Session 2 : > " + str(moyenne_annee2) + ' (' + colour_annee2 + ')');
+         if redoublants:
+             if not (moyenne_annee<10 and moyenne_annee2<10): continue;
 
          ## Real loop over the semesters
          for semestre in semestres:

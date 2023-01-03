@@ -52,7 +52,6 @@ UEs = {
     'LU3PY205': {'ects':3,  'nom':'Stage'},
     'LU3PY206': {'ects':3,  'nom':'HistMeca'},
     'LU2PY222': {'ects':6,  'nom':'PhysNum'},
-    'LU2PY215': {'ects':6,  'nom':'PhysNum'},
     'LU2PY022': {'ects':3,  'nom':'PhysNum'},
     'LU2PY531': {'ects':6,  'nom':'Astro', 'SX':True},
     'LU2PY041': {'ects':6,  'nom':'PhysAct'},
