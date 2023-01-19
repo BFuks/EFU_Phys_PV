@@ -60,6 +60,54 @@ def DecodeCSVProvenance(myfile):
     return data;
 
 
+
+##########################################################
+###                                                    ###
+###           Definition du parcours APOGEE            ###
+###                                                    ###
+##########################################################
+import sys;
+def ParcoursApogee(my_parcours):
+
+        ##  doctorat, master, prepa agreg, L1, Erasmus, cumulatifs
+        for nonLPY in ['D', 'M', 'Y', 'T', 'L2SX81']:
+           if my_parcours.startswith(nonLPY): return False, '';
+        if my_parcours[1]=='1': return False, '';
+
+        ## MIN de physique
+        if my_parcours.startswith('V') and my_parcours.endswith('PY') : return False, '';
+
+        ## Autre MAJ
+        for maj in ['CI', 'EE', 'MA', 'ME', 'IN', 'ST', 'SV']:
+            if my_parcours[2:4] == maj: return False, '';
+
+        ## DM et MAJ-MIN
+        if   my_parcours.startswith('Q'): return True, 'L' + my_parcours[1] + ' DM';
+        if my_parcours.startswith('V'): return True, 'L' + my_parcours[1] + ' Bi-Di';
+
+        ## LIOVIS
+        if my_parcours == 'P3PY01': return True, 'L3 LIOVIS';
+
+        ## MONO
+        if my_parcours in ['L2PY91', 'L2PY01', 'L3PY01']: return True, 'L' + my_parcours[1] + ' MONO';
+        if my_parcours in ['L2PY02', 'L3PY02', 'L3PY91']: return True, 'L' + my_parcours[1] + ' PADMONO';
+        if my_parcours in ['L2PY11', 'L3PY11']:           return True, 'L' + my_parcours[1] + ' MONO-Int';
+
+        # CMI
+        if my_parcours in ['L2PY51','L3PY51']:            return True,  'L' + my_parcours[1] + ' CMI'
+
+        # L3 PHYTEM
+        if my_parcours == 'L3PY03':                     return True, 'L3 PHYTEM';
+
+        # ERROR
+#        if not v['parcours'].startswith('L'): print(v['parcours']); la;
+        logger.error('parcours inconnu : ' + my_parcours);
+        sys.exit();
+
+
+
+
+
 import glob, os;
 def MergeProvenance(old_years, old_stats, known_ids):
     # initialisation
@@ -76,25 +124,8 @@ def MergeProvenance(old_years, old_stats, known_ids):
         if not year in years : years = years + [year];
         provenance = DecodeCSVProvenance(myfile);
         for etu,v in provenance.items():
-            ## Safety
-            if v['parcours'].startswith('M'):  continue;  # Master
-            if v['parcours'].startswith('Y'):  continue;  # Prepa agreg
-            if v['parcours'].startswith('L1'): continue;  # L1
-            if v['parcours'].startswith('T'):  continue;  # Erasmus
-            if v['parcours'].startswith('V') and v['parcours'].endswith('PY') : continue; # MIN physique
-            if v['parcours'].startswith('Q'): v['parcours'] =  'L'+v['parcours'][1] + ' DM'; # double majeure
-            elif v['parcours'].startswith('V'): v['parcours'] = 'L'+v['parcours'][1] + ' Bi-Di'; # Maj Phys / Min autre
-            elif v['parcours'] == 'P3PY01': v['parcours'] = 'L3 LIOVIS';   # LIOVIS
-            elif v['parcours'] in ['L2PY91', 'L2PY01']: v['parcours'] = 'L2 MONO';     # L2 MONO
-            elif v['parcours'] == 'L2PY02':             v['parcours'] = 'L2 PADMONO';  # L2 MONO (PAD)
-            elif v['parcours'] == 'L2PY11':             v['parcours'] = 'L2 MONO-Int'; # L2 MONO Intensif
-            elif v['parcours'] == 'L2PY51':             v['parcours'] = 'L2 CMI';      # L2 CMI
-            elif v['parcours'] == 'L3PY01':             v['parcours'] = 'L3 MONO';     # L3 MONO
-            elif v['parcours'] == 'L3PY02':             v['parcours'] = 'L3 PADMONO';  # L3 MONO (PAD)
-            elif v['parcours'] == 'L3PY03':             v['parcours'] = 'L3 PHYTEM';   # L3 PHYTEM
-            elif v['parcours'] == 'L3PY11':             v['parcours'] = 'L3 MONO-Int'; # L3 MONO Intensif
-            elif v['parcours'] == 'L3PY51':             v['parcours'] = 'L3 CMI';      # L4 CMI
-            elif not v['parcours'].startswith('L'): print(v['parcours']); la;
+            ok, v['parcours'] = ParcoursApogee(v['parcours']);
+            if not ok: continue;
 
             ## new students
             if not etu in results.keys():

@@ -26,7 +26,7 @@ def ReadCasperLists():
     for casper in sorted(listes_casper):
 
         # raw data
-        casper_infos = pandas.read_excel(casper, index_col = 1, header=3)
+        casper_infos = pandas.read_excel(casper, index_col=1, header=3)
         casper_dico  = casper_infos.to_dict('index');
 
         # Niveau
