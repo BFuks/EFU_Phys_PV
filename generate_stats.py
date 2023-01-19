@@ -85,8 +85,23 @@ for k in all_stats.keys(): known_ids =  known_ids + list(all_stats[k].keys());
 
 # Reader des stats de Marion
 from csv_provenance import MergeProvenance;
-print("Fusion de l'information \"provenance\"");
+logger.info("Fusion de l'information \"provenance\"");
 years, new_stats = MergeProvenance(years, new_stats, known_ids);
+
+# Reader des listes de Casper
+from casper_tools import ReadCasperLists;
+logger.info("Extraction des listes \"Casper\"");
+casper_data = ReadCasperLists();
+
+# Reader pour les notes de Casper
+from casper_tools import ReadCasperNotes;
+logger.info("Extraction des notes \"Casper\"");
+years, casper_data = ReadCasperNotes(casper_data, years);
+
+# Merging all lists
+from casper_tools import MergeCasper;
+logger.info("Fusion des infos \"Casper\"");
+new_stats = MergeCasper(casper_data, new_stats);
 
 # Selection of the year to generate the file for
 years = sorted(years);
@@ -117,10 +132,10 @@ for etu, value in new_stats.items():
 csv_stats = ToExcel(StatConverter(output_stats),my_year);
 
 
-# Data pour Edouard
-from pv_stat_merger import FormatiseStats;
-logger.warning('Infos pour Edouard');
-output_stats = FormatiseStats(output_stats,my_year);
+## # Data pour Edouard
+## from pv_stat_merger import FormatiseStats;
+## logger.warning('Infos pour Edouard');
+## output_stats = FormatiseStats(output_stats,my_year);
 
 # bye bye
 Bye();
