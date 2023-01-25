@@ -104,9 +104,10 @@ logger.info("Fusion des infos \"Casper\"");
 new_stats = MergeCasper(casper_data, new_stats);
 
 # Reader de l'info Apogee pre 2021-2022
-from apogee_tools import ReadApogeeLists;
+from apogee_tools import ReadApogeeLists, ReadApogeeNotes;
 logger.info("Extraction des listes Apogée antérieures à 2021")
 new_stats = ReadApogeeLists(new_stats);
+new_stats = ReadApogeeNotes(new_stats);
 
 # Selection of the year to generate the file for
 years = sorted(years);
