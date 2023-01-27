@@ -70,13 +70,13 @@ def ReadCasperLists():
                 else : casper_data[k]['parcours'][year] = casper_data[k]['parcours'][year] + ' & ' + parcours
                 if lastyear in casper_data[k]['N-1'].keys(): casper_data[k]['N-1'][year] = 'univ';
                 else: casper_data[k]['N-1'][year] = portail;
-                casper_data[k][year] = notes;
+                casper_data[k][year] = {"notes": notes};
                 casper_data[k] = dict(sorted(casper_data[k].items()));
 
             # new student
             else:
                 casper_data[k] = {
-                    year            : notes,
+                    year            : {"notes": notes},
                     'sexe'          : v['Sexe - libellé'].replace('Homme', 'M').replace('Femme','F'),
                     'nom'           : '',
                     'prenom'        : '',
@@ -287,7 +287,7 @@ def ReadCasperNotes(data, yearlist):
             if not math.isnan(line['N° Dossier']) and not student_id in [None]:
                if not student_id in casper_data.keys(): logger.warning('Ghost student: ' + str(student_id));
                else:
-                   for ue, note in notes.items(): casper_data[student_id][year][ue] = note;
+                   for ue, note in notes.items(): casper_data[student_id][year]['notes'][ue] = note;
                student_id = None; notes = {};
 
             # Saving the new student id

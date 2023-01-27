@@ -135,7 +135,7 @@ for etu, value in new_stats.items():
         elif key == 'N-1': output_stats[etu][key] = keyvalue[my_year];
     if my_year in new_stats[etu].keys(): output_stats[etu] = {**output_stats[etu], **new_stats[etu][my_year]};
     else: output_stats[etu]['notes Session1'] = {};
-csv_stats = ToExcel(StatConverter(output_stats),my_year);
+csv_stats = ToExcel(StatConverter(output_stats, my_year),my_year);
 
 
 ## # Data pour Edouard

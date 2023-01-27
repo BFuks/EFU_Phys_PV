@@ -79,26 +79,36 @@ def convert(pv):
     return multiIndex_dfT
 
 
-def StatConverter(stats):
+
+def StatConverter(stats,year):
     # Convert nest dictionaries into tuples
     reformed_dict = {};
     for outerKey, innerDict in stats.items():
         individual_stats = {};
         for innerKey, value in innerDict.items():
-            if not innerKey in ['notes Session1', 'notes Session2']: individual_stats[(innerKey,'')]=value;
+            if not innerKey in ['notes', 'notes Session1', 'notes Session2']: individual_stats[(innerKey,'')]=value;
             else:
                 for mykey, myvalue in value.items(): 
                    val = 0. if myvalue=='COVID' else myvalue;
                    if val in ['DIS', 'ENCO']: continue;
-                   individual_stats[(innerKey,mykey.replace('_Session1','').replace('_Session2',''))] = "{:5.2f}".format(round(val,2));
+                   if isinstance(val, float): individual_stats[(innerKey,mykey.replace('_Session1','').replace('_Session2',''))] = "{:5.2f}".format(round(val,2));
+                   else:                      individual_stats[(innerKey,mykey.replace('_Session1','').replace('_Session2',''))] = val;
         reformed_dict[str(outerKey)] = individual_stats;
 
     multiIndex_df = pandas.DataFrame(reformed_dict);
-    try: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'notes Session1', 'notes Session2', 'mail']];
-    except:
-        try: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'notes Session1', 'mail']];
-        except: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'mail']];
-    return multiIndex_dfT
+
+    # formatting
+    if int(year.split('_')[0])<2019:
+        try: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'notes', 'mail']];
+        except: logger.error('MISSING METHOD'); sys.exit();
+
+    else:
+        try: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'notes Session1', 'notes Session2', 'mail']];
+        except:
+            try: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'notes Session1', 'mail']];
+            except: multiIndex_dfT = multiIndex_df.transpose()[['nom','prenom','sexe','date_naissance', 'annee_bac', 'pays_bac', 'inscr_SU', 'parcours', 'N-1', 'bourse', 'mail']];
+
+    return multiIndex_dfT.sort_index(axis=0)
 
 
 
@@ -109,16 +119,27 @@ def StatConverter(stats):
 ##########################################################
 def ToExcel(stats, year):
     # Ordering of the notes
-    heads0 = [x for x in list(stats.columns) if not ('notes Session1' in x or 'notes Session2' in x)];
-    heads = {};
-    for keyword in ['Session1', 'Session2']:
-        heads1 = [x for x in list(stats.columns) if ('notes ' + keyword) in x and len(x[1])==2];
-        heads2 = [x for x in list(stats.columns) if ('notes ' + keyword) in x and len(x[1])==8];
+    if int(year.split('_')[0])<2019:
+        heads0 = [x for x in list(stats.columns) if not ('notes' in x)];
+        heads = {};
+        heads1 = [x for x in list(stats.columns) if ('notes') in x and len(x[1])==2];
+        heads2 = [x for x in list(stats.columns) if ('notes') in x and len(x[1])==5];
         heads1.sort(key=lambda y:y[1]);
         heads2.sort(key=lambda y:y[1]);
-        heads[keyword] = heads1+heads2;
-    heads = heads0[:-1] + heads['Session1'] + heads['Session2'] + [heads0[-1]];
-    stats = stats.reindex(columns=heads);
+        heads = heads1+heads2;
+        heads = heads0[:-1] + heads1 + heads2 + [heads0[-1]];
+        stats = stats.reindex(columns=heads);
+    else:
+        heads0 = [x for x in list(stats.columns) if not ('notes Session1' in x or 'notes Session2' in x)];
+        heads = {};
+        for keyword in ['Session1', 'Session2']:
+            heads1 = [x for x in list(stats.columns) if ('notes ' + keyword) in x and len(x[1])==2];
+            heads2 = [x for x in list(stats.columns) if ('notes ' + keyword) in x and len(x[1])==8];
+            heads1.sort(key=lambda y:y[1]);
+            heads2.sort(key=lambda y:y[1]);
+            heads[keyword] = heads1+heads2;
+        heads = heads0[:-1] + heads['Session1'] + heads['Session2'] + [heads0[-1]];
+        stats = stats.reindex(columns=heads);
 
     # From dictionnary to Excel
     writer = pandas.ExcelWriter('output/stats_'+year+'.xlsx', engine='xlsxwriter');
@@ -137,7 +158,7 @@ def ToExcel(stats, year):
     sheet.set_column(8,   8, 13); # Parcours
     sheet.set_column(9,   9, 10); # N-1
     sheet.set_column(10, 10,  6); # Bourse
-    if ix>10: sheet.set_column(11, ix,  8);   # notes
+    if ix>10: sheet.set_column(11, ix,  10);   # notes
     sheet.set_column(ix+1,ix+1,30); #mail
 
     #save and exit
