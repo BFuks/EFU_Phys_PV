@@ -31,8 +31,8 @@ logger = logging.getLogger('mylogger');
 ##########################################################
 from maquette import IsModule;
 def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
-    # safetfy check
-    if data_UE['validation'] in ['ENCO', 'DIS', 'U VAC']: return data_UE['validation'];
+    # safety check
+    if data_UE['validation'] in ['NCAE', 'ENCO', 'DIS', 'U VAC']: return data_UE['validation'];
     if data_UE['validation']=='ABJ': data_UE['note']=0;
     if data_UE['note']==None: return -1;
 
@@ -89,7 +89,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     printed = False;
     if blocs_maquette != blocs_pv:
          from misc     import Bye;
-         if not(parcours=='MONO' and semestre in ['S5', 'S6']):
+         if data_pv['total']['note']!='NCAE' and not(parcours=='MONO' and semestre in ['S5', 'S6']):
              printed = True
              logger.warning("Problemes de blocs sans notes dans le PV de " + etu_nom + " (" + etu_id + ")");
          for missing_bloc in [x for x in blocs_maquette if not x in blocs_pv]:
@@ -192,14 +192,14 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         except: moyenne_bloc = 0.
 
         ## Output and save if necessary
-        if data_pv[bloc]['note']=='-1':
+        if data_pv[bloc]['note']=='-1' and data_pv['total']['note']!='NCAE':
             if not(parcours=='MONO' and semestre in ['S5', 'S6']):
                 if not printed: logger.warning("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
                 logger.warning('  > Bloc ' + bloc + ' : moyenne calculee = ' + str(moyenne_bloc));
             data_pv[bloc]['note']=moyenne_bloc;
 
         ## Verification de la moyenne du bloc
-        if abs(moyenne_bloc-float(data_pv[bloc]['note']))>0.002:
+        if data_pv['total']['note']!='NCAE' and abs(moyenne_bloc-float(data_pv[bloc]['note']))>0.002:
             logger.error("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
             logger.error("  *** Moyenne calculee " + bloc + " : " + str(moyenne_bloc));
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
@@ -212,7 +212,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     ## Calcul de la moyenne du semestre
     try:    moyenne_tot  = round(moyenne_tot/(5.*coeff_tot),3);
     except: moyenne_tot = -1;
-    if data_pv['total']['note'] == 'ENCO': return;
+    if data_pv['total']['note'] in ['NCAE', 'ENCO']: return;
     if data_pv['total']['note'] in [-1]:
         logger.warning("Problemes de moyenne totale non calculee dans le PV de " + etu_nom + " (" + etu_id + ")");
         logger.warning("  > Moyenne calculee = " + str(moyenne_tot));

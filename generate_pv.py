@@ -133,7 +133,7 @@ semestres = [x for x in semestres if not 'Session2' in x];
 ## Statistics
 from stat_efu import GetStatistics, GetMoyenneAnnuelle;
 for semestre in semestres:
-    logger.info("Generation des satistique du PV pour le semestre " + semestre);
+    logger.info("Generation des statistiques du PV pour le semestre " + semestre);
     all_PVs[semestre] = GetStatistics(all_PVs[semestre], parcours, semestre);
 logger.info("Calcul des moyennes annuelles");
 all_PVs = GetMoyenneAnnuelle(all_PVs);
@@ -141,7 +141,7 @@ all_PVs = GetMoyenneAnnuelle(all_PVs);
 ## Creation des PV pirates
 from pv_writer  import PDFWriter;
 logger.info("Creation de la version PDF du PV " + parcours + " (" + annee + ")");
-PDFWriter(all_PVs, annee, niveau, parcours, semestres,redoublants=True);
+PDFWriter(all_PVs, annee, niveau, parcours, semestres,redoublants=False);
 
 # CSV writer
 from csv_converter import merge, convert, ToExcelPV

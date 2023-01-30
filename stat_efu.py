@@ -36,18 +36,21 @@ def GetMoyenneAnnuelle(pv):
          nbr_semestres = len([y for y in [etu[0] in pv[x].keys() for x in pv.keys()] if y]);
          # 1ere session
          for semestre in [x for x in pv.keys() if not 'full' in x]:
-             if not etu[0] in pv[semestre].keys() or moyenne_annee == 'ENCO': continue;
+             if not etu[0] in pv[semestre].keys() or moyenne_annee in ['ENCO', 'NCAE']: continue;
              if pv[semestre][etu[0]]['results']['total']['note'] == 'ENCO': moyenne_annee = 'ENCO'; continue;
+             if pv[semestre][etu[0]]['results']['total']['note'] == 'NCAE': moyenne_annee = 'NCAE'; continue;
              moyenne_annee += pv[semestre][etu[0]]['results']['total']['note']/nbr_semestres;
 
          #2eme session
          for semestre in [x for x in pv.keys() if not 'full' in x]:
-             if not etu[0] in pv[semestre].keys() or moyenne_annee2 == 'ENCO': continue;
+             if not etu[0] in pv[semestre].keys() or moyenne_annee2 in ['NCAE', 'ENCO']: continue;
              if 'note2' in pv[semestre][etu[0]]['results']['total'].keys() and pv[semestre][etu[0]]['results']['total']['note2'] == 'ENCO':
                  moyenne_annee2 = 'ENCO'; continue;
+             if 'note2' in pv[semestre][etu[0]]['results']['total'].keys() and pv[semestre][etu[0]]['results']['total']['note2'] == 'NCAE':
+                 moyenne_annee2 = 'NCAE'; continue;
              if 'note2' in pv[semestre][etu[0]]['results']['total'].keys(): moyenne_annee2 += pv[semestre][etu[0]]['results']['total']['note2']/nbr_semestres;
-             elif moyenne_annee!='ENCO': moyenne_annee2 += pv[semestre][etu[0]]['results']['total']['note']/nbr_semestres;
-             else: moyenne_annee2='ENCO';
+             elif moyenne_annee not in ['NCAE', 'ENCO']: moyenne_annee2 += pv[semestre][etu[0]]['results']['total']['note']/nbr_semestres;
+             else: moyenne_annee2=moyenne_annee;
 
          # Debug messages
          logger.debug("  -> session1: " + str(moyenne_annee))
@@ -58,13 +61,13 @@ def GetMoyenneAnnuelle(pv):
          pv["full2"][str(etu[0])] = moyenne_annee2;
 
     # Rankings
-    all_notes  = sorted([x for x in list(pv["full"].values()) if x!='ENCO'], reverse=True);
-    all_notes2 = sorted([x for x in list(pv["full2"].values()) if x!='ENCO'], reverse=True);
+    all_notes  = sorted([x for x in list(pv["full"].values()) if x not in ['NCAE', 'ENCO'] ], reverse=True);
+    all_notes2 = sorted([x for x in list(pv["full2"].values()) if x not in ['ENCO', 'NCAE'] ], reverse=True);
     for etu in pv["full"].keys():
-        if pv["full"][etu]!='ENCO':
+        if pv["full"][etu]not in ['NCAE', 'ENCO']:
             pv["full"][etu] = [pv["full"][etu], str(all_notes.index(pv["full"][etu])+1) + '/' + str(len(all_notes))];
     for etu in pv["full2"].keys():
-        if pv["full2"][etu]!='ENCO':
+        if pv["full2"][etu] not in ['NCAE', 'ENCO']:
             pv["full2"][etu] = [pv["full2"][etu], str(all_notes2.index(pv["full2"][etu])+1) + '/' + str(len(all_notes2))];
 
     return pv;
@@ -95,11 +98,11 @@ def GetStatistics(pv, parcours, semestre):
            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
 
            # get the notes
-           mynote2 = data_UE['note2'] if ('note2' in data_UE.keys() and data_UE['note2'] not in ['U VAC', 'DIS', 'COVID', 'ENCO']) else '';
-           if 'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO']:
+           mynote2 = data_UE['note2'] if ('note2' in data_UE.keys() and data_UE['note2'] not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE']) else '';
+           if 'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE']:
                notes[key].append(data_UE['note']);
            if mynote2!='': notes2[key].append(mynote2);
-           elif  'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO']: notes2[key].append(data_UE['note']);
+           elif  'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE']: notes2[key].append(data_UE['note']);
 
     # formatting
     for key in notes.keys() : notes[key]  = sorted([float(x) for x in  notes[key]],reverse=True);
@@ -116,10 +119,10 @@ def GetStatistics(pv, parcours, semestre):
            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
 
            # get the notes
-           if 'note' in data_UE.keys() and data_UE['note'] not in ['ENCO', 'U VAC', 'DIS', 'COVID']:
+           if 'note' in data_UE.keys() and data_UE['note'] not in ['ENCO', 'U VAC', 'DIS', 'COVID', 'NCAE']:
                pv[etudiant]['results'][label]['ranking']  =  str(notes[key].index(float(data_UE['note']))+1)+'/'+str(len(notes[key]));
 
-           if 'note2' in data_UE.keys() and data_UE['note2'] not in ['ENCO', 'U VAC', 'DIS', 'COVID']:
+           if 'note2' in data_UE.keys() and data_UE['note2'] not in ['ENCO', 'U VAC', 'DIS', 'COVID', 'NCAE']:
                pv[etudiant]['results'][label]['ranking2'] = str(notes2[key].index(float(data_UE['note2']))+1)+'/'+str(len(notes2[key]));
 
     # output

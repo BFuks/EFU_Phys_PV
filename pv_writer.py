@@ -54,7 +54,7 @@ def GetLength(semestres, parcours):
     num_ue = [[ x for x in Maquette.keys() if parcours in Maquette[x]['parcours'] and y in Maquette[x]['semestre'] and Maquette[x]['nom']!='MIN'] for y in tags_semestre];
     return max([ sum([ max([ len(ues) for ues in bloc])  for bloc in sem] ) for sem in [[(Maquette[x]['UE'] if Maquette[x]['nom']!='MIN' else [' ']) for x in z] for z in num_ue]]);
 
-def MakeHeaders(semestres, parcours):
+def MakeHeaders(annee, semestres, parcours):
     # number of columns in the table
     num_ue = GetLength(semestres, parcours);
     if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
@@ -65,6 +65,7 @@ def MakeHeaders(semestres, parcours):
     if parcours=='CMI' and semestres[0].startswith('S3'):num_ue-=2;
     if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
     if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
+    if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
 
     # The header themselves
     Headers = [[
@@ -93,14 +94,14 @@ from pv_checker              import CheckValidation
 def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee):
 
     ## Formatting session 1(colour)
-    if notes['total']['note']=='ENCO': my_color='black';
+    if notes['total']['note'] in ['NCAE', 'ENCO']: my_color='black';
     elif notes['total']['note']>=10. : my_color='black';
     elif moyenne_annee[0] > 10.      : my_color='orange'; 
     else                             : my_color='red'
 
     ## Formatting session 2 (colour)
     if 'note2'in notes['total'].keys():
-        if notes['total']['note2']=='ENCO': my_color2='black';
+        if notes['total']['note2'] in ['NCAE', 'ENCO']: my_color2='black';
         elif notes['total']['note2']>=10. : my_color2='black';
         elif moyenne_annee[1] > 10.       : my_color2='orange'; 
         else                              : my_color2='red'
@@ -108,17 +109,17 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee):
 
     ## Affichage moyennes
     sess1 = ''; sess2 = '';
-    if notes['total']['note']!='ENCO':
+    if notes['total']['note'] not in ['NCAE', 'ENCO']:
         sess1  = '<b>' + semestre.replace('_Session1','') + ' :<br />  <font color=' + my_color + '>'+ '{:.3f}'.format(notes['total']['note']) + '/20</font></b>';
         sess1 += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking']+')</font>';
     else:
-        sess1 = '<b>' + semestre.replace('_Session1','')  + ' :<br />  <font color=' + my_color + '>ENCO</font></b>';
+        sess1 = '<b>' + semestre.replace('_Session1','')  + ' :<br />  <font color=' + my_color + '>' + notes['total']['note'] + '</font></b>';
     if 'note2' in notes['total'].keys() and notes['total']['note2'] != notes['total']['note']:
-        if notes['total']['note2']!='ENCO':
+        if notes['total']['note2'] not in ['NCAE', 'ENCO']:
             sess2  = '<br /><b><font color=' + my_color2 + '>'+ '{:.3f}'.format(notes['total']['note2']) + '/20</font></b>';
             sess2 += '<font color=\'grey\' size=\'8\'> (#'+notes['total']['ranking2']+')</font>';
         else:
-            sess2 = '<br /><b><font color=' + my_color2 + '>ENCO</font></b>';
+            sess2 = '<br /><b><font color=' + my_color2 + '>' + notes['total']['note2'] + '</font></b>';
 
     moyennes_string = '<para align="center">' + sess1 +  sess2 + '<br />';
 
@@ -130,8 +131,9 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee):
         else:
             nombloc  = 'MAJ1' if 'PY' in bloc else 'MAJ2';
             notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
-        colour = 'red' if notebloc<50 else 'black';
-        moyennes_string += '<br />' + nombloc + ' :  <font color=\'' + colour + '\'>' + '{:.3f}'.format(notebloc) + '/100</font>';
+        if notes['total']['note'] not in ['NCAE', 'ENCO']:
+            colour = 'red' if float(notebloc)<50 else 'black';
+            moyennes_string += '<br />' + nombloc + ' :  <font color=\'' + colour + '\'>' + '{:.3f}'.format(notebloc) + '/100</font>';
     moyennes_string += '</para>';
 
     ## output
@@ -146,9 +148,9 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
     ## Initialisation
     notes_string = [];
     counter = 0;
-    compensation = ( moyenne_annee[0]>=10. or float(notes['total']['note'])>10.) if notes['total']['note']!= 'ENCO' else False;
+    compensation = ( moyenne_annee[0]>=10. or float(notes['total']['note'])>10.) if notes['total']['note'] not in ['NCAE','ENCO'] else False;
     compensation2 = False;
-    if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee[1]>=10. or float(notes['total']['note2'])>10.) if notes['total']['note']!= 'ENCO' else False;
+    if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee[1]>=10. or float(notes['total']['note2'])>10.) if notes['total']['note'] not in ['NCAE','ENCO'] else False;
 
     ## Boucle sur les UE
     for ue in (ues+[x for x in notes.keys() if (x in GrosSac.keys() or x in GrosSacP2.keys())and not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'] + [x for x in notes.keys() if x in ['LK3PYC03', 'LK4PYC03', 'LK5PYMI0', 'LK6PYMI0'] ] ):
@@ -164,6 +166,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
         # Mineure
         if ue.startswith('LU') and not ('PY' in ue or 'LV' in ue or ue in ['LU3ME010']): continue;
         if ue.startswith('L5PH') or ue.startswith('L3LACH') or ue.startswith('L4LACH') or ue.startswith('L6PH'): continue;
+        if ue.startswith('L5LACH') or ue.startswith('L6LACH'): continue;
 
         ### Redoublant deja valide
         validation_tag = "<br /><font color='grey' size='8'>("+notes[ue]['annee_val']+')</font>' if notes[ue]['annee_val']!=None else '';
@@ -172,18 +175,20 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
         current_note2=''; fontcolor2='black';
         if 'note2' in notes[ue].keys():
             my_note2 = notes[ue]['note2'];
-            current_note2 = '{:.2f}'.format(my_note2)+'/100' if not my_note2 in ['ABI', 'DIS', 'COVID', 'ENCO', 'U VAC'] else my_note2.replace('COVID','???');
+            current_note2 = '{:.2f}'.format(my_note2)+'/100' if not my_note2 in ['NCAE', 'ABI', 'DIS', 'COVID', 'ENCO', 'U VAC'] else my_note2.replace('COVID','???');
             if 'ranking2' in notes[ue].keys(): current_note2 += '<font color=\'grey\' size=\'7\'> [#'+notes[ue]['ranking2']+']</font>';
 
-            fontcolor2 = 'black' if not my_note2 in ['ABI', 'COVID'] and (my_note2 in ['ENCO', 'DIS', 'U VAC'] or my_note2>=50.) else 'red';
+            fontcolor2 = 'black' if not my_note2 in ['ABI', 'COVID'] and (my_note2 in ['NCAE', 'ENCO', 'DIS', 'U VAC'] or my_note2>=50.) else 'red';
             if fontcolor2=='red' and compensation2: fontcolor2='orange';
 
         ### Note session 1 + formattage
         my_note = notes[ue]['note'];
-        current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'COVID', 'ENCO', 'U VAC'] else my_note.replace('COVID','???');
-        if 'ranking' in notes[ue].keys(): current_note += '<br /><font color=\'grey\' size=\'8\'>#'+notes[ue]['ranking']+'</font>';
+        if my_note!=-1:
+            current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'COVID', 'NCAE', 'ENCO', 'U VAC'] else my_note.replace('COVID','???');
+            if 'ranking' in notes[ue].keys(): current_note += '<br /><font color=\'grey\' size=\'8\'>#'+notes[ue]['ranking']+'</font>';
+        else: current_note = '???';
 
-        fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note in ['ENCO', 'DIS', 'U VAC'] or my_note>=50.) else 'red';
+        fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note in ['NCAE', 'ENCO', 'DIS', 'U VAC'] or my_note>=50.) else 'red';
         if fontcolor=='red' and compensation: fontcolor='orange';
         if (not 'note2' in notes[ue].keys() or current_note.split('<')[0] == current_note2.split('<')[0]) and compensation2 and fontcolor=='red': fontcolor='orange';
 
@@ -246,7 +251,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
 
     # Title and headers
     pv_file, story =  MakeTitle(annee, niveau, parcours, semestres);
-    story.append(MakeHeaders(semestres, parcours));
+    story.append(MakeHeaders(annee,semestres, parcours));
 
     # Liste des UE et blocs par semestre
     blocs_maquette = {}; UEs_maquette = {};
@@ -308,11 +313,11 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
          ## Calcul de la moyenne annuelle
          moyennes = {};
          colour_annee = 'black';
-         if full[str(etu[0])] !='ENCO':
+         if full[str(etu[0])] not in ['NCAE', 'ENCO']:
              moyenne_annee = full[str(etu[0])][0];
              colour_annee      = 'red' if moyenne_annee<10 else 'black';
          logger.debug("  > Session1 : " + str(moyenne_annee) + ' (' + colour_annee + ')');
-         if full2[str(etu[0])] !='ENCO':
+         if full2[str(etu[0])] not in ['ENCO', 'NCAE']:
              moyenne_annee2 = full2[str(etu[0])][0];
              colour_annee2      = 'red' if moyenne_annee2<10 else 'black';
          if moyenne_annee!=moyenne_annee2: logger.debug("  Session 2 : > " + str(moyenne_annee2) + ' (' + colour_annee2 + ')');
@@ -334,15 +339,15 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
             line_style = GetLineStyle(dep, semestre==semestres[-1] and etu == GetList(pv.values())[-1]);
 
             sess1=''; sess2='';
-            if full[str(etu[0])]=='ENCO':
-                sess1 = '<b>Session1 = <font color=' + colour_annee + '>ENCO</font></b>';
+            if full[str(etu[0])] in ['NCAE', 'ENCO']:
+                sess1 = '<b>Session1 = <font color=' + colour_annee + '>' + full[str(etu[0])] + '</font></b>';
             else:
                 sess1 =  '<b>Session1 = <font color=' + colour_annee + '>' + \
                      '{:.3f}'.format(moyenne_annee) + '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full[str(etu[0])][1] +\
                      ')</font>';
 
-            if moyenne_annee!=moyenne_annee2 and full2[str(etu[0])]=='ENCO':
-                sess2 = '<b>Session2 = <font color=' + colour_annee + '>' + 'ENCO</font></b>';
+            if moyenne_annee!=moyenne_annee2 and full2[str(etu[0])] in ['NCAE', 'ENCO']:
+                sess2 = '<b>Session2 = <font color=' + colour_annee + '>' + full2[str(etu[0])]  + '</font></b>';
             elif moyenne_annee!=moyenne_annee2:
                 sess2 =  '<b>Session2 = <font color=' + colour_annee2 + '>' + \
                      '{:.3f}'.format(moyenne_annee2) + '/20</font></b><font color=\'grey\' size=\'9\'> (#' + full2[str(etu[0])][1] +\
@@ -368,6 +373,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
             if parcours=='CMI' and semestres[0].startswith('S3'):num_ue-=2;
             if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
             if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
+            if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];
