@@ -1,5 +1,5 @@
 data/*
 output/*
 *.swp
-old
+backup
 .DS_Store

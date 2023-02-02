@@ -294,11 +294,12 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
                  maj2 = maj2 + pv[sem][etu[0]]['results'][sem]['MAJ2'][0];
                  coe1 = coe1 + pv[sem][etu[0]]['results'][sem]['MAJ1'][1];
                  coe2 = coe2 + pv[sem][etu[0]]['results'][sem]['MAJ2'][1];
-             maj1 = maj1/coe1; maj2 = maj2/coe2;
+             maj1 = maj1/coe1;
+             maj2 = maj2/coe2 if coe2!=0 else 0;
              col1 = 'red' if maj1 < 50 else 'black';
              col2 = 'red' if maj2 < 50 else 'black';
              if maj1 < 50: logger.warning(etu[1] + " (" + str(etu[0]) + ")] : Bloc Phys non valide [" + '{:.3f}'.format(maj1) + '/100]');
-             if maj2 < 50: logger.warning(etu[1] + " (" + str(etu[0]) + ")] : Bloc " +  UEs[MIN[-1]]['nom'][3:-1] + " non valide [" + '{:.3f}'.format(maj2) + '/100]');
+             if coe2!=0 and maj2 < 50: logger.warning(etu[1] + " (" + str(etu[0]) + ")] : Bloc " +  UEs[MIN[-1]]['nom'][3:-1] + " non valide [" + '{:.3f}'.format(maj2) + '/100]');
 
              disc =  '<br />MAJ1 : <font color=' + col1 + '> ' + '{:.3f}'.format(maj1) + '/100</font>' + \
                      '<br />MAJ2 : <font color=' + col2 + '> ' + '{:.3f}'.format(maj2) + '/100</font>';
