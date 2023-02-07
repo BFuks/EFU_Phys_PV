@@ -167,6 +167,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
         if ue.startswith('LU') and not ('PY' in ue or 'LV' in ue or ue in ['LU3ME010']): continue;
         if ue.startswith('L5PH') or ue.startswith('L3LACH') or ue.startswith('L4LACH') or ue.startswith('L6PH'): continue;
         if ue.startswith('L5LACH') or ue.startswith('L6LACH'): continue;
+        if ue.startswith('L3PH') or ue.startswith('L4PH'): continue;
 
         ### Redoublant deja valide
         validation_tag = "<br /><font color='grey' size='8'>("+notes[ue]['annee_val']+')</font>' if notes[ue]['annee_val']!=None else '';

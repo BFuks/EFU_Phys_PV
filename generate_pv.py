@@ -60,7 +60,7 @@ niveau = niveaux[int(answer)-1];
 
 ## Choice de l'annee
 logger.warning("Choisir une annee parmi:");
-annees          = [x for x in PV_dico[niveau].keys()];
+annees          = sorted([x for x in PV_dico[niveau].keys()], reverse=True);
 allowed_answers = [str(x+1) for x in list(range(len(annees)))];
 for i in range(len(annees)):
     print('         *** ', i+1, ':', annees[i]);

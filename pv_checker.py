@@ -298,6 +298,7 @@ def SanityCheck(pv, parcours, semestre):
             if my_label == 'LK5PYJ01' and parcours=='SPRINT': new_label = 'LK5PYJ03';
             if my_label == 'LK6PYJ20' and parcours=='DK': new_label = 'LK6PYDK0';
             if my_label == 'LK4PYJ22': new_label = 'LK4PYJ21';
+            if my_label == 'LK3STM00': new_label = 'LK3STM01';
             if my_label == 'LK4PYJ23': new_label = 'LK4PYJ21';
             if my_label in ['LY5PY090', 'LY5PY092']: data_UE['UE']=None;
             pv_individuel[new_label] = {'note':CheckValidation(new_label, data_UE, str(etudiant), pv[etudiant]['nom']), 'annee_val':data_UE['annee_val']};
