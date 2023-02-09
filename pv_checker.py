@@ -220,7 +220,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         logger.warning("Problemes de moyenne totale non calculee dans le PV de " + etu_nom + " (" + etu_id + ")");
         logger.warning("  > Moyenne calculee = " + str(moyenne_tot));
         data_pv['total']['note'] = moyenne_tot;
-    if (moyenne_tot-float(data_pv['total']['note'])) > 0.001:
+    threshold = 0.1 if 'PAD' in parcours else 0.001;
+    if (moyenne_tot-float(data_pv['total']['note'])) > threshold:
         logger.error("Problemes de moyenne totale dans le PV de "  + etu_nom + " (" + etu_id + "):");
         logger.error("  *** Moyenne calculee : " + str(moyenne_tot));
         logger.error("  *** Moyenne Apogee   : " + str(data_pv['total']['note']));
