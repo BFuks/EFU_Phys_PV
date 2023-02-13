@@ -712,6 +712,7 @@ Maquette = {
     'LK6STM01' : { 'UE' : [ ['LU3ST060', 'LU3ST061'], ['LU3ST060', 'LU3ST062'], ['LU3ST069', 'LU3ST062'], ['LU3ST066', 'LU3ST062'] ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
     'LK5STD00' : { 'UE' : [ ['LU3ST057', 'LU3ST059', 'LU3ST507'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S5" },
     'LK6STD00' : { 'UE' : [ ['LU3ST060', 'LU3ST603', 'LU3ST605', 'LU3PY105'], ['LU3ST060', 'LU3ST603', 'LU3ST605', 'LU3PY124'], ['LU3ST060', 'LU3ST603', 'LU3ST605', 'LU3PY125'], ['LU3ST060', 'LU3ST603', 'LU3ST605', 'LU3PY122'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S6" },
+    'LK3IAM00' : { 'UE' : [ ['LU2IAS31', 'LU2IAS32']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S3" },
     'LK5IAM00' : { 'UE' : [ ['LU3IAS54', 'LU3IAS53']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
     'LK6IAM00' : { 'UE' : [ ['LU3IAS61']                         ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
     'LK5MTM00' : { 'UE' : [ ['LU3MT551', 'LU3MT552']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
