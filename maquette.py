@@ -636,7 +636,7 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S6"
     },
-    'LK3CIM00' : { 'UE' : [ ['LU2CI012', 'LU2CI011']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S3" },
+    'LK3CIM00' : { 'UE' : [ ['LU2CI012', 'LU2CI011']             ], 'parcours': ['MAJ', 'PADMAJ'], 'nom' : "MIN", 'semestre': "S3" },
     'LK4CIM00' : { 'UE' : [ ['LU2CI101', 'LU2CI102']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
     'LK3CID00' : { 'UE' : [ ['LU2CI012', 'LU2CI011', 'LU2CI031'] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S3" },
     'LK4CID00' : { 'UE' : [ ['LU2CI101', 'LU2CI102', 'LU2CI105', 'LU2PY123'] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S4" },
