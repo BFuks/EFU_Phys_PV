@@ -669,7 +669,7 @@ Maquette = {
     'LK4CHM00' : { 'UE' : [ ['L4LACHCI', 'L4LACHLA']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
     'LK5CHM00' : { 'UE' : [ ['L5LACHCI', 'L5LACHLA']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
     'LK6CHM00' : { 'UE' : [ ['L6LACHCI', 'L6LACHLA']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
-    'LK3GSM00' : { 'UE' : [ ['LU2GSG31', 'LU2GSG32']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S3" },
+    'LK3GSM00' : { 'UE' : [ ['LU2GSG31', 'LU2GSG32']             ], 'parcours': ['MAJ', 'PADMAJ'], 'nom' : "MIN", 'semestre': "S3" },
     'LK4GSM00' : { 'UE' : [ ['LU2GSG41', 'LU2GSG42']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
     'LK3MTM00' : { 'UE' : [ ['LU2MT017', 'LU2MT018']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S3" },
     'LK4MTM00' : { 'UE' : [ ['LU2MT001', 'LU2MT002']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S4" },
