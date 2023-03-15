@@ -66,6 +66,7 @@ def GetHistoData(PVs):
 ###                                                    ###
 ##########################################################
 import matplotlib.pyplot as plt;
+import numpy             as np;
 def MakePlot1(variable, data, title, filename):
     # Histograms
     font1 = {'family':'sans-serif', 'color':'darkred',  'size':15};
@@ -107,8 +108,18 @@ def MakePlot2(variable, data, title, filename):
 
     # data
     maxi  = 100 if variable.startswith('L') else 20;
+
     ax1.hist(data[0], bins=40, range=[0,maxi], color='teal', label='Session 1');
+    ax1.axvline(np.mean(data[0]),   color='darkred',  linestyle='dashed', linewidth=1);
+    ax1.axvline(np.median(data[0]), color='darkblue', linestyle='dotted', linewidth=1);
+    ax1.text(maxi/40, ax1.get_ylim()[1]*.90, 'Moy. : {:.2f}'.format(np.mean(data[0])),   color='darkred');
+    ax1.text(maxi/40, ax1.get_ylim()[1]*.80, 'Med. : {:.2f}'.format(np.median(data[0])), color='darkblue');
+
+    ax2.axvline(np.mean(data[1]),   color='darkred',  linestyle='dashed', linewidth=1);
+    ax2.axvline(np.median(data[1]), color='darkblue', linestyle='dotted', linewidth=1);
     ax2.hist(data[1], bins=40, range=[0,maxi], color='teal', label='Session 2');
+    ax2.text(maxi/40, ax2.get_ylim()[1]*.90, 'Moy. : {:.2f}'.format(np.mean(data[1])),   color='darkred');
+    ax2.text(maxi/40, ax2.get_ylim()[1]*.80, 'Med. : {:.2f}'.format(np.median(data[1])), color='darkblue');
 
     # Layout
     ax1.set_title(title, fontdict=font1);
