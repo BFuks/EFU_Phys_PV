@@ -82,6 +82,7 @@ UEs = {
     'LU2GSG31': {'ects': 6, 'nom':'MinGestion1'},
     'LU3GSG51': {'ects': 6, 'nom':'MinGestion1'},
     'LU3GSG53': {'ects': 6, 'nom':'MinGestion2'},
+    'LU5SX06E': {'ects': 6, 'nom':'MinGestion2'},
     'LU2GSG32': {'ects': 6, 'nom':'MinGestion2'},
     'LK3HNM00': {'ects':12, 'nom':'MinHistNat0'},
     'LU2HNP31': {'ects': 3, 'nom':'MinHistNat1'},
@@ -588,7 +589,10 @@ Maquette = {
         'semestre': "S5"
     },
     'LK5PYMI0': {
-        'UE'      : [['LU3CI052', 'LU3CI011', 'LU3GSG51'], ['LU3EE100', 'LU3EE101', 'LU3GSG51'] ],
+        'UE'      : [
+           ['LU3CI052', 'LU3CI011', 'LU3GSG51'], ['LU3EE100', 'LU3EE101', 'LU3GSG51'],
+           ['LU3CI052', 'LU3CI011', 'LU3GSG51', 'LU5SX06E'], ['LU3EE100', 'LU3EE101', 'LU3GSG51', 'LU5SX06E']
+         ],
         'parcours': ['CMI'],
         'nom'     : "CMP",
         'semestre': "S5"

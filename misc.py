@@ -128,3 +128,80 @@ def GetUEsMaquette(blocs_maquette):
         length-=1;
     return UEs_maquette;
 
+
+
+##########################################################
+###                                                    ###
+###    Liste des niveaux disponibles pour les PVs      ###
+###                                                    ###
+##########################################################
+def Niveau(all_niveaux):
+    # Allowed options
+    logger.warning("Choisir un niveau parmi:");
+    niveaux         = sorted([x for x in all_niveaux]);
+    allowed_answers = [str(x+1) for x in list(range(len(niveaux)))];
+
+    # Printout
+    for i in range(len(niveaux)): print('         *** ', i+1, ':', niveaux[i]);
+
+    # Choice
+    answer = ""
+    answer = input("INFO   : Choix ? ")
+    while answer not in allowed_answers:
+        logger.error('Reponse non pertinente');
+        answer = input("INFO   : Choix parmi [" + ''.join(allowed_answers) + "]: ")
+
+    # Output
+    return niveaux[int(answer)-1];
+
+
+
+##########################################################
+###                                                    ###
+###     Liste des années disponibles pour les PVs      ###
+###                                                    ###
+##########################################################
+def Year(all_years):
+    # Allowed options
+    logger.warning("Choisir une annee parmi:");
+    annees          = sorted([x for x in all_years], reverse=True);
+    allowed_answers = [str(x+1) for x in list(range(len(annees)))];
+
+    # Printout
+    for i in range(len(annees)): print('         *** ', i+1, ':', annees[i]);
+
+    # Choice
+    answer          = ""
+    answer = input("INFO   : Choix ? ")
+    while answer not in allowed_answers:
+        logger.error('Reponse non pertinente');
+        answer = input("INFO   : Choix parmi [" + ''.join(allowed_answers) + "]: ")
+
+    # Output
+    return annees[int(answer)-1];
+
+##########################################################
+###                                                    ###
+###    Liste des parcours disponibles pour les PVs     ###
+###                                                    ###
+##########################################################
+def Parcours(all_parcours):
+    # Allowed options
+    logger.warning("Choisir un parcours parmi:");
+    parcours        = sorted([x for x in all_parcours]);
+    allowed_answers = [str(x+1) for x in list(range(len(parcours)))];
+
+    # Printout
+    for i in range(len(parcours)): print('         *** ', i+1, ':', parcours[i]);
+
+    # Choice
+    answer = ""
+    answer = input("INFO   : Choix ? ")
+    while answer not in allowed_answers:
+        logger.error('Reponse non pertinente');
+        answer =input("INFO   : Choix parmi [" + ', '.join(allowed_answers) + "]: ")
+
+    # Output
+    return parcours[int(answer)-1];
+
+

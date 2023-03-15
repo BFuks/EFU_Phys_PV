@@ -182,7 +182,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                 no120=True;
                 continue
             if not parcours in ['DK', 'DM', 'SPRINT'] or (not 'SX' in UEs[ue].keys() and not (ue=='LU2PY123' and no123)):
-                if ue in ['LU2PY102', 'LU2GSG31', 'LU3GSG51', 'LU3PY105'] and sxcmi: continue;
+                if ue in ['LU2PY102', 'LU2GSG31', 'LU3GSG51', 'LU3PY105', 'LU5SX06E'] and sxcmi: continue;
                 if data_pv[ue]['note'] != 'COVID':
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
                     moyenne_tot  += float(data_pv[ue]['note'])*UEs[ue]['ects'];
@@ -205,11 +205,11 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
 
     # Verification du nombre de creds
-    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51'] and sxcmi)]);
+    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51', 'LU5SX06E'] and sxcmi)]);
     if no120: creds = creds-6;
     if creds!=30 and data_pv['total']['note']!='NCAE': logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(creds) + " ECTS");
     if data_pv['total']['note']=='NCAE':
-        ncae_creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and     (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51'] and sxcmi) and isinstance(data_pv[x]['note'],float)]);
+        ncae_creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and     (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51', 'LU5SX06E'] and sxcmi) and isinstance(data_pv[x]['note'],float)]);
         if ncae_creds==30: logger.error("L'étudiant " +  etu_nom + " (" + etu_id + ") a un contrat complet (NCAE incorrect)");
 
     ## Calcul de la moyenne du semestre

@@ -1,5 +1,6 @@
 data/*
 output/*
+histos/*
 *.swp
 backup
 .DS_Store

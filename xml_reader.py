@@ -288,3 +288,31 @@ def DecodePV(xml_data,structure):
     # output
     return resultats;
 
+
+
+##########################################################
+###                                                    ###
+###                 Patch pour le S6 DM                ###
+###                                                    ###
+##########################################################
+def Patch_DMS6(pv_in, pv_out):
+    # Initialisation
+    PV_result = pv_out;
+
+    # Updating the pv_out if necessary
+    for key in pv_in.keys():
+        # Basic info
+        if key=='resume': continue;
+
+        # New info to store
+        if not key in PV_result.keys(): PV_result[key] = pv_in[key];
+
+        # Existing entry to maybe store
+        else:
+            old_keys = [x for x in PV_result[key]['results'].keys() if 'note' in PV_result[key]['results'][x].keys()];
+            new_keys = [x for x in pv_in[key]['results'].keys() if 'note' in pv_in[key]['results'][x].keys()];
+            if len(new_keys)>len(old_keys): PV_result[key] = pv_in[key];
+
+    # Output
+    return PV_result;
+
