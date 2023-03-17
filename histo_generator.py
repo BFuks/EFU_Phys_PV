@@ -82,6 +82,11 @@ def MakePlot1(variable, data, title, filename):
     maxi  = 100 if variable.startswith('L') else 20;
     ax.hist(data, bins=40, range=[0,maxi], color='teal', label='Session 1');
 
+    ax.axvline(np.mean(data),   color='darkred',  linestyle='dashed', linewidth=1);
+    ax.axvline(np.median(data), color='darkblue', linestyle='dotted', linewidth=1);
+    ax.text(maxi/40, ax.get_ylim()[1]*.90, 'Moy. : {:.2f}'.format(np.mean(data)),   color='darkred');
+    ax.text(maxi/40, ax.get_ylim()[1]*.80, 'Med. : {:.2f}'.format(np.median(data)), color='darkblue');
+
     # Layout
     ax.set_title(title, fontdict=font1);
     ax.legend(loc='upper right');
