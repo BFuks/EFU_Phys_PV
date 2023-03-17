@@ -24,14 +24,13 @@ Start();
 
 # Options
 import getopt, sys;
-
 try:   optlist, arglist = getopt.getopt(sys.argv[1:], "d", ["debug"]);
 except getopt.GetoptError as err:
     logger.error(str(err));
     Bye();
-
 for o,a in optlist:
     if o in ["-d", "--debug"]: logger.setLevel(logging.DEBUG);
+
 
 ## Obtention de la liste des PV disponible
 logger.info("");
