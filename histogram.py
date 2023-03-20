@@ -20,7 +20,7 @@ logger = logging.getLogger('mylogger');
 ###                    Get data                        ###
 ###                                                    ###
 ##########################################################
-def GetHistoData(PVs):
+def GetHistoData(PVs, DMPM=False):
     # Initialisation
     stats_session1 = {}; stats_session2 = {};
 
@@ -31,6 +31,8 @@ def GetHistoData(PVs):
 
         # Loop over all students
         for student in PVs[semestre].keys():
+            if DMPM:
+                if len([x for x in PVs[semestre][student]['results'].keys() if x.startswith('L') and 'MA' in x])==0: continue;
             for ue, result in  PVs[semestre][student]['results'].items():
                 # semester average
                 if ue=='total':

@@ -51,8 +51,10 @@ annee    = Year(PV_dico[niveau].keys());
 all_parcours = [];
 if len(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']))>0: all_parcours.append('MAJ');
 if 'MONO' in PV_dico[niveau][annee].keys(): all_parcours.append('MONO');
+if 'DM'   in PV_dico[niveau][annee].keys(): all_parcours.append('DM-PM');
 parcours = Parcours(all_parcours);
-if   parcours == 'MONO': list_parcours = ['MONO'];
+if   parcours == 'MONO':  list_parcours = ['MONO'];
+elif parcours == 'DM-PM': list_parcours = ['DM'];
 elif parcours == 'MAJ':
     list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']));
 
@@ -88,7 +90,6 @@ for semestre in semestres:
         # Fusion des infos avec les PVs deja existants
         all_PVs[semestre] = Patch_DMS6(PV_tmp, all_PVs[semestre]);
 
-
 ## Merging 1st and 2nd session
 from session_merger import Merge;
 for sess2 in [x for x in all_PVs.keys() if "Session2" in x]:
@@ -104,8 +105,8 @@ for sess2 in [x for x in all_PVs.keys() if "Session2" in x]:
 semestres = [x for x in semestres if not 'Session2' in x];
 
 # Histograms
-from histo_generator import GetHistoData, MakePlot1, MakePlot2;
-stats_session1, stats_session2 = GetHistoData(all_PVs);
+from histogram import GetHistoData, MakePlot1, MakePlot2;
+stats_session1, stats_session2 = GetHistoData(all_PVs, (parcours == 'DM-PM'));
 for variable in stats_session1.keys():
     title = 'Parcours ' + parcours + '; ' + ('semestre ' + variable if variable.startswith('S') else variable) + ' (' + annee.replace('_','-') + ')';
     filename  = 'histos/histo_'+ parcours+'_' +annee.replace('_','-') + '_' + variable + '.png'
