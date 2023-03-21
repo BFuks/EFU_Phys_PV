@@ -41,7 +41,7 @@ PV_dico = GetPVList();
 
 # Safety
 if len(PV_dico) == 0:
-  logger.error("Pas de donnees disponibles pour generer les stats");
+  logger.error("Pas de donnees disponibles pour generer les histos");
   Bye();
 
 ## Choix du niveau, de l'annee et du parcours
@@ -50,13 +50,14 @@ niveau   = Niveau(PV_dico.keys());
 annee    = Year(PV_dico[niveau].keys());
 all_parcours = [];
 if len(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']))>0: all_parcours.append('MAJ');
-if 'MONO' in PV_dico[niveau][annee].keys(): all_parcours.append('MONO');
-if 'DM'   in PV_dico[niveau][annee].keys(): all_parcours.append('DM-PM');
+if 'MONO' in PV_dico[niveau][annee].keys():    all_parcours.append('MONO');
+if 'DM'   in PV_dico[niveau][annee].keys():    all_parcours.append('DM-PM');
+if len(set(PV_dico[niveau][annee].keys()) & set(['PADMAJ', 'PADMONO']))>0: all_parcours.append('PAD');
 parcours = Parcours(all_parcours);
-if   parcours == 'MONO':  list_parcours = ['MONO'];
-elif parcours == 'DM-PM': list_parcours = ['DM'];
-elif parcours == 'MAJ':
-    list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']));
+if   parcours == 'MONO':    list_parcours = ['MONO'];
+elif parcours == 'DM-PM':   list_parcours = ['DM'];
+elif parcours == 'MAJ':     list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']));
+elif parcours == 'PAD':     list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['PADMAJ', 'PADMONO']));
 
 # Semestres disponibles
 semestres = [];

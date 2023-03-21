@@ -81,6 +81,7 @@ def MakePlot1(variable, data, title, filename):
     ax.tick_params(axis='y', colors='darkblue');
 
     # data
+    if 'semestre' in title: logger.info(title + ' : ' + str(len(data)) +  ' étudiants');
     maxi  = 100 if variable.startswith('L') else 20;
     ax.hist(data, bins=40, range=[0,maxi], color='teal', label='Session 1');
 
@@ -114,6 +115,7 @@ def MakePlot2(variable, data, title, filename):
     ax2.tick_params(axis='y', colors='darkblue');
 
     # data
+    if 'semestre' in title: logger.info(title + ' : ' + str(len(data[0])) +  ' étudiants');
     maxi  = 100 if variable.startswith('L') else 20;
 
     ax1.hist(data[0], bins=40, range=[0,maxi], color='teal', label='Session 1');
