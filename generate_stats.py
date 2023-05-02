@@ -131,7 +131,8 @@ for etu, value in new_stats.items():
     for key, keyvalue in new_stats[etu].items():
         if key in ['sexe', 'nom', 'prenom', 'date_naissance', 'mail', 'bourse', 'annee_bac', 'pays_bac', 'inscr_SU']: output_stats[etu][key] = keyvalue;
         elif key == 'parcours': output_stats[etu][key] = keyvalue[my_year];
-        elif key == 'N-1': output_stats[etu][key] = keyvalue[my_year];
+        elif key == 'N-1':
+            output_stats[etu][key] = keyvalue[my_year] if my_year in keyvalue.keys() else '';
     if my_year in new_stats[etu].keys(): output_stats[etu] = {**output_stats[etu], **new_stats[etu][my_year]};
     else: output_stats[etu]['notes Session1'] = {};
 csv_stats = ToExcel(StatConverter(output_stats, my_year),my_year);

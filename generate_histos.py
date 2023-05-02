@@ -49,15 +49,17 @@ from misc import Niveau, Year, Parcours;
 niveau   = Niveau(PV_dico.keys());
 annee    = Year(PV_dico[niveau].keys());
 all_parcours = [];
-if len(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']))>0: all_parcours.append('MAJ');
+if len(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']))>0: all_parcours.append('MAJ+DM+DK'); all_parcours.append('MAJ');
 if 'MONO' in PV_dico[niveau][annee].keys():    all_parcours.append('MONO');
-if 'DM'   in PV_dico[niveau][annee].keys():    all_parcours.append('DM-PM');
+if 'SPRINT' in PV_dico[niveau][annee].keys():    all_parcours.append('SPRINT');
+if 'CMI' in PV_dico[niveau][annee].keys():    all_parcours.append('CMI');
+if 'DM'   in PV_dico[niveau][annee].keys():    all_parcours.append('DM-PM'); all_parcours.append('DM')
 if len(set(PV_dico[niveau][annee].keys()) & set(['PADMAJ', 'PADMONO']))>0: all_parcours.append('PAD');
 parcours = Parcours(all_parcours);
-if   parcours == 'MONO':    list_parcours = ['MONO'];
-elif parcours == 'DM-PM':   list_parcours = ['DM'];
-elif parcours == 'MAJ':     list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']));
-elif parcours == 'PAD':     list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['PADMAJ', 'PADMONO']));
+if   parcours in ['MONO', 'MAJ', 'SPRINT', 'CMI'] : list_parcours = [parcours];
+elif parcours.startswith('DM'): list_parcours = ['DM'];
+elif parcours == 'MAJ+DM+DK'  : list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM', 'DK']));
+elif parcours == 'PAD'        : list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['PADMAJ', 'PADMONO']));
 
 # Semestres disponibles
 semestres = [];
@@ -76,7 +78,9 @@ for semestre in semestres:
     all_PVs[semestre] = {};
 
     # Now the loop
-    for my_parcours in (sorted(list_parcours) + ['DM2', 'DM3', 'DM4', 'DM5', 'DM6']):  # cf S6-DM
+    to_browse = sorted(list_parcours);
+    if 'DM' in parcours: to_browse += ['DM2', 'DM3', 'DM4', 'DM5', 'DM6'];
+    for my_parcours in to_browse:
         # Safety
         if not os.path.isfile(os.path.join(os.getcwd(),'data', niveau+'_'+annee+'_'+semestre+'_'+my_parcours+'.dat')): continue;
 
@@ -85,7 +89,8 @@ for semestre in semestres:
         PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, my_parcours));
 
         # Extra computations
-        tag = 'DM' if 'DM' in my_parcours else parcours;
+        tag = 'DM' if parcours.startswith('DM') else my_parcours;
+#        if parcours == 'PAD': tag = my_parcours;
         logger.disabled = True; PV_tmp = SanityCheck(PV_tmp,tag,semestre); logger.disabled = False;
 
         # Fusion des infos avec les PVs deja existants
@@ -106,13 +111,39 @@ for sess2 in [x for x in all_PVs.keys() if "Session2" in x]:
 semestres = [x for x in semestres if not 'Session2' in x];
 
 # Histograms
-from histogram import GetHistoData, MakePlot1, MakePlot2;
-stats_session1, stats_session2 = GetHistoData(all_PVs, (parcours == 'DM-PM'));
+from histogram import GetHistoData, MakePlot1, MakePlot2, MakePie;
+all_stats, stats_session1, stats_session2 = GetHistoData(all_PVs, (parcours == 'DM-PM'));
 for variable in stats_session1.keys():
     title = 'Parcours ' + parcours + '; ' + ('semestre ' + variable if variable.startswith('S') else variable) + ' (' + annee.replace('_','-') + ')';
     filename  = 'histos/histo_'+ parcours+'_' +annee.replace('_','-') + '_' + variable + '.png'
     if len(semestres)==1: MakePlot1(variable, stats_session1[variable], title, filename);
     else:                 MakePlot2(variable, [ stats_session1[variable], stats_session2[variable]], title, filename);
+
+# Validation
+for variable in stats_session2.keys():
+    # Safety
+    if not 'validation' in variable: continue;
+
+    # chart itself
+    title = 'Parcours ' + parcours + '; ' + 'semestre ' + variable.replace('_validation','') + ' (' + annee.replace('_','-') + ')';
+    filename  = 'histos/pie_'+ parcours+'_' +annee.replace('_','-') + '_' + variable.replace('_validation','') + '.png'
+    MakePie(title, stats_session2[variable],filename);
+
+# Extra charts
+from histogram import GetSuccessData;
+all_stats = GetSuccessData(all_stats);
+title = niveau + '; parcours ' + parcours + '; ' + ' (' + annee.replace('_','-') + ')';
+filename  = 'histos/histo_'+ parcours+'_' +annee.replace('_','-') + '_' + niveau + '.png';
+MakePlot1(niveau, all_stats['year'], title, filename);
+MakePie(title, all_stats['year_validation'],filename.replace('histo_','pie_'));
+
+# Physics mastering
+for variable in all_stats.keys():
+    if not variable.startswith('LU') or 'note' in variable: continue;
+    title = 'Parcours ' + parcours + '; ' + ('semestre ' + variable if variable.startswith('S') else variable) + ' (' + annee.replace('_','-') + ')';
+    filename  = 'histos/histo_tot_'+ parcours+'_' +annee.replace('_','-') + '_' + variable + '.png'
+    MakePlot1(variable, all_stats[variable+'_note'], title, filename);
+    MakePie(title, all_stats[variable],filename.replace('histo_tot_','pie_'));
 
 # Bye bye
 Bye();

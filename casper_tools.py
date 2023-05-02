@@ -333,6 +333,7 @@ def MergeCasper(casper_data, stats):
         else:
             for keyword in ['parcours', 'N-1']:
                 for year in value[keyword].keys():
+                    if not keyword in new_stats[etu_id].keys(): new_stats[etu_id][keyword] = {};
                     if not year in new_stats[etu_id][keyword].keys(): new_stats[etu_id][keyword][year] = value[keyword][year]
             for year in [k for k in value.keys() if k.startswith('2')]: new_stats[etu_id][year] = value[year];
 

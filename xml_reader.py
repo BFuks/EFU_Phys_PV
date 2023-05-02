@@ -117,6 +117,7 @@ def DecodeXMLStats(xml_data, structure=apogee_stats):
 
         # Parcours
         if   stats_individuel['parcours'] == 'L2PY01(20)': stats_individuel['parcours'] = 'L2 MONO';
+        elif stats_individuel['parcours'] == 'G1PY01(21)': stats_individuel['parcours'] = 'L3 SPRINT';
         elif stats_individuel['parcours'] == 'L3PY01(21)': stats_individuel['parcours'] = 'L3 MONO';
         elif stats_individuel['parcours'] == 'V2PY01(20)': stats_individuel['parcours'] = 'L2 Bi-Di';
         elif stats_individuel['parcours'] == 'V3PY01(21)': stats_individuel['parcours'] = 'L3 Bi-Di';
