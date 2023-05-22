@@ -82,7 +82,7 @@ def ReadCasperLists():
                     'prenom'        : '',
                     'date_naissance': '',
                     'mail'          : '',
-                    'bourse'        : '',
+                    'bourse'        : {},
                     'parcours'      : {year: parcours},
                     'annee_bac'     : '',
                     'pays_bac'      : bac,

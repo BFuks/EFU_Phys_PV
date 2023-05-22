@@ -108,6 +108,13 @@ logger.info("Extraction des listes Apogée antérieures à 2021")
 new_stats = ReadApogeeLists(new_stats);
 new_stats = ReadApogeeNotes(new_stats);
 
+# Info Pascaline
+from apogee_tools import ReadApogeeT24, ReadApogee2020S3, ReadApogee2020UEs;
+logger.info("Patch Apogée 2020")
+new_stats = ReadApogeeT24(new_stats);
+new_stats = ReadApogee2020S3(new_stats);
+new_stats = ReadApogee2020UEs(new_stats);
+
 # Selection of the year to generate the file for
 years = sorted(years);
 logger.warning("Choisir une annee parmi:");
@@ -129,12 +136,11 @@ for etu, value in new_stats.items():
     # we need to record the student
     output_stats[etu] = {};
     for key, keyvalue in new_stats[etu].items():
-        if key in ['sexe', 'nom', 'prenom', 'date_naissance', 'mail', 'bourse', 'annee_bac', 'pays_bac', 'inscr_SU']: output_stats[etu][key] = keyvalue;
-        elif key == 'parcours': output_stats[etu][key] = keyvalue[my_year];
-        elif key == 'N-1':
-            output_stats[etu][key] = keyvalue[my_year] if my_year in keyvalue.keys() else '';
+        if key in ['sexe', 'nom', 'prenom', 'date_naissance', 'mail', 'annee_bac', 'pays_bac', 'inscr_SU']: output_stats[etu][key] = keyvalue;
+        elif key in ['N-1', 'parcours', 'bourse', 'parcours2']: output_stats[etu][key] = {my_year: keyvalue[my_year]} if my_year in keyvalue.keys() else {my_year:''};
     if my_year in new_stats[etu].keys(): output_stats[etu] = {**output_stats[etu], **new_stats[etu][my_year]};
     else: output_stats[etu]['notes Session1'] = {};
+
 csv_stats = ToExcel(StatConverter(output_stats, my_year),my_year);
 
 

@@ -102,10 +102,14 @@ def PVtoStats(stats, pv, session, parcours):
         keyword = 'Session1' if 'Session1' in session else 'Session2';
         notes =  pv[etudiant]['results'];
         if not 'notes ' + keyword in results[etudiant].keys(): results[etudiant]['notes ' + keyword] = {};
+        maj = [];
         for ue, details in notes.items():
             if ue in Relevant:  results[etudiant]['notes ' + keyword][ue]=details['note'];
             elif ue == 'total': results[etudiant]['notes ' + keyword][session] = details['note'];
             elif not (ue in Irrelevant or not 'PY' in ue or 'LK' in ue): logger.warning('UE a inclure dans les stats ? -> ' + ue);
+            if ue.startswith('LU'): maj.append(ue[3:5]);
+        maj = [x for x in maj if not x in ['PY', 'LV']];
+        results[etudiant]['parcours2'] = max(set(maj), key = maj.count) if maj!=[] else '';
 
         # PAD
         if 'PAD' in parcours: results[etudiant]['parcours']=stats[etudiant]['parcours'][:3]+parcours;
@@ -135,11 +139,17 @@ def MergeStats(stats):
         for year in all_years:
             if etu in stats[year].keys():
                 new_stats[int(etu)][year] = {};
-                for old_key in [kk for kk in stats[year][etu].keys() if not 'notes' in kk and not kk in ['parcours','annees'] ]:
+                for old_key in [kk for kk in stats[year][etu].keys() if not 'notes' in kk and not kk in ['parcours','annees', 'bourse', 'parcours2'] ]:
                     if not old_key in new_stats[int(etu)].keys(): new_stats[int(etu)][old_key] = stats[year][etu][old_key];
                 for old_key in [kk for kk in stats[year][etu].keys() if 'notes' in kk]: new_stats[int(etu)][year][old_key] = stats[year][etu][old_key];
+
+                # update du parcours et du statut de la bourse
                 if not 'parcours' in new_stats[int(etu)].keys(): new_stats[int(etu)]['parcours'] = {};
                 new_stats[int(etu)]['parcours'][year]=stats[year][etu]['parcours'];
+                if not 'parcours2' in new_stats[int(etu)].keys(): new_stats[int(etu)]['parcours2'] = {};
+                if 'parcours2' in stats[year][etu].keys(): new_stats[int(etu)]['parcours2'][year]=stats[year][etu]['parcours2'];
+                if not 'bourse' in new_stats[int(etu)].keys(): new_stats[int(etu)]['bourse'] = {};
+                if 'bourse' in stats[year][etu].keys(): new_stats[int(etu)]['bourse'][year]=stats[year][etu]['bourse'];
 
     # output
     return new_stats;

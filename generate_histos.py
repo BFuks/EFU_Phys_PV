@@ -33,7 +33,7 @@ except getopt.GetoptError as err:
 for o,a in optlist:
     if o in ["-d", "--debug"]: logger.setLevel(logging.DEBUG);
 
-## Obtention de la liste des PV disponible
+## Obtention de la liste des PV disponibles
 logger.info("");
 logger.info("Obtention de la liste des PV disponibles");
 from misc import GetPVList;

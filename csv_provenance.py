@@ -115,7 +115,7 @@ def MergeProvenance(old_years, old_stats, known_ids):
     results = old_stats;
     lists     = glob.glob(os.path.join(os.getcwd(), 'data/prov*'));
     new_infos   = [ 'annee_bac', 'pays_bac', 'inscr_SU'];
-    blank_infos = ['nom', 'prenom', 'mail', 'bourse', 'date_naissance', 'sexe'];
+    blank_infos = ['nom', 'prenom', 'mail', 'date_naissance', 'sexe'];
 
     # Loop over the available file
     for myfile in lists:
@@ -133,14 +133,16 @@ def MergeProvenance(old_years, old_stats, known_ids):
                 known_ids = known_ids + [etu];
                 for new in new_infos: results[etu][new] = v[new];
                 for new in blank_infos: results[etu][new] = '';
+                results[etu]['bourse'] = {};
                 results[etu]['parcours'] = {year:v['parcours']};
                 results[etu]['N-1'] = {year:v['N-1']};
 
             ## existing student
             else:
-                for new in new_infos: results[etu][new] = v[new]; muf = False;
+                for new in new_infos: results[etu][new] = v[new];
                 if not year in results[etu]['parcours'].keys(): results[etu]['parcours'][year] = v['parcours'];
                 if not 'N-1' in results[etu].keys(): results[etu]['N-1'] = {year:v['N-1']};
+                if not 'bourse' in results[etu].keys(): results[etu]['bourse'] = {};
                 else                                 : results[etu]['N-1'][year] = v['N-1'];
 
     # cleaning
