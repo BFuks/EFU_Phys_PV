@@ -62,7 +62,7 @@ all_PVs = {};
 for semestre in semestres:
     logger.info("Lecture da la version XML du PV pour le semestre " + semestre);
     print("         *** Decodage des infos dans le PV");
-    if 'S6' in semestre and parcours =='DM':
+    if 'S6' in semestre and parcours =='DM' and annee=='2021_2022':
         PV_semestre = {};
         for i in range(2,7):
             PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, parcours+str(i)));
