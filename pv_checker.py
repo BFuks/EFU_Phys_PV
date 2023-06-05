@@ -203,7 +203,6 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             logger.error("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
             logger.error("  *** Moyenne calculee " + bloc + " : " + str(moyenne_bloc));
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
-            print(data_pv)
 
     # Verification du nombre de creds
     creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51', 'LU5SX06E'] and sxcmi)]);
