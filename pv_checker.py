@@ -108,10 +108,11 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3.keys() and missing_ue in GrosSac3[x] ];
              if missing_ue=='LU3PY122' and not any([ (x in data_pv.keys()) for x in ['LU3PY231', 'LU3PY232', 'LU3PY233', 'LU3PY234', 'LU3PY235']]) and 'LU3PY033' in data_pv.keys(): grossac=['LU3PY033']
-             logger.debug("  > grossac = "+ str(grossac));
 
              # specific patch
              if etu_id =='28716431' and semestre=='S5' and missing_ue=='LU3PY121': grossac=['LU3PY011', 'LU3LVAN1'];
+             if etu_id =='3700628' and semestre=='S6' and missing_ue=='LU3PY105': grossac=['LU3PY015'];
+             logger.debug("  > grossac = "+ str(grossac));
 
              # test si l'UE fait partie du 1er gros sac
              if len(grossac)>0:
@@ -174,7 +175,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                    'annee_val': None, 'UE': None};
 
         ## Calcul de la moyenne du bloc
-        bloc_ues = [x for x in Maquette[bloc]['UE'] if set(x).issubset(set(data_pv.keys())) ][0];
+        bloc_ues = [x for x in Maquette[bloc]['UE'] if set(x).issubset(set(data_pv.keys())) ];
+        bloc_ues = bloc_ues[1] if sxcmi and bloc=='LK6PYJ00' and len(bloc_ues)>1 else bloc_ues[0];
         moyenne_bloc = 0.; coeff_bloc   = 0.;
         for ue in bloc_ues:
             if data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO']: continue;
@@ -241,7 +243,7 @@ def CalculBlocsDisc(pv_etu, semestre):
     # list UEs
     ues = [x for x in pv_etu.keys() if 'LU' in x and not 'LV' in x and not 'OIP' in x];
     phys= [x for x in BlocsDisc[semestre]['PY'] if all([y in ues for y in x])][0];
-    tag = list(set([x[3:5] for x in [y.replace('SX','') for y in ues] if x[3:5]!='PY']));
+    tag = list(set([x[3:5] for x in [y.replace('SX','').replace('XS','') for y in ues] if x[3:5]!='PY']));
     if len(tag)==0: tag=''; MIN='';
     else: tag = tag[0];
     try:    MIN = [x for x in BlocsDisc[semestre][tag] if all([y in ues for y in x])][0];
@@ -317,6 +319,8 @@ def SanityCheck(pv, parcours, semestre):
             'LU2ST403' in pv_individuel.keys() and 'LU2PY123' in pv_individuel.keys():
             pv_individuel['LK4STD00'] = {'tag': 'Bloc DM ST S4', 'bareme': '100', 'validation': 'ADM', 'note': '-1', 'annee_val': None, 'UE': None}
 
+        # path allemand
+        if 'LK3ALD00' in pv_individuel.keys(): pv_individuel['LU2XSAL1']=pv_individuel['LK3ALD00'];
 
         # Verification des moyennes (blocs et semestre)
         CheckMoyennes(pv_individuel, parcours, semestre.split('_')[0], str(etudiant), pv[etudiant]['nom']);
