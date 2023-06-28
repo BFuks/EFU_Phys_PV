@@ -1,6 +1,8 @@
 data/*
 output/*
 histos/*
+trash/*
+genessai.*
 *.swp
 backup
 .DS_Store
