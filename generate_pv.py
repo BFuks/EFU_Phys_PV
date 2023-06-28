@@ -94,13 +94,13 @@ all_PVs = GetMoyenneAnnuelle(all_PVs);
 ## Creation des PV pirates
 from pv_writer  import PDFWriter;
 logger.info("Creation de la version PDF du PV " + parcours + " (" + annee + ")");
-PDFWriter(all_PVs, annee, niveau, parcours, semestres,redoublants=False);
+PDFWriter(all_PVs, annee, niveau, parcours, semestres,redoublants=False, success=False);
 
-# CSV writer
-from csv_converter import merge, convert, ToExcelPV
-logger.info("Creation de la version Excel du PV " + parcours + " (" + annee + ")");
-merged_pvs = convert(merge(all_PVs));
-ToExcelPV(merged_pvs, annee, niveau, parcours);
+## # CSV writer
+## from csv_converter import merge, convert, ToExcelPV
+## logger.info("Creation de la version Excel du PV " + parcours + " (" + annee + ")");
+## merged_pvs = convert(merge(all_PVs));
+## ToExcelPV(merged_pvs, annee, niveau, parcours);
 
 
 # Bye bye

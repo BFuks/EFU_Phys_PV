@@ -248,7 +248,7 @@ def GetLineStyle(counter, endline):
 
 
 from misc import GetBlocsMaquette, GetUEsMaquette;
-def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
+def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success=False):
 
     # Title and headers
     pv_file, story =  MakeTitle(annee, niveau, parcours, semestres);
@@ -275,7 +275,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
                  if not etu[0] in pv[sem].keys():continue;
                  try:    MIN = MIN + [ x for x in pv[sem][etu[0]]['results'].keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'];
                  except: MIN = [''];
-             logger.debug("  > Parcours = "  + str(MIN))
+             logger.debug("  > Parcours " + sem + " = "  + str(MIN))
              if parcours=='MAJ':
                  try:    my_parcours = 'MajPhys - ' + UEs[MIN[-1]]['nom'][:-1];
                  except: my_parcours = 'MajPhys';
@@ -325,6 +325,8 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False):
          if moyenne_annee!=moyenne_annee2: logger.debug("  Session 2 : > " + str(moyenne_annee2) + ' (' + colour_annee2 + ')');
          if redoublants:
              if not (moyenne_annee<10 and moyenne_annee2<10): continue;
+         if success:
+             if (moyenne_annee<10 and moyenne_annee2<10): continue;
 
          ## Real loop over the semesters
          for semestre in semestres:

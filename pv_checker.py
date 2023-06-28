@@ -123,6 +123,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                  elif [ data_pv[ue]['note'] for ue in list_note ] in ['U VAC']: note = 'U VAC';
                  else: note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
                  data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
+                 logger.debug('  > Ajout du grossac : ' + missing_ue + " : "  + str(data_pv[missing_ue]) + '(#0)');
                  if parcours in ['MAJ']:
                      if grossac[0] in GrosSac.keys() and missing_ue == GrosSac[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
@@ -132,10 +133,11 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
              # On a vraiment une UE manquante -> COVID
              elif not missing_ue+'_GS' in data_pv.keys():
-                 logger.debug("  > Ajout de l'UE "+ missing_ue);
                  data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': 'COVID', 'annee_val': None, 'UE': None};
+                 if parcours == 'PADMONO': data_pv[missing_ue]['ancienneUE']=True;
+                 logger.debug("  > Ajout de l'UE "+ missing_ue + " : " + str(data_pv[missing_ue]) + '(#1)');
              else:
-                 logger.debug("  > Ajout de l'UE "+ missing_ue);
+                 logger.debug("  > Ajout de l'UE "+ missing_ue + '(#2)');
                  data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'GS', 'note':'DIS', 'annee_val': None, 'UE': None};
 
 
@@ -183,7 +185,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             if ('LK6EED00' in list(data_pv.keys()) or 'LK6STD00' in list(data_pv.keys())) and ue in ['LU3PY105', 'LU3PY122', 'LU3PY124', 'LU3PY125']:
                 no120=True;
                 continue
-            if not parcours in ['DK', 'DM', 'SPRINT'] or (not 'SX' in UEs[ue].keys() and not (ue=='LU2PY123' and no123)):
+            if not parcours in ['DK', 'DM', 'SPRINT'] or (not 'SX' in UEs[ue].keys() and not (ue=='LU2PY123' and no123)) or (parcours=='DM' and ue in ['LU2IN003', 'LU2IN009']):
                 if ue in ['LU2PY102', 'LU2GSG31', 'LU3GSG51', 'LU3PY105', 'LU5SX06E'] and sxcmi: continue;
                 if data_pv[ue]['note'] != 'COVID':
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
@@ -207,7 +209,10 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
 
     # Verification du nombre de creds
-    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51', 'LU5SX06E'] and sxcmi)]);
+    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51', 'LU5SX06E'] and sxcmi) and not 'ancienneUE' in data_pv[x].keys()]);
+    if 'LK4IND00' in data_pv.keys(): 
+        creds=sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and x != 'LU2IN006'] );
+
     if no120: creds = creds-6;
     if creds!=30 and data_pv['total']['note']!='NCAE': logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(creds) + " ECTS");
     if data_pv['total']['note']=='NCAE':
@@ -295,7 +300,7 @@ def SanityCheck(pv, parcours, semestre):
             logger.debug('  > label = ' + my_label + "; UE = " + str(data_UE));
 
             ## Extraction du PV
-            if   my_label == 'LY5PY090': new_label = data_UE['UE'];
+            if my_label == 'LY5PY090': new_label = data_UE['UE'];
             elif my_label == 'LY5PY092': new_label = data_UE['UE'] + '_GS';
             else: new_label = my_label;
             if my_label == 'LK3PYJ01': new_label = 'LK3PYJ00';
