@@ -58,11 +58,12 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
 ###                                                    ###
 ##########################################################
 from misc import GetBlocsMaquette, GetUEsMaquette;
-from maquette import GrosSac, GrosSacP2, GrosSac2, GrosSac3;
+from maquette import GrosSac, GrosSacP2, GrosSac2, GrosSac3, GrosSac3P2;
 def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
     # patch SX bizarre
     no123=False;
+    if 'LU2SXAL2' in data_pv.keys():no123=True;
     if 'LU2SXPH2' in data_pv.keys():no123=True;
     if 'LU2SXHI2' in data_pv.keys():no123=True;
     if 'LK4EWK00' in data_pv.keys():no123=True;
@@ -100,13 +101,14 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
          missings = [  [x for x in z if not x in list(data_pv.keys()) ] for z in GetUEsMaquette(blocs_maquette) ];
          missings = [x for x in missings if len(x)==min([len(y) for y in missings]) ][0];
          for missing_ue in missings:
-             logger.debug("  > Ajout de l'UE manquante " + missing_ue);
+             logger.debug("  > Ajout de l'UE manquante " + missing_ue + ' (##)');
 
              # est-ce que l'UE est dans le premier gros sac ?
              grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] and not x in used_ues] + \
                  [x for x in data_pv.keys() if x in GrosSacP2.keys() and missing_ue in GrosSacP2[x] and not x in used_ues];
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3.keys() and missing_ue in GrosSac3[x] ];
+             if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3P2.keys() and missing_ue in GrosSac3P2[x] ];
              if missing_ue=='LU3PY122' and not any([ (x in data_pv.keys()) for x in ['LU3PY231', 'LU3PY232', 'LU3PY233', 'LU3PY234', 'LU3PY235']]) and 'LU3PY033' in data_pv.keys(): grossac=['LU3PY033']
 
              # specific patch
@@ -129,6 +131,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                      elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSac2.keys() and missing_ue == GrosSac2[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSac3.keys() and missing_ue == GrosSac3[grossac[0]][-1]: used_ues += grossac;
+                     elif grossac[0] in GrosSac3P2.keys() and missing_ue == GrosSac3P2[grossac[0]][-1]: used_ues += grossac;
 
 
              # On a vraiment une UE manquante -> COVID
@@ -150,15 +153,17 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         missings = [x for x in missings if len(x)==min([len(y) for y in missings]) ][0];
         used_ues = [];
         for missing_ue in missings:
-            logger.debug("  > Ajout de l'UE manquante "+ missing_ue);
+            logger.debug("  > Ajout de l'UE manquante "+ missing_ue + ' (#moy - bloc ' + bloc + ')');
 
             # est-ce que l'UE est dans le premier gros sac ?
             grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] and not x in used_ues] + \
                 [x for x in data_pv.keys() if x in GrosSacP2.keys() and missing_ue in GrosSacP2[x] and not x in used_ues];
             if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
             if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3.keys() and missing_ue in GrosSac3[x] ];
+            if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3P2.keys() and missing_ue in GrosSac3P2[x] ];
 
             # test si l'UE fait partie du 1er gros sac
+            logger.debug("  > Gros Sac = " + str(grossac))
             if len(grossac)>0:
                 annee = data_pv[grossac[0]]['note'];
                 coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
@@ -171,6 +176,9 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                      elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSac2.keys() and missing_ue == GrosSac2[grossac[0]][-1]: used_ues += grossac;
                      elif grossac[0] in GrosSac3.keys() and missing_ue == GrosSac3[grossac[0]][-1]: used_ues += grossac;
+                     elif grossac[0] in GrosSac3P2.keys() and missing_ue == GrosSac3P2[grossac[0]][-1]: used_ues += grossac;
+            elif data_pv['total']['note']=='NCAE':
+                data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'AJ', 'note':-1, 'annee_val': None, 'UE': None};
             else:
                 val = 'ADM' if float(data_pv[bloc]['note'])>=50. else 'AJ';
                 data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': val, 'note':data_pv[bloc]['note'],\
@@ -323,9 +331,6 @@ def SanityCheck(pv, parcours, semestre):
         elif 'LU2ST045' in pv_individuel.keys() and 'LU2ST402' in pv_individuel.keys() and \
             'LU2ST403' in pv_individuel.keys() and 'LU2PY123' in pv_individuel.keys():
             pv_individuel['LK4STD00'] = {'tag': 'Bloc DM ST S4', 'bareme': '100', 'validation': 'ADM', 'note': '-1', 'annee_val': None, 'UE': None}
-
-        # path allemand
-        if 'LK3ALD00' in pv_individuel.keys(): pv_individuel['LU2XSAL1']=pv_individuel['LK3ALD00'];
 
         # Verification des moyennes (blocs et semestre)
         CheckMoyennes(pv_individuel, parcours, semestre.split('_')[0], str(etudiant), pv[etudiant]['nom']);

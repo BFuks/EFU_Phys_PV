@@ -12,7 +12,9 @@ class ColoredFormatter(logging.Formatter):
         logging.Formatter.__init__(self, msg)
 
     def format(self,record):
-        if   (record.levelno >= 40):   #FATAL
+        if   (record.levelno >= 50):   #SUPER INFO
+            color = '\x1b[33mERROR  : '
+        elif (record.levelno >= 40):   #FATAL
             color = '\x1b[31mERROR  : '
         elif (record.levelno >= 30): #WARNING
             color = '\x1b[35mINFO   : '

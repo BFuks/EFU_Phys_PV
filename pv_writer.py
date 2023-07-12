@@ -91,7 +91,7 @@ def MakeHeaders(annee, semestres, parcours):
 ##########################################################
 from pv_checker              import CheckValidation
 # Calcul et formattage des moyennes semestrielles
-def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee):
+def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee, etu_id):
 
     ## Formatting session 1(colour)
     if notes['total']['note'] in ['NCAE', 'ENCO']: my_color='black';
@@ -130,7 +130,12 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee):
             if 'note2' in notes[bloc].keys(): notebloc = notes[bloc]['note2'];
         else:
             nombloc  = 'MAJ1' if 'PY' in bloc else 'MAJ2';
-            notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
+            #notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
+            try:
+                notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
+            except:
+                notebloc = 0
+                logger.error('Étudiant ' + str(etu_id) + ' - Problème de maquette pour le bloc ' + nombloc + " : " + str(notes[semestre][nombloc]));
         if notes['total']['note'] not in ['NCAE', 'ENCO']:
             colour = 'red' if float(notebloc)<50 else 'black';
             moyennes_string += '<br />' + nombloc + ' :  <font color=\'' + colour + '\'>' + '{:.3f}'.format(notebloc) + '/100</font>';
@@ -143,7 +148,7 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee):
 
 # Formattage des notes
 from maquette import GrosSac, GrosSacP2;
-def GetNotes(notes, ues, ncases, moyenne_annee):
+def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
 
     ## Initialisation
     notes_string = [];
@@ -197,6 +202,9 @@ def GetNotes(notes, ues, ncases, moyenne_annee):
         tmp_string= '<para align="center"><b>' + ue + '</b><br />' + \
              '<font color=\'grey\' size=\'8\'><super>[' + UEs[ue]['nom'].replace('0','') + ' - ' + str(UEs[ue]['ects']) + ' ECTS]</super></font><br />';
         if 'note2' in notes[ue].keys() and current_note.split('<')[0] != current_note2.split('<')[0]:
+            # Check session 2 > session 1
+            if notes[ue]['note2']<notes[ue]['note']:
+                logger.critical(semestre[:2] + ' - ' + str(etu_id) + " :  Note session 2 < note session1 - " + ue + " (" + str(round(notes[ue]['note'],2)) +  ' > ' +  str(round(notes[ue]['note2'],2)) + ")");
             current_note =  current_note.replace('<br />',' ').replace('#','[#').replace('</font>',']</font>').replace('8','7');
             tmp_string = tmp_string + '<font color=' + fontcolor + ' size=\'7\'>' + current_note + '</font><br />';
             tmp_string = tmp_string + '<font size = \'7\' color=' + fontcolor2 + '>' + current_note2 + '</font>'
@@ -305,7 +313,6 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
              disc =  '<br />MAJ1 : <font color=' + col1 + '> ' + '{:.3f}'.format(maj1) + '/100</font>' + \
                      '<br />MAJ2 : <font color=' + col2 + '> ' + '{:.3f}'.format(maj2) + '/100</font>';
 
-
          ## Header etudiant
          etu_id = Paragraph('<para align="center"><b>' + etu[1] + '<br />' + str(etu[0]) + '</b><br /><br />' + my_parcours + '</para>',getSampleStyleSheet()['BodyText']);
          nbr_semestres = len([y for y in [etu[0] in pv[x].keys() for x in semestres] if y]);
@@ -365,7 +372,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
 
 
             ### Second cell of the table
-            header_semestre = GetAverages(parcours, semestre, pv_ind['results'], blocs_maq, [moyenne_annee, moyenne_annee2]);
+            header_semestre = GetAverages(parcours, semestre, pv_ind['results'], blocs_maq, [moyenne_annee, moyenne_annee2], etu[0]);
 
             ### Notes des UE
             num_ue = GetLength(semestres, parcours);
@@ -382,7 +389,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];
             logger.debug("  > List UEs = " + str(list_ues));
-            etu_notes = GetNotes(pv_ind['results'], list_ues, num_ue, [moyenne_annee, moyenne_annee2]);
+            etu_notes = GetNotes(pv_ind['results'], list_ues, num_ue, [moyenne_annee, moyenne_annee2], etu[0], semestre);
 
             ### Adding the line to the table
             line_data = [[etu_id, header_semestre] + etu_notes];

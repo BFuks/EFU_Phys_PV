@@ -49,7 +49,8 @@ def Merge(session1, session2):
         for ue in session1[etudiant]['results'].keys():
             # no second session
             if not ue in session2[etudiant]['results'].keys():
-                logger.warning(ue + ' manquant dans le PV de ' + results[etudiant]['nom'] + ' (' + str(etudiant) + ')')
+                if not ue.startswith('S'):
+                    logger.warning(ue + ' manquant dans le PV de ' + results[etudiant]['nom'] + ' (' + str(etudiant) + ')')
                 session2[etudiant]['results'][ue] = session1[etudiant]['results'][ue]
 
             # Traitement double majeure
