@@ -220,6 +220,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not '_GS' in x and not x.startswith('LK') and not ('UE' in data_pv[x].keys() and data_pv[x]['UE']=='GrosSac') and (not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[x].keys()) and not (x=='LU2PY123' and no123) and not (x in ['LU2PY102', 'LU3PY105', 'LU2GSG31', 'LU3GSG51', 'LU5SX06E'] and sxcmi) and not 'ancienneUE' in data_pv[x].keys()]);
     if 'LK4IND00' in data_pv.keys(): 
         creds=sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and x != 'LU2IN006'] );
+    if 'LK6IND00' in data_pv.keys(): 
+        creds=sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and x != 'LU3IN024'] );
 
     if no120: creds = creds-6;
     if creds!=30 and data_pv['total']['note']!='NCAE': logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(creds) + " ECTS");
@@ -319,6 +321,7 @@ def SanityCheck(pv, parcours, semestre):
             if my_label == 'LK4PYJ22': new_label = 'LK4PYJ21';
             if my_label == 'LK3STM00': new_label = 'LK3STM01';
             if my_label == 'LK4PYJ23': new_label = 'LK4PYJ21';
+            if my_label == 'LK5PY092' and parcours=='CMI': new_label = 'LK5PYMI0';
             if my_label in ['LY5PY090', 'LY5PY092']: data_UE['UE']=None;
             pv_individuel[new_label] = {'note':CheckValidation(new_label, data_UE, str(etudiant), pv[etudiant]['nom']), 'annee_val':data_UE['annee_val']};
 

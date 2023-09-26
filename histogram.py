@@ -125,6 +125,64 @@ def GetSuccessData(raw_data):
 
 
 
+def GetCCIData(PVs):
+    # Initialisation
+    stats_session1 = {}; stats_session2 = {};
+
+    # Loop over all semesters
+    for semestre in PVs.keys():
+        # Initialisation
+        stats_session1[semestre.replace('_Session1','')] = []; stats_session2[semestre.replace('_Session1','')] = [];
+        stats_session1[semestre.replace('_Session1','_validation')] = []; stats_session2[semestre.replace('_Session1','_validation')] = [];
+
+        # Loop over all students
+        for student, results  in PVs[semestre].items():
+            my_results = results['results'];
+
+            # initialisation student
+            logger.debug(str(student) +  ":" + str(my_results) + '\n');
+
+            # Compensation
+            def getnote(x, session):
+                if session=='session2' and 'note2' in x.keys() : return x['note2'];
+                else: return x['note'];
+            compensated1 = [getnote(PVs[semestre][student]['results'][x], 'session1') for x in PVs[semestre][student]['results'].keys() if x.startswith('LU')];
+            compensated1 = any([ x<50.for x in compensated1 if isinstance(x, float)]);
+            compensated2 = [getnote(PVs[semestre][student]['results'][x], 'session2') for x in PVs[semestre][student]['results'].keys() if x.startswith('LU')];
+            compensated2 = any([ x<50.for x in compensated2 if isinstance(x, float)]);
+
+            # results
+            result = my_results['total'];
+            stats_session1[semestre.replace('_Session1','')].append(result['note']);
+            if 'note2' in result.keys():  stats_session2[semestre.replace('_Session1','')].append(result['note2']);
+            else:                         stats_session2[semestre.replace('_Session1','')].append(result['note']);
+            if isinstance(getnote(result, 'session1'), str): continue;
+            note = getnote(result, 'session1')
+            if note < 10  : stats_session1[semestre.replace('_Session1','_validation')].append(-1);
+            elif compensated1 : stats_session1[semestre.replace('_Session1','_validation')].append(0);
+            elif note>=10 : stats_session1[semestre.replace('_Session1','_validation')].append(1);
+            if isinstance(getnote(result, 'session2'), str): continue;
+            note = getnote(result, 'session2')
+            if note < 10  : stats_session2[semestre.replace('_Session1','_validation')].append(-1);
+            elif compensated2 : stats_session2[semestre.replace('_Session1','_validation')].append(0);
+            elif note>=10 : stats_session2[semestre.replace('_Session1','_validation')].append(1);
+
+            #debug 
+            logger.debug(str(student) +  " session1 : " + str(stats_session1) + '\n');
+            logger.debug(str(student) +  " session2 : " + str(stats_session2) + '\n');
+
+    # Cleaning
+    for key in stats_session1.keys():
+        stats_session1[key] = [x for x in stats_session1[key] if isinstance(x,float) or isinstance(x, int)];
+        stats_session2[key] = [x for x in stats_session2[key] if isinstance(x,float) or isinstance(x, int)];
+
+    # Output
+    return stats_session1, stats_session2;
+
+
+
+
+
 ##########################################################
 ###                                                    ###
 ###                      Plotter                       ###
@@ -224,6 +282,38 @@ def MakePie(variable, raw_data, filename):
     # Saving the file
     plt.savefig(filename);
     plt.close();
+
+
+def MakePie2(variable, raw_data, filename):
+    # Layout
+    font1  = {'family':'sans-serif', 'color':'darkred',  'size':15};
+    font2  = {'family':'sans-serif', 'color':'darkblue', 'size':11};
+    colors = ["Brown", "Cornsilk", "DarkSeaGreen"]
+
+    # formatting data
+    data1 = np.array([raw_data[0].count(-1), raw_data[0].count(0), raw_data[0].count(1)]);
+    data2 = np.array([raw_data[1].count(-1), raw_data[1].count(0), raw_data[1].count(1)]);
+    labels = ['Ajournés', 'Compensés', 'Admis'];
+
+    # canvas
+    fig = plt.figure();
+    (ax1, ax2) = fig.subplots(1,2);
+
+    # Pie chart
+    ax1.pie(data1, wedgeprops=dict(width=0.6), colors=colors, autopct='%1.1f%%');
+    ax2.pie(data2, wedgeprops=dict(width=0.6), colors=colors, autopct='%1.1f%%');
+    ax1.text(-0.275, -0.05, "Session 1", fontdict=font2);
+    ax2.text(-0.275, -0.05, "Session 2", fontdict=font2);
+
+    # Layout again
+    fig.legend(labels, loc="lower center")
+    fig.suptitle(variable, fontdict=font1, y=0.85);
+    fig.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
+
+    # Saving the file
+    plt.savefig(filename, bbox_inches='tight', pad_inches=0.1);
+    plt.close();
+
 
 
 

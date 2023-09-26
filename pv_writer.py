@@ -155,7 +155,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
     counter = 0;
     compensation = ( moyenne_annee[0]>=10. or float(notes['total']['note'])>10.) if notes['total']['note'] not in ['NCAE','ENCO'] else False;
     compensation2 = False;
-    if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee[1]>=10. or float(notes['total']['note2'])>10.) if notes['total']['note'] not in ['NCAE','ENCO'] else False;
+    if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee[1]>=10. or float(notes['total']['note2'])>10.) if notes['total']['note2'] not in ['NCAE','ENCO'] else False;
 
     ## Boucle sur les UE
     for ue in (ues+[x for x in notes.keys() if (x in GrosSac.keys() or x in GrosSacP2.keys())and not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'] + [x for x in notes.keys() if x in ['LK3PYC03', 'LK4PYC03', 'LK5PYMI0', 'LK6PYMI0'] ] ):
@@ -203,7 +203,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
              '<font color=\'grey\' size=\'8\'><super>[' + UEs[ue]['nom'].replace('0','') + ' - ' + str(UEs[ue]['ects']) + ' ECTS]</super></font><br />';
         if 'note2' in notes[ue].keys() and current_note.split('<')[0] != current_note2.split('<')[0]:
             # Check session 2 > session 1
-            if notes[ue]['note2']<notes[ue]['note']:
+            if current_note!='???' and notes[ue]['note2']<notes[ue]['note']:
                 logger.critical(semestre[:2] + ' - ' + str(etu_id) + " :  Note session 2 < note session1 - " + ue + " (" + str(round(notes[ue]['note'],2)) +  ' > ' +  str(round(notes[ue]['note2'],2)) + ")");
             current_note =  current_note.replace('<br />',' ').replace('#','[#').replace('</font>',']</font>').replace('8','7');
             tmp_string = tmp_string + '<font color=' + fontcolor + ' size=\'7\'>' + current_note + '</font><br />';

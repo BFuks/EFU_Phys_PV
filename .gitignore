@@ -2,6 +2,7 @@ data/*
 output/*
 histos/*
 trash/*
+cci/*
 genessai.*
 *.swp
 backup

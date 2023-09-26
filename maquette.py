@@ -392,6 +392,7 @@ UEs = {
     'LK4PYC03': {'ects': 18,'nom':'MinCMI0'},
     'LK5PYMI0': {'ects': 18,'nom':'MinCMI0'},
     'LK6PYMI0': {'ects': 18,'nom':'MinCMI0'},
+    'LU6SX21E': {'ects': 21,'nom':'Moblite'},
 
     'LU3LVAN1': {'ects': 3, 'nom':'Anglais'},
     'LU3LVAN2': {'ects': 3, 'nom':'Anglais'},
@@ -519,7 +520,8 @@ Maquette = {
            ['LU3PY103', 'LU3PY111', 'LU3PY122','LU3LVAN2'],
            ['LU3PY103', 'LU3PY111', 'LU3PY124','LU3LVAN2'],
            ['LU3PY103', 'LU3PY111', 'LU3PY125','LU3LVAN2'],
-           ['LU3PY103', 'LU3PY111', 'LU3PY126','LU3LVAN2']
+           ['LU3PY103', 'LU3PY111', 'LU3PY126','LU3LVAN2'],
+           ['LU6SX21E']
         ],
         'parcours': ['MONO', 'MAJ', 'PADMONO', 'PADMAJ', 'CMI'],
         'nom'     : "MAJ",
@@ -538,6 +540,7 @@ Maquette = {
 
     'LK6PYJ20' : {
         'UE'      : [
+           ['LU3PY103', 'LU3PY111', 'LU3PY537','LU3LVAN2'],
            ['LU3PY403', 'LU3PY411', 'LU3MA120','LU3LVAN2'],
            ['LU3PY103', 'LU3PY111', 'LU3ST061','LU3LVAN2'],
            ['LU3PY103', 'LU3PY111', 'LU2IN024','LU3LVAN2'],
@@ -614,7 +617,8 @@ Maquette = {
     'LK5PYMI0': {
         'UE'      : [
            ['LU3CI052', 'LU3CI011', 'LU3GSG51'], ['LU3EE100', 'LU3EE101', 'LU3GSG51'],
-           ['LU3CI052', 'LU3CI011', 'LU3GSG51', 'LU5SX06E'], ['LU3EE100', 'LU3EE101', 'LU3GSG51', 'LU5SX06E']
+           ['LU3CI052', 'LU3CI011', 'LU3GSG51', 'LU5SX06E'], ['LU3EE100', 'LU3EE101', 'LU3GSG51', 'LU5SX06E'],
+           ['LU3PYSO3', 'LU3GSG51', 'LU5SX06E']
          ],
         'parcours': ['CMI'],
         'nom'     : "CMP",
