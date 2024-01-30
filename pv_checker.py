@@ -44,7 +44,7 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom):
 
     # Verification du statut de validation
     if not nom_UE in IsModule  and note<50. and not data_UE['validation'] in ['AJ', 'ABJ']:
-        logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + etu_nom +') : ' + nom_UE.replace('_GS','') + ' devrait etre AJ');
+        logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + str(etu_nom) +') : ' + nom_UE.replace('_GS','') + ' devrait etre AJ');
     elif not nom_UE in IsModule  and note>=50. and not data_UE['validation'] in ['VAC', 'ADM', 'U ADM']:
         logger.warning('Probleme avec le PV de ' + str(etu_id) + ' (' + etu_nom +') : ' + nom_UE.replace('_GS','') + ' devrait etre ADM');
 
@@ -76,6 +76,10 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
     # Obtentien des blocs et verification que la liste est complete
     blocs_maquette = GetBlocsMaquette(semestre, parcours);
+    if 'LU2PY125' in data_pv.keys() and 'LK3PYJ05' in blocs_maquette and 'LK3PYJ00' in blocs_maquette:
+        blocs_maquette.remove('LK3PYJ00');
+    elif not 'LU2PY125' in data_pv.keys() and 'LK3PYJ05' in blocs_maquette and 'LK3PYJ00' in blocs_maquette:
+        blocs_maquette.remove('LK3PYJ05');
     blocs_pv = sorted([x for x in data_pv.keys() if (x.startswith('LK') or not x in UEs) and not x in ['total', '999999'] and not x in GrosSac.keys() and not x in GrosSacP2.keys()]);
     blocs_maquette = [x for x in blocs_maquette if not x in [x for x in UEs if x.startswith('LK')] or x in blocs_pv];
     if len(blocs_maquette)!=2 and data_pv['total']['note']!='NCAE':
@@ -92,7 +96,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
          from misc     import Bye;
          if data_pv['total']['note']!='NCAE' and not(parcours=='MONO' and semestre in ['S5', 'S6']):
              printed = True
-             logger.warning("Problemes de blocs sans notes dans le PV de " + etu_nom + " (" + etu_id + ")");
+             logger.warning("Problemes de blocs sans notes dans le PV de " + str(etu_nom) + " (" + etu_id + ")");
          for missing_bloc in [x for x in blocs_maquette if not x in blocs_pv]:
              if not(parcours=='MONO' and semestre in ['S5', 'S6']): logger.debug("  > Adding block " + missing_bloc);
              data_pv[missing_bloc] =  {'tag': Maquette[missing_bloc]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '-1', 'annee_val': None, 'UE': None};

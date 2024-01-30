@@ -32,6 +32,7 @@ UEs = {
     'LU2PY123': {'ects':3,  'nom':'Math-S4'},
     'LU2PY423': {'ects':3,  'nom':'Math-S4'},
     'LU2PY124': {'ects':3,  'nom':'Relat'},
+    'LU2PY125': {'ects':3,  'nom':'ITE'},
     'LU3PY124': {'ects':6,  'nom':'ProjExp'},
     'LU2PY424': {'ects':3,  'nom':'Relat'},
     'LU2PY212': {'ects':6,  'nom':'PhysExp1'},
@@ -432,6 +433,14 @@ UEs = {
 # Maquette MONO
 Maquette = {
     # bloc Majeure
+    'LK3PYJ05': {
+        'UE'      : [ 
+           ['LU2PY103', 'LU2PY110', 'LU2PY125', 'LU2LVAN1']
+        ],
+        'parcours': ['MONO'],
+        'nom'     : "MAJ",
+        'semestre': "S3"
+    },
     'LK3PYJ00': {
         'UE'      : [ 
            ['LU2PY103', 'LU2PY110', 'LU2PY124', 'LU2LVAN1'],

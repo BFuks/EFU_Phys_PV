@@ -207,5 +207,3 @@ def ToExcelPV(pv, year, niveau, parcours):
     writer.close();
     return;
 
-
-

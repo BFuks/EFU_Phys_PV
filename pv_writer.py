@@ -66,6 +66,7 @@ def MakeHeaders(annee, semestres, parcours):
     if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
     if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
     if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
+    if parcours=='MONO': num_ue-=4;
 
     # The header themselves
     Headers = [[
@@ -232,6 +233,11 @@ import itertools
 def GetList(pv):
     liste_etudiants =  [ [ [y, x[y]['nom']] for y in x.keys() if y != 'resume'] for x in pv];
     liste_etudiants = [x for y in liste_etudiants for x in y];
+    filtered_data = []
+    for item in liste_etudiants:
+         if item[1] != None or all(entry[1] == None for entry in liste_etudiants if entry[0] == item[0]):
+            filtered_data.append(item)
+    liste_etudiants = filtered_data;
     liste_etudiants.sort(key=lambda elem: elem[1]);
     return list(liste_etudiants for liste_etudiants, _ in itertools.groupby(liste_etudiants));
 
@@ -343,6 +349,10 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
             ### PV individuel
             pv_ind = pv[semestre][etu[0]];
             blocs_maq = [x for x in blocs_maquette[semestre] if not x in [x for x in UEs if x.startswith('LK')] or x in pv_ind['results'].keys()];
+            if int(annee.split('_')[0])>2022 and 'LK3PYJ05' in blocs_maq and 'LK3PYJ00' in blocs_maq:
+                blocs_maq.remove('LK3PYJ00');
+            elif int(annee.split('_')[0])<2023 and 'LK3PYJ05' in blocs_maq and 'LK3PYJ00' in blocs_maq:
+                blocs_maq.remove('LK3PYJ05');
             UEs_maquette[semestre]   = GetUEsMaquette(blocs_maq);
 
             ### First cell of the table
@@ -385,6 +395,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
             if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
             if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
             if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
+            if parcours=='MONO': num_ue-=4;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];

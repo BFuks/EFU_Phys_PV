@@ -106,14 +106,26 @@ semestres = [x for x in semestres if not 'Session2' in x];
 
 
 # Histograms
-from histogram import GetCCIData, GetHistoData, MakePlot2, MakePie2;
+from histogram import GetHistoData, MakePlot2, MakePie2;
+from cci_tools import GetCCIData;
 all_stats, stats_session1, stats_session2 = GetHistoData(all_PVs);
-success_session1, success_session2 =  GetCCIData(all_PVs);
+success_session1, success_session2, students =  GetCCIData(all_PVs);
 for variable in [x for x in stats_session1.keys() if x.startswith('S')]:
     title = 'Parcours ' + prcrs_key.lower() + '; ' + variable + ' (' + annee.replace('_','-') + ')';
     filename  = 'cci/' + variable + '_' + prcrs_key.lower() +'_' +annee.replace('_','-') + '.png'
     MakePlot2(variable, [ stats_session1[variable], stats_session2[variable]], title, filename);
     MakePie2(title, [success_session1[variable+'_validation'], success_session2[variable+'_validation']], filename.replace('cci/','cci/pie_'));
 
-# Bye bye
-Bye();
+# Excelised data
+from cci_tools import CCIdataToExcel;
+CCIdataToExcel(students, niveau, annee, prcrs_key);
+
+# Role of second session
+semesters = ['S3', 'S4'] if niveau == 'L2' else ['S5', 'S6'];
+sem1  = [ x[5] for x in students if x[1]!=''];
+sem2  = [ x[7] for x in students if x[3]!=''];
+new1 = len([ x[5] for x in students if x[1]!='' and x[4]=='AJO' and x[5]!='AJO']);
+new2 = len([ x[7] for x in students if x[3]!='' and x[6]=='AJO' and x[7]!='AJO']);
+print(semesters[0] + ": ", len(sem1)-sem1.count('AJO'), '/', len(sem1), 'validations (dont', new1, 'AJ en session1)');
+print(semesters[1] + ": ", len(sem2)-sem2.count('AJO'), '/', len(sem2), 'validations (dont', new2, 'AJ en session1)');
+
