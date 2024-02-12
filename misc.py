@@ -163,6 +163,7 @@ def Niveau(all_niveaux):
 ###     Liste des années disponibles pour les PVs      ###
 ###                                                    ###
 ##########################################################
+from __version__ import __version__
 def Year(all_years):
     # Allowed options
     logger.warning("Choisir une annee parmi:");
@@ -180,7 +181,14 @@ def Year(all_years):
         answer = input("INFO   : Choix parmi [" + ''.join(allowed_answers) + "]: ")
 
     # Output
-    return annees[int(answer)-1];
+    if int(annees[int(answer)-1].split('_')[0])<=int(__version__[1:]):
+        return annees[int(answer)-1];
+    else:
+        logger.error('Pour des PV de 2023 ou ultérieurs, il faut utiliser la version 2023 du code  (git switch main)')
+        logger.error('Exiting...')
+        sys.exit()
+    bla
+
 
 ##########################################################
 ###                                                    ###

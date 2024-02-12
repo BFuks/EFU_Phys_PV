@@ -50,8 +50,6 @@ niveau   = Niveau(PV_dico.keys());
 annee    = Year(PV_dico[niveau].keys());
 parcours = Parcours(PV_dico[niveau][annee].keys());
 
-from misc import __version__:
-
 # Semestres disponibles
 semestres = sorted([x for x in PV_dico[niveau][annee][parcours].keys()]);
 if len(semestres)==1: logger.warning("Generation du PV pour le semestre : " + ', '.join(semestres) );
