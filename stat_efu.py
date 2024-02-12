@@ -98,11 +98,11 @@ def GetStatistics(pv, parcours, semestre):
            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
 
            # get the notes
-           mynote2 = data_UE['note2'] if ('note2' in data_UE.keys() and data_UE['note2'] not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE']) else '';
-           if 'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE']:
+           mynote2 = data_UE['note2'] if ('note2' in data_UE.keys() and data_UE['note2'] not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE', 'VAC']) else '';
+           if 'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE', 'VAC']:
                notes[key].append(data_UE['note']);
            if mynote2!='': notes2[key].append(mynote2);
-           elif  'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE']: notes2[key].append(data_UE['note']);
+           elif  'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', 'COVID', 'ENCO', 'NCAE', 'VAC']: notes2[key].append(data_UE['note']);
 
     # formatting
     for key in notes.keys() : notes[key]  = sorted([float(x) for x in  notes[key]],reverse=True);
@@ -119,10 +119,10 @@ def GetStatistics(pv, parcours, semestre):
            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
 
            # get the notes
-           if 'note' in data_UE.keys() and data_UE['note'] not in ['ENCO', 'U VAC', 'DIS', 'COVID', 'NCAE']:
+           if 'note' in data_UE.keys() and data_UE['note'] not in ['ENCO', 'VAC', 'U VAC', 'DIS', 'COVID', 'NCAE']:
                pv[etudiant]['results'][label]['ranking']  =  str(notes[key].index(float(data_UE['note']))+1)+'/'+str(len(notes[key]));
 
-           if 'note2' in data_UE.keys() and data_UE['note2'] not in ['ENCO', 'U VAC', 'DIS', 'COVID', 'NCAE']:
+           if 'note2' in data_UE.keys() and data_UE['note2'] not in ['ENCO', 'U VAC', 'VAC', 'DIS', 'COVID', 'NCAE']:
                pv[etudiant]['results'][label]['ranking2'] = str(notes2[key].index(float(data_UE['note2']))+1)+'/'+str(len(notes2[key]));
 
     # output

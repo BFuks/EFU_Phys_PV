@@ -47,6 +47,9 @@ def Merge(session1, session2):
 
         # loop over the UEs
         for ue in session1[etudiant]['results'].keys():
+            # patch old pad
+            if ue in ['LK5PYJ1B', 'LK5PYJ0B', 'LK6PYJ0C', 'LK6PYJ1C']: continue;
+
             # no second session
             if not ue in session2[etudiant]['results'].keys():
                 if not ue.startswith('S'):

@@ -65,7 +65,30 @@ for year in years:
         niveau = pv_name.split('_')[0];
         semestre = pv_name.split('_')[3] + '_' +pv_name.split('_')[4];
         parcours = pv_name.split('_')[5].split('.')[0];
-        PV = DecodeXML(GetXML(niveau, year, semestre, parcours));
+
+        if 'S6' in semestre and parcours =='DM' and year=='2021_2022':
+            PV = {};
+            for i in range(2,7):
+                PV_tmp = DecodeXML(GetXML(niveau, year, semestre, parcours+str(i)));
+                PV = Patch_DMS6(PV_tmp, PV);
+        elif parcours in ['DM', 'MAJ'] and year=='2020_2021' and ('S3' in semestre or 'S4' in semestre):
+            PV = {};
+            for i in range(1,3):
+                PV_tmp = DecodeXML(GetXML(niveau, year, semestre, parcours+str(i)));
+                PV = Patch_DMS6(PV_tmp, PV);
+        elif parcours in ['MAJ'] and year=='2020_2021' and ('S5' in semestre or 'S6' in semestre):
+            PV = {};
+            for i in range(1,17):
+                PV_tmp = DecodeXML(GetXML(niveau, year, semestre, parcours+str(i)));
+                PV = Patch_DMS6(PV_tmp, PV);
+        elif parcours in ['DM'] and year=='2020_2021' and ('S5' in semestre or 'S6' in semestre):
+            PV = {};
+            for i in range(1,3):
+                PV_tmp = DecodeXML(GetXML(niveau, year, semestre, parcours+str(i)));
+                PV = Patch_DMS6(PV_tmp, PV);
+        else: PV = DecodeXML(GetXML(niveau, year, semestre, parcours));
+        if year=='2020_2021': PV = Hack2020(parcours, semestre, PV)
+
         if 'DM' in parcours and not 'PAD' in parcours: parcours='DM';
         logger.disabled = True;
         PV = SanityCheck(PV,parcours,semestre);

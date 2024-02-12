@@ -43,6 +43,8 @@ Relevant = {
   'LU2PY520': 'Math-2 ',
   'LU2PY531': 'Astro  ',
   'LU2PY532': 'ML     ',
+  'LU3PY003': 'Thermo2',
+  'LU3PY044': 'Hydro  ',
   'LU3PY101': 'Ph.Qu-1',
   'LU3PY103': 'Thermo2',
   'LU3PY105': 'Stage  ',

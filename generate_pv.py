@@ -50,6 +50,8 @@ niveau   = Niveau(PV_dico.keys());
 annee    = Year(PV_dico[niveau].keys());
 parcours = Parcours(PV_dico[niveau][annee].keys());
 
+from misc import __version__:
+
 # Semestres disponibles
 semestres = sorted([x for x in PV_dico[niveau][annee][parcours].keys()]);
 if len(semestres)==1: logger.warning("Generation du PV pour le semestre : " + ', '.join(semestres) );
@@ -58,6 +60,7 @@ else:                 logger.warning("Generation du PV pour les semestres : " + 
 ## Obtention des infos et verifications
 from xml_reader import GetXML, DecodeXML, Patch_DMS6;
 from pv_checker import SanityCheck;
+from misc       import Hack2020;
 all_PVs = {};
 for semestre in semestres:
     logger.info("Lecture da la version XML du PV pour le semestre " + semestre);
@@ -67,7 +70,23 @@ for semestre in semestres:
         for i in range(2,7):
             PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, parcours+str(i)));
             PV_semestre = Patch_DMS6(PV_tmp, PV_semestre);
+    elif parcours in ['DM', 'MAJ'] and annee=='2020_2021' and ('S3' in semestre or 'S4' in semestre):
+        PV_semestre = {};
+        for i in range(1,3):
+            PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, parcours+str(i)));
+            PV_semestre = Patch_DMS6(PV_tmp, PV_semestre);
+    elif parcours in ['MAJ'] and annee=='2020_2021' and ('S5' in semestre or 'S6' in semestre):
+        PV_semestre = {};
+        for i in range(1,17):
+            PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, parcours+str(i)));
+            PV_semestre = Patch_DMS6(PV_tmp, PV_semestre);
+    elif parcours in ['DM'] and annee=='2020_2021' and ('S5' in semestre or 'S6' in semestre):
+        PV_semestre = {};
+        for i in range(1,3):
+            PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, parcours+str(i)));
+            PV_semestre = Patch_DMS6(PV_tmp, PV_semestre);
     else: PV_semestre = DecodeXML(GetXML(niveau, annee, semestre, parcours));
+    if annee=='2020_2021': PV_semestre = Hack2020(parcours, semestre, PV_semestre)
     print("         *** Verification des moyennes du PV");
     all_PVs[semestre] = SanityCheck(PV_semestre, parcours, semestre);
 

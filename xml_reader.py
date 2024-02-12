@@ -310,9 +310,13 @@ def Patch_DMS6(pv_in, pv_out):
 
         # Existing entry to maybe store
         else:
-            old_keys = [x for x in PV_result[key]['results'].keys() if 'note' in PV_result[key]['results'][x].keys()];
+            old_keys = [x for x in PV_result[key]['results'].keys() if 'note' in PV_result[key]['results'][x].keys() and 'LY4PYMI0' not in x];
             new_keys = [x for x in pv_in[key]['results'].keys() if 'note' in pv_in[key]['results'][x].keys()];
             if len(new_keys)>len(old_keys): PV_result[key] = pv_in[key];
+
+        # patch 2020
+        if '211-LK4ST113 ' in PV_result[key]['results'].keys(): del PV_result[key]['results']['211-LK4ST113 '];
+        if '251-LY4ST113 ' in PV_result[key]['results'].keys(): del PV_result[key]['results']['251-LY4ST113 '];
 
     # Output
     return PV_result;
