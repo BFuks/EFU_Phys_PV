@@ -57,22 +57,23 @@ def GetLength(semestres, parcours):
 def MakeHeaders(annee, semestres, parcours):
     # number of columns in the table
     num_ue = GetLength(semestres, parcours);
-    if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
-    if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
-    if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
-    if parcours in ['DM', 'MAJ', 'DK', 'PADMAJ'] and semestres[0].startswith('S3'): num_ue+=1;
-    if parcours in ['DM', 'DK'] and semestres[0].startswith('S5'): num_ue+=1;
-    if parcours=='CMI' and semestres[0].startswith('S3'):num_ue-=2;
-    if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
-    if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
-    if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
-    if parcours in ['MONO'] and num_ue>12: num_ue-=7;
-    if parcours in ['MAJ'] and num_ue>12: num_ue-=8;
-    if parcours in ['CMI'] and num_ue>9: num_ue-=5;
-    if parcours in ['MAJ', 'CMI'] and num_ue>8: num_ue-=4;
-    if parcours in ['DM', 'MONO'] and num_ue>8: num_ue-=4;
-    if parcours=='PADMONO' and num_ue>8: num_ue-=6;
-    if parcours in ['PADMAJ','DM'] and num_ue>7: num_ue-=3;
+    if parcours=='CMI': num_ue-=2;
+    if parcours in ['DM', 'MAJ']: num_ue+=1;
+###     if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
+###     if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
+###     if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
+###     if parcours in ['DM', 'MAJ', 'DK', 'PADMAJ'] and semestres[0].startswith('S3'): num_ue+=1;
+###     if parcours in ['DM', 'DK'] and semestres[0].startswith('S5'): num_ue+=1;
+###     if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
+###     if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
+###     if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
+###     if parcours in ['MONO'] and num_ue>12: num_ue-=7;
+###     if parcours in ['MAJ'] and num_ue>12: num_ue-=8;
+###     if parcours in ['CMI'] and num_ue>9: num_ue-=5;
+###     if parcours in ['MAJ', 'CMI'] and num_ue>8: num_ue-=4;
+###     if parcours in ['DM', 'MONO'] and num_ue>8: num_ue-=4;
+###     if parcours=='PADMONO' and num_ue>8: num_ue-=6;
+###     if parcours in ['PADMAJ','DM'] and num_ue>7: num_ue-=3;
 
     # The header themselves
     Headers = [[
@@ -137,7 +138,6 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee, etu_id
                 if 'note2' in notes[bloc].keys(): notebloc = notes[bloc]['note2'];
             else:
                 nombloc  = 'MAJ1' if 'PY' in bloc else 'MAJ2';
-                #notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
                 try:
                     notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
                 except:
@@ -190,20 +190,20 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
         current_note2=''; fontcolor2='black';
         if 'note2' in notes[ue].keys():
             my_note2 = notes[ue]['note2'];
-            current_note2 = '{:.2f}'.format(my_note2)+'/100' if not my_note2 in ['NCAE', 'ABI', 'DIS', 'COVID', 'ENCO', 'U VAC', 'VAC'] else my_note2.replace('COVID','???');
+            current_note2 = '{:.2f}'.format(my_note2)+'/100' if not my_note2 in ['NCAE', 'ABI', 'DIS', 'ENCO', 'U VAC', 'VAC', '???'] else my_note2;
             if 'ranking2' in notes[ue].keys(): current_note2 += '<font color=\'grey\' size=\'7\'> [#'+notes[ue]['ranking2']+']</font>';
 
-            fontcolor2 = 'black' if not my_note2 in ['ABI', 'COVID'] and (my_note2 in ['NCAE', 'ENCO', 'DIS', 'U VAC', 'VAC'] or my_note2>=50.) else 'red';
+            fontcolor2 = 'black' if not my_note2 in ['ABI', '???'] and (my_note2 in ['NCAE', 'ENCO', 'DIS', 'U VAC', 'VAC'] or my_note2>=50.) else 'red';
             if fontcolor2=='red' and compensation2: fontcolor2='orange';
 
         ### Note session 1 + formattage
         my_note = notes[ue]['note'];
         if my_note!=-1:
-            current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'COVID', 'NCAE', 'ENCO', 'U VAC', 'VAC'] else my_note.replace('COVID','???');
+            current_note = '{:.2f}'.format(my_note)+'/100' if not my_note in ['ABI', 'DIS', 'NCAE', 'ENCO', 'U VAC', 'VAC', '???'] else my_note
             if 'ranking' in notes[ue].keys(): current_note += '<br /><font color=\'grey\' size=\'8\'>#'+notes[ue]['ranking']+'</font>';
         else: current_note = '???';
 
-        fontcolor = 'black' if not my_note in ['ABI', 'COVID'] and (my_note in ['NCAE', 'ENCO', 'DIS', 'U VAC', 'VAC'] or my_note>=50.) else 'red';
+        fontcolor = 'black' if not my_note in ['ABI', '???'] and (my_note in ['NCAE', 'ENCO', 'DIS', 'U VAC', 'VAC'] or my_note>=50.) else 'red';
         if fontcolor=='red' and compensation: fontcolor='orange';
         if (not 'note2' in notes[ue].keys() or current_note.split('<')[0] == current_note2.split('<')[0]) and compensation2 and fontcolor=='red': fontcolor='orange';
 
@@ -357,54 +357,24 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
             ### PV individuel
             pv_ind = pv[semestre][etu[0]];
             blocs_maq = [x for x in blocs_maquette[semestre] if not x in [x for x in UEs if x.startswith('LK')] or x in pv_ind['results'].keys()];
-            if int(annee.split('_')[0])>2022 and 'LK3PYJ05' in blocs_maq and 'LK3PYJ00' in blocs_maq:
-                blocs_maq.remove('LK3PYJ00');
-            elif int(annee.split('_')[0])<2023 and 'LK3PYJ05' in blocs_maq and 'LK3PYJ00' in blocs_maq:
-                blocs_maq.remove('LK3PYJ05');
-            if int(annee.split('_')[0])>2022 and 'LK3PYJ06' in blocs_maq and 'LK3PYJ00' in blocs_maq:
-                blocs_maq.remove('LK3PYJ00');
-            elif int(annee.split('_')[0])<2023 and 'LK3PYJ06' in blocs_maq and 'LK3PYJ00' in blocs_maq:
-                blocs_maq.remove('LK3PYJ06');
-            if   'LK3PYJ05' in blocs_maq and 'LK3PYJ06' in blocs_maq and 'LK3MAM00' in pv_ind['results'].keys(): blocs_maq.remove('LK3PYJ05');
-            elif 'LK3PYJ05' in blocs_maq and 'LK3PYJ06' in blocs_maq and not 'LK3MAM00' in pv_ind['results'].keys(): blocs_maq.remove('LK3PYJ06')
-            elif 'LK3PYJ10' in blocs_maq and 'LK3PYJ11' in blocs_maq: blocs_maq.remove('LK3PYJ10')
-            if 'LK3SSK00' in pv_ind['results'].keys() and not 'LK3SSK00' in blocs_maq: blocs_maq.append('LK3SSK00');
-            if 'LK3DRD00' in pv_ind['results'].keys() and not 'LK3DRD00' in blocs_maq: blocs_maq.append('LK3DRD00');
-
-            if ('LK5PYJDD' in pv_ind['results'].keys() or 'LK5PYJEE' in  pv_ind['results'].keys()) and 'LK5PYJ00' in blocs_maq: blocs_maq.remove('LK5PYJ00');
-            if ('LK6PYJDD' in pv_ind['results'].keys() or 'LK6PYJEE' in  pv_ind['results'].keys()) and 'LK6PYJ00' in blocs_maq: blocs_maq.remove('LK6PYJ00');
-            if ('LK6PYJDD' in pv_ind['results'].keys() or 'LK6PYJEE' in  pv_ind['results'].keys()) and 'LK6PYJ20' in blocs_maq: blocs_maq.remove('LK6PYJ20');
-            if len(blocs_maq)==3 and 'LK5HIM00' in blocs_maq: blocs_maq.remove('LK5HIM00');
-
-            # patch PAD 2020-2021
-            old_pad=False;
-            if len([el for el in ['LU3PY001', 'LU3PY002', 'LU3PY011', 'LU3PY013', 'LU3LVAN1', 'LU3PY015'] if el in pv_ind['results'].keys()])==6:
-               blocs_maq=['LK5PYJ1B'];
-               old_pad = True;
-            elif len([el for el in ['LU3PY001', 'LU3PY002', 'LU3PY011', 'LU3PY044', 'LU3LVAN1'] if el in pv_ind['results'].keys()])==5:
-               blocs_maq=['LK5PYJ0B'];
-               old_pad = True;
-            elif len([el for el in ['LU3PY001', 'LU3PY011', 'LU3PY044', 'LU3LVAN1'] if el in pv_ind['results'].keys()])==4:
-               blocs_maq=['LK5PYJ0D', 'LK5MEM02'];
-               old_pad = True;
-            elif len([el for el in ['LU3PY004', 'LU3PY021', 'LU3PY022', 'LU3PYSO5'] if el in pv_ind['results'].keys()])==4:
-               blocs_maq=['LK6PYJ1C'];
-               old_pad = True;
-            elif len([el for el in ['LU3PY021', 'LU3PY040', 'LU3PY043'] if el in pv_ind['results'].keys()])==3:
-               blocs_maq=['LK6PYJ0C'];
-               old_pad = True;
-            elif len([el for el in ['LU3PY021', 'LU3PY043'] if el in pv_ind['results'].keys()])==2:
-               blocs_maq=['LK6PYJ0E', 'LK6MEM03'];
-               old_pad = True;
-            if len(pv_ind['results'])==1:
-               blocs_maq=['LK5PYJ0B'];
-               old_pad = True;
-
-            if str(etu[0]) in ['3100369', '3803953'] and semestre.startswith('S6'):
-               blocs_maq.remove('LK6PYJ00'); blocs_maq.remove('LK6PYC00');
-
-            for blc in ['LK5PYJ0B', 'LK5PYJ1B', 'LK5PYJ0D', 'LK6PYJ0C', 'LK6PYJ1C', 'LK6PYJ0E']:
-                if not old_pad and blc in blocs_maq: blocs_maq.remove(blc);
+##             if int(annee.split('_')[0])>2022 and 'LK3PYJ05' in blocs_maq and 'LK3PYJ00' in blocs_maq:
+##                 blocs_maq.remove('LK3PYJ00');
+##             elif int(annee.split('_')[0])<2023 and 'LK3PYJ05' in blocs_maq and 'LK3PYJ00' in blocs_maq:
+##                 blocs_maq.remove('LK3PYJ05');
+##             if int(annee.split('_')[0])>2022 and 'LK3PYJ06' in blocs_maq and 'LK3PYJ00' in blocs_maq:
+##                 blocs_maq.remove('LK3PYJ00');
+##             elif int(annee.split('_')[0])<2023 and 'LK3PYJ06' in blocs_maq and 'LK3PYJ00' in blocs_maq:
+##                 blocs_maq.remove('LK3PYJ06');
+##             if   'LK3PYJ05' in blocs_maq and 'LK3PYJ06' in blocs_maq and 'LK3MAM00' in pv_ind['results'].keys(): blocs_maq.remove('LK3PYJ05');
+##             elif 'LK3PYJ05' in blocs_maq and 'LK3PYJ06' in blocs_maq and not 'LK3MAM00' in pv_ind['results'].keys(): blocs_maq.remove('LK3PYJ06')
+##             elif 'LK3PYJ10' in blocs_maq and 'LK3PYJ11' in blocs_maq: blocs_maq.remove('LK3PYJ10')
+##             if 'LK3SSK00' in pv_ind['results'].keys() and not 'LK3SSK00' in blocs_maq: blocs_maq.append('LK3SSK00');
+##             if 'LK3DRD00' in pv_ind['results'].keys() and not 'LK3DRD00' in blocs_maq: blocs_maq.append('LK3DRD00');
+## 
+##             if ('LK5PYJDD' in pv_ind['results'].keys() or 'LK5PYJEE' in  pv_ind['results'].keys()) and 'LK5PYJ00' in blocs_maq: blocs_maq.remove('LK5PYJ00');
+##             if ('LK6PYJDD' in pv_ind['results'].keys() or 'LK6PYJEE' in  pv_ind['results'].keys()) and 'LK6PYJ00' in blocs_maq: blocs_maq.remove('LK6PYJ00');
+##             if ('LK6PYJDD' in pv_ind['results'].keys() or 'LK6PYJEE' in  pv_ind['results'].keys()) and 'LK6PYJ20' in blocs_maq: blocs_maq.remove('LK6PYJ20');
+##             if len(blocs_maq)==3 and 'LK5HIM00' in blocs_maq: blocs_maq.remove('LK5HIM00');
 
             UEs_maquette[semestre]   = GetUEsMaquette(blocs_maq);
 
@@ -439,22 +409,22 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
 
             ### Notes des UE
             num_ue = GetLength(semestres, parcours);
-            if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
-            if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
-            if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
-            if parcours in ['MAJ','DM', 'DK', 'PADMAJ'] and semestres[0].startswith('S3'): num_ue+=1;
-            if parcours in ['DM', 'DK'] and semestres[0].startswith('S5'): num_ue+=1;
-            if parcours=='CMI' and semestres[0].startswith('S3'):num_ue-=2;
-            if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
-            if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
-            if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
-            if parcours in ['MONO'] and num_ue>12: num_ue-=7;
-            if parcours in ['MAJ'] and num_ue>12: num_ue-=8;
-            if parcours in ['CMI'] and num_ue>9: num_ue-=5;
-            if parcours in ['MAJ', 'CMI'] and num_ue>8: num_ue-=4;
-            if parcours in['DM', 'MONO'] and num_ue>8: num_ue-=4;
-            if parcours=='PADMONO' and num_ue>8: num_ue-=6;
-            if parcours in ['PADMAJ', 'DM'] and num_ue>7: num_ue-=3;
+            if parcours=='CMI':num_ue-=2;
+##             if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
+##             if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
+##             if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
+##             if parcours in ['MAJ','DM', 'DK', 'PADMAJ'] and semestres[0].startswith('S3'): num_ue+=1;
+##             if parcours in ['DM', 'DK'] and semestres[0].startswith('S5'): num_ue+=1;
+##             if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
+##             if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
+##             if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
+##             if parcours in ['MONO'] and num_ue>12: num_ue-=7;
+##             if parcours in ['MAJ'] and num_ue>12: num_ue-=8;
+##             if parcours in ['CMI'] and num_ue>9: num_ue-=5;
+##             if parcours in ['MAJ', 'CMI'] and num_ue>8: num_ue-=4;
+##             if parcours in['DM', 'MONO'] and num_ue>8: num_ue-=4;
+##             if parcours=='PADMONO' and num_ue>8: num_ue-=6;
+##             if parcours in ['PADMAJ', 'DM'] and num_ue>7: num_ue-=3;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];
