@@ -146,21 +146,28 @@ def MakePlot1(variable, data, title, filename):
     ax.tick_params(axis='y', colors='darkblue');
 
     # data
-    if 'semestre' in title: logger.info(title + ' : ' + str(len(data)) +  ' étudiants');
+    if 'semestre' in title: logger.info('  -->  ' + title.split(';')[0] + ' : ' + str(len(data)) +  ' étudiants');
     maxi  = 100 if variable.startswith('L') and len(variable)>2 else 20;
     label = title[-10:-1] if len(variable)==2 else 'Session 1';
     ax.hist(data, bins=40, range=[0,maxi], color='teal', label=label);
 
+    # Calculate percentiles
     ax.axvline(np.mean(data),   color='darkred',  linestyle='dashed', linewidth=1);
     ax.axvline(np.median(data), color='darkblue', linestyle='dotted', linewidth=1);
-    ax.text(maxi/40, ax.get_ylim()[1]*.90, 'Moy. : {:.2f}'.format(np.mean(data)),   color='darkred');
-    ax.text(maxi/40, ax.get_ylim()[1]*.80, 'Med. : {:.2f}'.format(np.median(data)), color='darkblue');
+    ax.text(maxi/100, ax.get_ylim()[1]*.95, 'Moy. : {:.2f}'.format(np.mean(data)),   color='darkred');
+    ax.text(maxi/100, ax.get_ylim()[1]*.90, 'Med. : {:.2f}'.format(np.median(data)), color='darkblue');
+
+    percentiles = [10, 25, 75, 90]
+    for percentile in percentiles:
+        value = np.percentile(data, percentile)
+        ax.axvline(value, color='darkgreen', linestyle='dashdot', linewidth=1, label=f'{percentile}% percentile')
+        ax.text(value, 6, f'{percentile}%', rotation=90, verticalalignment='center')
 
     # Layout
     ax.set_title(title, fontdict=font1);
-    ax.legend(loc='upper right');
     plt.xlabel('Note / ' + str(maxi), fontdict=font2);
     fig.supylabel('# étudiants/étudiantes', fontdict=font2, x=0.05);
+    ax.set_xlim(0, maxi)
 
     # Saving the file
     plt.savefig(filename);

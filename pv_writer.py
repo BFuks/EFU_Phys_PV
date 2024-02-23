@@ -130,22 +130,21 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee, etu_id
             sess2 = '<br /><b><font color=' + my_color2 + '>' + notes['total']['note2'] + '</font></b>';
 
     moyennes_string = '<para align="center">' + sess1 +  sess2 + '<br />';
-    if all(blocs_maquette!=[s] for s in ['LK5PYJ0B', 'LK6PYJ0C', 'LK5PYJ1B', 'LK6PYJ1C', 'LK5PYJ0D', 'LK6PYJ0E']):
-        for bloc in sorted([x for x in list(blocs_maquette)],reverse=True):
-            if not parcours in ['DK', 'DM']:
-                nombloc  = Maquette[bloc]['nom'];
-                notebloc = notes[bloc]['note'];
-                if 'note2' in notes[bloc].keys(): notebloc = notes[bloc]['note2'];
-            else:
-                nombloc  = 'MAJ1' if 'PY' in bloc else 'MAJ2';
-                try:
-                    notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
-                except:
-                    notebloc = 0
-                    logger.error('Étudiant ' + str(etu_id) + ' - Problème de maquette pour le bloc ' + nombloc + " : " + str(notes[semestre][nombloc]));
-            if notes['total']['note'] not in ['NCAE', 'ENCO']:
-                colour = 'red' if float(notebloc)<50 else 'black';
-                moyennes_string += '<br />' + nombloc + ' :  <font color=\'' + colour + '\'>' + '{:.3f}'.format(notebloc) + '/100</font>';
+    for bloc in sorted([x for x in list(blocs_maquette)],reverse=True):
+        if not parcours in ['DK', 'DM']:
+            nombloc  = Maquette[bloc]['nom'];
+            notebloc = notes[bloc]['note'];
+            if 'note2' in notes[bloc].keys(): notebloc = notes[bloc]['note2'];
+        else:
+            nombloc  = 'MAJ1' if 'PY' in bloc else 'MAJ2';
+            try:
+                notebloc = notes[semestre][nombloc][0]/notes[semestre][nombloc][1];
+            except:
+                notebloc = 0
+                logger.error('Étudiant ' + str(etu_id) + ' - Problème de maquette pour le bloc ' + nombloc + " : " + str(notes[semestre][nombloc]));
+        if notes['total']['note'] not in ['NCAE', 'ENCO']:
+            colour = 'red' if float(notebloc)<50 else 'black';
+            moyennes_string += '<br />' + nombloc + ' :  <font color=\'' + colour + '\'>' + '{:.3f}'.format(notebloc) + '/100</font>';
     moyennes_string += '</para>';
 
     ## output
@@ -156,7 +155,6 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee, etu_id
 # Formattage des notes
 from maquette import GrosSac, GrosSacP2;
 def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
-
     ## Initialisation
     notes_string = [];
     counter = 0;
@@ -165,10 +163,9 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
     if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee[1]>=10. or float(notes['total']['note2'])>10.) if notes['total']['note2'] not in ['NCAE','ENCO'] else False;
 
     ## Boucle sur les UE
-    for ue in (ues+[x for x in notes.keys() if (x in GrosSac.keys() or x in GrosSacP2.keys())and not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'] + [x for x in notes.keys() if x in ['LK3PYC03', 'LK4PYC03', 'LK5PYMI0', 'LK6PYMI0'] ] ):
+    l1 = True if '1SLPY001' in notes.keys() else False
+    for ue in (ues+[x for x in notes.keys() if not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'] + [x for x in notes.keys() if x in ['LK3PYC03', 'LK4PYC03', 'LK5PYMI0', 'LK6PYMI0'] ] ):
         ### Enlever les notes de la mineure
-        if ue+'_GS' in notes.keys(): continue
-        if 'UE' in notes[ue].keys() and notes[ue]['UE']=='GrosSac': continue
         if ue in ['LK5EEJ13', 'LK5PHM99', 'LK6ST113', 'LK6ST116']: continue
 
         ### Note manquante
@@ -177,11 +174,12 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
             continue;
 
         # Mineure
-        if ue.startswith('LU') and not ('PY' in ue or 'LV' in ue or ue in ['LU3ME010']): continue;
+        if ue.startswith('LU') and not ('PY' in ue or 'LV' in ue or l1): continue;
+        if ue.startswith('LK') and 'PY' in ue: continue;
         if ue.startswith('L5PH') or ue.startswith('L3LACH') or ue.startswith('L4LACH') or ue.startswith('L6PH'): continue;
         if ue.startswith('L5LACH') or ue.startswith('L6LACH'): continue;
         if ue.startswith('L3PH') or ue.startswith('L4PH'): continue;
-        if ue=='LK3SSK00': continue
+        if ue in ['total', '1SLPY001']: continue
 
         ### Redoublant deja valide
         validation_tag = "<br /><font color='grey' size='8'>("+notes[ue]['annee_val']+')</font>' if notes[ue]['annee_val']!=None else '';

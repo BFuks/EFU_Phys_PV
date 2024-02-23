@@ -31,15 +31,21 @@ UEs = {
     'LK3STD00': {'ects': 12, 'nom':'MajSDT0'  },
     'LK3STM00': {'ects': 12, 'nom':'MinSDT0'  },
 
+    'LU1CI001': {'ects':6,   'nom':'Chimie-1' },
+    'LU1MA001': {'ects':9,   'nom':'Maths-1'  },
+    'LU1MEPY3': {'ects':9,   'nom':'McPhs-1'  },
+    'LU1PY001': {'ects':6,   'nom':'Phys-1'   },
+    'LU1SXM06': {'ects':3,   'nom':'Methodo', 'SX':True },
+
 
     'LU2PY103': {'ects':6,   'nom':'Thermo'   },     'LU3PY101': {'ects': 6, 'nom':'PhysQ1'  },
     'LU2PY110': {'ects':6,   'nom':'Math-S3'  },     'LU3PY121': {'ects': 9, 'nom':'OEM'     },
     'LU2PY124': {'ects':3,   'nom':'Relat'    },     'LU3PY213': {'ects': 3, 'nom':'Math-S5' },
-    'LU2PY125': {'ects':3,   'nom':'ITE'      },     'LU3PY215': {'ects': 3, 'nom':'PhysExp3'},
-    'LU2PY212': {'ects':6 ,  'nom':'PhysExp1' },     'LU3PY216': {'ects': 3, 'nom':'MicroElc'},
-    'LU2PY220': {'ects':6,   'nom':'MathCmp'  },     'LU3PYOIP': {'ects': 3, 'nom':'OIP'     },
-    'LU2PY222': {'ects':6,   'nom':'PhysNum'  },
-    'LU2PY403': {'ects':6,   'nom':'Thermo'   },
+    'LU2PY125': {'ects':3,   'nom':'ITE'      },     'LU3PY214': {'ects': 6, 'nom':'MilCont' },
+    'LU2PY212': {'ects':6 ,  'nom':'PhysExp1' },     'LU3PY215': {'ects': 3, 'nom':'PhysExp3'},
+    'LU2PY220': {'ects':6,   'nom':'MathCmp'  },     'LU3PY216': {'ects': 3, 'nom':'MicroElc'},
+    'LU2PY222': {'ects':6,   'nom':'PhysNum'  },     'LU3PY401': {'ects': 6, 'nom':'PhysQ1'  },
+    'LU2PY403': {'ects':6,   'nom':'Thermo'   },     'LU3PYOIP': {'ects': 3, 'nom':'OIP'     },
     'LU2PY424': {'ects':3,   'nom':'Relat'    },
 
 
@@ -483,10 +489,18 @@ UEs = {
 
 # Maquette MONO
 Maquette = {
+    # block L1
+    '1SLPY001': {
+      'UE'      : [ ['LU1PY001', 'LU1CI001', 'LU1MA001', 'LU1MEPY3', 'LU1SXM06'] ],
+      'parcours': ['SPRINT'],
+      'nom'     : "MAJ",
+      'semestre': "S1"
+    },
+
     # bloc Majeure
     'LK3PYJ05': {
       'UE'      : [ ['LU2PY103', 'LU2PY110', 'LU2PY125', 'LU2LVAN1'], ['LU2PY103', 'LU2PY222', 'LU2PY125', 'LU2LVAN1'] ],
-      'parcours': ['CMI', 'MAJ'],
+      'parcours': ['CMI', 'MAJ', 'MONO'],
       'nom'     : "MAJ",
       'semestre': "S3"
     },
@@ -497,9 +511,8 @@ Maquette = {
       'semestre': "S3"
     },
     'LK5PYJ00' : {
-      'UE'      : [ ['LU3PY101', 'LU3PY121', 'LU3PYOIP'],
-      ],
-      'parcours': ['CMI', 'SUAD'],
+      'UE'      : [ ['LU3PY101', 'LU3PY121', 'LU3PYOIP'] ],
+      'parcours': ['MONO', 'CMI', 'SUAD'],
       'nom'     : "MAJ",
       'semestre': "S5"
     },
@@ -670,7 +683,7 @@ Maquette = {
 
     'LK3PYC00': {
       'UE'      : [['LU2PY212', 'LU2PY220'] ],
-      'parcours': ['SUAD'],
+      'parcours': ['MONO', 'SUAD'],
       'nom'     : "CMP",
       'semestre': "S3"
     },
@@ -679,6 +692,12 @@ Maquette = {
       'parcours': ['CMI'],
       'nom'     : "CMP",
       'semestre': "S3"
+    },
+    'LK5PYC00': {
+      'UE'      : [['LU3PY213', 'LU3PY214', 'LU3PY215']],
+      'parcours': ['MONO'],
+      'nom'     : "CMP",
+      'semestre': "S5"
     },
     'LK5PYC02': {
       'UE'      : [['LU3PY213', 'LU3PY215', 'LU3PY216', 'LU3LVAD1'] ],
@@ -713,12 +732,6 @@ Maquette = {
 ##         'semestre': "S4"
 ##     },
 ## 
-##     'LK5PYC00': {
-##         'UE'      : [['LU3PY213', 'LU3PY214', 'LU3PY215']],
-##         'parcours': ['MONO', 'PADMONO'],
-##         'nom'     : "CMP",
-##         'semestre': "S5"
-##     },
 ##     'LK5PYC01': {
 ##         'UE'      : [['LU3PY513', 'LU3PY514', 'LU3PY215', 'LU3PY536']],
 ##         'parcours': ['SPRINT'],
@@ -901,6 +914,10 @@ Maquette = {
 };
 
 Irrelevant = ['LU2LVAN1'];
+
+Swap = {
+    'LU3PY401' : ['LU3PY101']
+}
 
 GrosSac    = {
     'LU3PY015' : ['LU3PYOIP','LU3PY215'],

@@ -39,6 +39,7 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom, nobloc=True, parcours='', 
     if data_UE['validation']=='ABJ': data_UE['note']=0;
     if data_UE['note']==None and data_UE['validation']=='VAC': return 'VAC';
     if data_UE['note']==None: return -1;
+    if data_UE['note']=='???': return '???';
 
     # Calcul de la note
     note = float(data_UE['note'])/float(data_UE['bareme'])*100. if nom_UE!='total' and nobloc else float(data_UE['note']);
@@ -61,59 +62,22 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom, nobloc=True, parcours='', 
 ###                                                    ###
 ##########################################################
 from misc import GetBlocsMaquette, GetUEsMaquette;
-from maquette import GrosSac, GrosSacP2, GrosSac2, GrosSac3, GrosSac3P2;
+from maquette import Swap;
 def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
-
-##    # patch SX bizarre
-##    no123 = any(key in data_pv.keys() for key in ['LU2SXAL2', 'LU2SXPH2', 'LU2SXHI2', 'LK4EWK00', 'LK4SSK00', 'LK4MED00'])
-
     # Obtentien des blocs et verification que la liste est complete
     blocs_maquette = GetBlocsMaquette(semestre, parcours)
-    blocs_pv       = sorted([x for x in data_pv.keys() if (x.startswith('LK') or not x in UEs) and not x in ['total', '999999']]) # and not x in GrosSac.keys() and not x in GrosSacP2.keys()]);
+    blocs_pv       = sorted([x for x in data_pv.keys() if (x.startswith('LK') or x.startswith('1SL') or not x in UEs) and not x in ['total', '999999']])
     blocs_maquette = [x for x in blocs_maquette if not x in [x for x in UEs if x.startswith('LK')] or x in blocs_pv]
-
-
-##     if 'LK3PYJ10' in data_pv.keys() and 'LK3PYJ10' in blocs_maquette and 'LK3PYJ11' in blocs_maquette: blocs_maquette.remove('LK3PYJ11')
-##     if (etu_id=='21104860' or 'LU2PY125' in data_pv.keys()) and ('LK3PYJ05' in blocs_maquette or 'LK3PYJ06' in blocs_maquette) and 'LK3PYJ00' in blocs_maquette:
-##         blocs_maquette.remove('LK3PYJ00');
-##     elif not 'LU2PY125' in data_pv.keys() and 'LK3PYJ05' in blocs_maquette and 'LK3PYJ00' in blocs_maquette:
-##         blocs_maquette.remove('LK3PYJ05');
-##         if 'LK3PYJ06' in blocs_maquette: blocs_maquette.remove('LK3PYJ06')
-##     elif not 'LU2PY125' in data_pv.keys() and 'LK3PYJ06' in blocs_maquette and 'LK3PYJ00' in blocs_maquette:
-##         blocs_maquette.remove('LK3PYJ06');
-
-##     if   'LK3PYJ05' in blocs_maquette and 'LK3PYJ06' in blocs_maquette and 'LK3MAM00' in blocs_pv: blocs_maquette.remove('LK3PYJ05');
-##     elif 'LK3PYJ05' in blocs_maquette and 'LK3PYJ06' in blocs_maquette and not 'LK3MAM00' in blocs_pv: blocs_maquette.remove('LK3PYJ06')
-##     elif 'LK3PYJ10' in blocs_maquette and 'LK3PYJ11' in blocs_maquette: blocs_maquette.remove('LK3PYJ10')
-##     if   'LK3PYJ05' in blocs_pv and 'LK3PYJ11' in blocs_pv: blocs_pv.remove('LK3PYJ05');
-##     if 'LK3SSK00' in blocs_pv and not 'LK3SSK00' in blocs_maquette: blocs_maquette.append('LK3SSK00');
-##     if 'LK5PHM99' in blocs_pv: blocs_pv.remove('LK5PHM99');
-##     if 'LK6ST113' in blocs_pv: blocs_pv.remove('LK6ST113');
-##     if 'LK6ST116' in blocs_pv: blocs_pv.remove('LK6ST116');
-##     if 'LK6HSM01' in blocs_pv: blocs_pv.remove('LK6HSM01');
-##     if '6ZVPYME1' in blocs_pv: blocs_pv.remove('6ZVPYME1');
-##    if len(blocs_maquette)==3 and 'LK5HIM00' in blocs_maquette: blocs_maquette.remove('LK5HIM00');
 
     # Comparaison de la maquette et du pv au niveau des blocs
     logger.debug('  > Comparaison de la maquette et du pv au niveau des blocs')
     logger.debug('     * blocs maq=' + str(blocs_maquette))
     logger.debug('     * blocs pv =' + str(blocs_pv))
-    if len(blocs_pv)!=2 and data_pv['total']['note']!='NCAE':
+    if (len(blocs_pv)!=2 and blocs_pv!=['1SLPY001']) and data_pv['total']['note']!='NCAE':
        logger.warning("Problemes de bloc manquant dans le PV de " + etu_nom + " (" + etu_id + "). Blocs detectes : " + ", ".join(blocs_maquette)  );
 
-
-##     if parcours=='PADMAJ' and len(blocs_maquette)==1 and semestre=='S3': blocs_maquette.append('LK3MEM02');
-##     if parcours=='PADMAJ' and len(blocs_maquette)==1 and semestre=='S4': blocs_maquette.append('LK4MEM04');
-
-    # Check all blocs are there
-
-    # Verification qu'en cas d'UE dans le gros sac, les UE correspondent ne sont pas dans le PV
-##     for to_del in [x for x in data_pv.keys() if x+'_GS' in data_pv.keys()]:
-##        logger.warning("Problemes d'UE a supprimer dans le PV de " + etu_nom + " (" + etu_id + "): " + to_del);
-##        del data_pv[to_del];
-
     # Ajout des blocs manquants
-##     if data_pv['total']['note']!='NCAE': logger.warning("Moyenne totale non calculée dans le PV de " + str(etu_nom) + " (" + etu_id + ")")
+    to_del = [];
     for missing_bloc in [x for x in blocs_maquette if not x in blocs_pv]:
         logger.warning("  > Adding block " + missing_bloc  + " dans le PV de " + etu_nom + " (" + etu_id + ")")
         data_pv[missing_bloc] =  {'tag': Maquette[missing_bloc]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '???', 'annee_val': None, 'UE': None};
@@ -126,45 +90,15 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     for missing_ue in missings:
         logger.warning("  > Ajout de l'UE manquante " + missing_ue + " dans le PV de " + etu_nom + " (" + etu_id + ")");
 
-##              # est-ce que l'UE est dans le premier gros sac ?
-##              grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] and not x in used_ues] + \
-##                  [x for x in data_pv.keys() if x in GrosSacP2.keys() and missing_ue in GrosSacP2[x] and not x in used_ues];
-##              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
-##              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3.keys() and missing_ue in GrosSac3[x] ];
-##              if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3P2.keys() and missing_ue in GrosSac3P2[x] ];
-##              if missing_ue=='LU3PY122' and not any([ (x in data_pv.keys()) for x in ['LU3PY231', 'LU3PY232', 'LU3PY233', 'LU3PY234', 'LU3PY235']]) and 'LU3PY033' in data_pv.keys(): grossac=['LU3PY033']
-## 
-##              # specific patch
-##              logger.warning("  > grossac = "+ str(grossac));
-## 
-##              # test si l'UE fait partie du 1er gros sac
-##              if len(grossac)>0:
-##                  annee = data_pv[grossac[0]]['note'];
-##                  coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
-##                  list_note = [ ue for ue in grossac if not data_pv[ue]['note'] in ['DIS', 'ENCO', 'COVID'] ];
-##                  if   [ data_pv[ue]['note'] for ue in list_note ] in ['DIS']: note = 'DIS';
-##                  elif [ data_pv[ue]['note'] for ue in list_note ] in ['U VAC']: note = 'U VAC';
-##                  else: note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
-##                  data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
-##                  logger.debug('  > Ajout du grossac : ' + missing_ue + " : "  + str(data_pv[missing_ue]) + '(#0)');
-##                  if parcours in ['MAJ']:
-##                      if grossac[0] in GrosSac.keys() and missing_ue == GrosSac[grossac[0]][-1]: used_ues += grossac;
-##                      elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
-##                      elif grossac[0] in GrosSac2.keys() and missing_ue == GrosSac2[grossac[0]][-1]: used_ues += grossac;
-##                      elif grossac[0] in GrosSac3.keys() and missing_ue == GrosSac3[grossac[0]][-1]: used_ues += grossac;
-##                      elif grossac[0] in GrosSac3P2.keys() and missing_ue == GrosSac3P2[grossac[0]][-1]: used_ues += grossac;
+        # UE remplacée par une autre
+        grossac = [x for x in data_pv.keys() if x in Swap.keys() and missing_ue in Swap[x]];
+        if len(grossac)==1:
+            logger.warning("    -> UE remplacée par " + grossac[0])
+            data_pv[missing_ue] = data_pv[grossac[0]].copy()
+            data_pv[grossac[0]]['SX'] = True
+            to_del.append(missing_ue)
 
-
-             # On a vraiment une UE manquante -> COVID
-##              elif not missing_ue+'_GS' in data_pv.keys():
-
-        data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '???', 'annee_val': None, 'UE': None};
-##                  if parcours == 'PADMONO': data_pv[missing_ue]['ancienneUE']=True;
-##                  logger.debug("  > Ajout de l'UE "+ missing_ue + " : " + str(data_pv[missing_ue]) + '(#1)');
-##               else:
-##                  logger.debug("  > Ajout de l'UE "+ missing_ue + '(#2)');
-##                  data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'GS', 'note':'DIS', 'annee_val': None, 'UE': None};
-
+        else: data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '???', 'annee_val': None, 'UE': None};
 
     # Verification des moyennes (blocs)
     moyenne_tot  = 0.; coeff_tot    = 0.;
@@ -172,67 +106,19 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     for bloc in blocs_pv:
         moyenne_bloc = 0.; coeff_bloc = 0.; compensated = False;
 
-##         ## Checking whether all UEs are present
-##         missings = [  [x for x in z if not x in list(data_pv.keys()) ] for z in GetUEsMaquette(blocs_pv) ];
-##         missings = [x for x in missings if len(x)==min([len(y) for y in missings]) ][0];
-##         used_ues = [];
-##         for missing_ue in missings:
-##             logger.debug("  > Ajout de l'UE manquante "+ missing_ue + ' (#moy - bloc ' + bloc + ')');
-## 
-##             # est-ce que l'UE est dans le premier gros sac ?
-##             grossac = [x for x in data_pv.keys() if x in GrosSac.keys() and missing_ue in GrosSac[x] and not x in used_ues] + \
-##                 [x for x in data_pv.keys() if x in GrosSacP2.keys() and missing_ue in GrosSacP2[x] and not x in used_ues];
-##             if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac2.keys() and missing_ue in GrosSac2[x] ];
-##             if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3.keys() and missing_ue in GrosSac3[x] ];
-##             if grossac  == []: grossac = [x for x in data_pv.keys() if x in GrosSac3P2.keys() and missing_ue in GrosSac3P2[x] ];
-## 
-##             # test si l'UE fait partie du 1er gros sac
-##             logger.debug("  > Gros Sac = " + str(grossac))
-##             if len(grossac)>0:
-##                 annee = data_pv[grossac[0]]['note'];
-##                 coeff = sum([UEs[ue]['ects'] for ue in grossac if not parcours in ['DK', 'DM', 'SPRINT'] or not 'SX' in UEs[ue].keys()]);
-##                 list_note = [ ue for ue in grossac if not data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO'] ];
-##                 if [data_pv[ue]['note'] for ue in grossac] == ['DIS']: note = 'DIS';
-##                 else: note = sum( [ data_pv[ue]['note']*UEs[ue]['ects']/coeff for ue in list_note] );
-##                 data_pv[missing_ue] = {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': None, 'note': note, 'annee_val': None, 'UE': 'GrosSac'};
-##                 if parcours in ['MAJ']:
-##                      if grossac[0] in GrosSac.keys() and missing_ue == GrosSac[grossac[0]][-1]: used_ues += grossac;
-##                      elif grossac[0] in GrosSacP2.keys() and missing_ue == GrosSacP2[grossac[0]][-1]: used_ues += grossac;
-##                      elif grossac[0] in GrosSac2.keys() and missing_ue == GrosSac2[grossac[0]][-1]: used_ues += grossac;
-##                      elif grossac[0] in GrosSac3.keys() and missing_ue == GrosSac3[grossac[0]][-1]: used_ues += grossac;
-##                      elif grossac[0] in GrosSac3P2.keys() and missing_ue == GrosSac3P2[grossac[0]][-1]: used_ues += grossac;
-##             elif data_pv['total']['note']=='NCAE':
-##                 data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'AJ', 'note':-1, 'annee_val': None, 'UE': None};
-##             else:
-##                 val = 'ADM' if float(data_pv[bloc]['note'])>=50. else 'AJ';
-##                 data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': val, 'note':data_pv[bloc]['note'],\
-##                    'annee_val': None, 'UE': None};
-
         ## Calcul de la moyenne du bloc
         bloc_ues = [x for x in Maquette[bloc]['UE'] if set(x).issubset(set(data_pv.keys())) ][0];
         logger.debug('     * bloc ' + str(bloc) + " : " + str(bloc_ues))
-##         bloc_ues = bloc_ues[1] if sxcmi and bloc=='LK6PYJ00' and len(bloc_ues)>1 else bloc_ues[0];
 
         for ue in bloc_ues:
             if data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO', 'VAC']: continue;
-##             if ('LK6EED00' in list(data_pv.keys()) or 'LK6STD00' in list(data_pv.keys())) and ue in ['LU3PY105', 'LU3PY122', 'LU3PY124', 'LU3PY125']:
-##                 no120=True;
-##                 continue
             if not parcours in ['DM', 'SPRINT', 'CMI'] or (not 'SX' in UEs[ue].keys()):
-                if data_pv[ue]['note'] != '???':
+                if data_pv[ue]['note'] != '???' and not 'SX' in data_pv[ue].keys():
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
                     moyenne_tot  += float(data_pv[ue]['note'])*UEs[ue]['ects'];
                 coeff_tot  += UEs[ue]['ects'];
                 coeff_bloc += UEs[ue]['ects'];
                 if data_pv[ue]['note'] == '???' or float(data_pv[ue]['note']) < 50: compensated = True;
-##             if not parcours in ['DK', 'DM', 'SPRINT'] or (not 'SX' in UEs[ue].keys() and not (ue=='LU2PY123' and no123)) or (parcours=='DM' and ue in ['LU2IN003', 'LU2IN009']):
-##                 if ue in ['LU2PY102', 'LU2GSG31', 'LU3GSG51', 'LU3PY105', 'LU5SX06E', 'LU3SXCE1'] and sxcmi: continue;
-##                 if ue=='LU2PY123' and bloc=='LK4CID00': continue;
-##                 if data_pv[ue]['note'] != 'COVID':
-##                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
-##                     moyenne_tot  += float(data_pv[ue]['note'])*UEs[ue]['ects'];
-##                 coeff_tot  += UEs[ue]['ects'];
-##                 coeff_bloc += UEs[ue]['ects'];
         try:    moyenne_bloc = round(moyenne_bloc/coeff_bloc,3);
         except: moyenne_bloc = 0.
         logger.debug('       -> moyenne bloc  calculée = ' + str(moyenne_bloc) + ' : ' + str(compensated))
@@ -240,13 +126,13 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
         ## Output and save if necessary
         if data_pv[bloc]['note']=='???' and data_pv['total']['note']!='NCAE':
-##             if not(parcours=='MONO' and semestre in ['S5', 'S6']):
             logger.warning("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
             logger.warning('  > Bloc ' + bloc + ' : moyenne calculee = ' + str(moyenne_bloc));
             data_pv[bloc]['note']=moyenne_bloc;
 
         ## Verification de la moyenne du bloc
-        if data_pv['total']['note']!='NCAE' and abs(moyenne_bloc-float(data_pv[bloc]['note']))>0.002:
+        threshold = 0.002 if not '1SLPY001' in data_pv.keys() else 0.1
+        if data_pv['total']['note']!='NCAE' and abs(moyenne_bloc-float(data_pv[bloc]['note']))>threshold:
             logger.error("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
             logger.error("  *** Moyenne calculee " + bloc + " : " + str(moyenne_bloc));
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
@@ -255,13 +141,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         CheckValidation(bloc, data_pv[bloc], str(etu_id), etu_nom, nobloc=False, parcours=parcours, compensation=compensated)
 
     # Verification du nombre de credits
-    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys())]);
-##     if 'LK4IND00' in data_pv.keys(): 
-##         creds=sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and x != 'LU2IN006'] );
-##     if 'LK6IND00' in data_pv.keys(): 
-##         creds=sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and x != 'LU3IN024'] );
+    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys()]);
 
-##     if no120: creds = creds-6;
     if creds!=30 and data_pv['total']['note']!='NCAE':
         logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(creds) + " ECTS");
     if data_pv['total']['note']=='NCAE':
@@ -276,13 +157,13 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         logger.warning("Problemes de moyenne totale non calculee dans le PV de " + etu_nom + " (" + etu_id + ")");
         logger.warning("  > Moyenne calculee = " + str(moyenne_tot));
         data_pv['total']['note'] = moyenne_tot;
-##     threshold = 0.1 if 'PAD' in parcours else 0.001;
     if abs(moyenne_tot-float(data_pv['total']['note'])) > 0.001:
         logger.error("Problemes de moyenne totale dans le PV de "  + etu_nom + " (" + etu_id + "):");
         logger.error("  *** Moyenne calculee : " + str(moyenne_tot));
         logger.error("  *** Moyenne Apogee   : " + str(data_pv['total']['note']));
 
     # output
+    for ue in to_del: del data_pv[ue]
     return
 
 
@@ -333,8 +214,13 @@ def SanityCheck(pv, parcours, semestre):
             ## On a un element de PV, qui peut etre a ce stade soit une UE soit un bloc
             my_label = label.split('-')[-1].strip();
 
+            # patch L1
+            if 'LU1' in label or '1SL' in label and not 'UE' in data_UE.keys():
+                data_UE['UE'] = label.split('-')[1].strip()
+                data_UE['annee_val'] = None
+
             ## Ici l'element est vide : on l'ignore
-            if 'UE' not in data_UE.keys(): continue;
+            if 'UE' not in data_UE.keys() : continue;
 
             ## Simplification -> quelques blocs sont ignorés
             if my_label in ['LK5PY092', 'LK3STM01', 'LK3PYDM0', '999999', 'LY3PYJ11', 'LY3PYDM0', 'LK3PYJ04']: continue
@@ -370,7 +256,9 @@ def SanityCheck(pv, parcours, semestre):
 ##             if my_label == 'LK5PY092' and parcours=='CMI': new_label = 'LK5PYMI0';
 ##             if my_label in ['LY5PY090', 'LY5PY092']: data_UE['UE']=None;
 ##             if my_label == 'LK3PYC00' and parcours=='PADMONO': new_label='LK3PYC02';
-            pv_individuel[new_label] = {'note':CheckValidation(new_label, data_UE, str(etudiant), pv[etudiant]['nom']), 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']};
+            mynote = CheckValidation(new_label, data_UE, str(etudiant), pv[etudiant]['nom'])
+            if '1SL' in label: pv_individuel['total'] = {'note':mynote/5., 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']}
+            pv_individuel[new_label] = {'note':mynote, 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']};
 
         # patch philo
 ##         if 'LU2SXPH2' in pv_individuel.keys(): pv_individuel['LK4PHD00'] = pv_individuel['LU2SXPH2'];

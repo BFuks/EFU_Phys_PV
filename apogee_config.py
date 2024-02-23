@@ -90,7 +90,7 @@ apogee_blocpv_structure = {
 ##########################################################
 apogee_notes_structure = {
   'irrelevant' : ['NBR_CRD_OBJ_TPW', 'TEM_CRD_PVM', 'COD_TPW', 'NOT_TPW_U', 'NOT_CAL_TPW',
-                  'COD_MEN_TPW', 'NOT_PNT_JUR_TPW',
+                  'COD_MEN_TPW', 'NOT_PNT_JUR_TPW', 'COD_TRE_VAQ',
                   'LIC_FEX_TPW', 'NBR_RNG_ETU_TPW', 'ETA_NOT_TPW',
                   'ETA_RES_TPW', 'TEM_RES_MEI_NOT_TPW', 'NB_AST', 'LIB_AST', 'COD_TRE',
                   'NOT_SUB_TPW_VAQ', 'NOT_VAA', 'BAR_NOT_VAA', 'C_NBR_CRD', 'CF_FLAG_MEI_NOT',
