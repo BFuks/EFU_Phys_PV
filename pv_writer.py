@@ -164,9 +164,13 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
 
     ## Boucle sur les UE
     l1 = True if '1SLPY001' in notes.keys() else False
-    for ue in (ues+[x for x in notes.keys() if not x in ues] + [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN'] + [x for x in notes.keys() if x in ['LK3PYC03', 'LK4PYC03', 'LK5PYMI0', 'LK6PYMI0'] ] ):
+    list1 = [x for x in notes.keys() if not x in ues]
+    list2 = [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN' and not x in list1]
+    list3 = [x for x in notes.keys() if x in ['LK3PYC03', 'LK4PYC03', 'LK5PYMI0', 'LK6PYMI0']] 
+    for ue in (ues+list1+list2+list3):
         ### Enlever les notes de la mineure
         if ue in ['LK5EEJ13', 'LK5PHM99', 'LK6ST113', 'LK6ST116']: continue
+        if ue.startswith('S'): continue
 
         ### Note manquante
         if not ue in notes.keys():

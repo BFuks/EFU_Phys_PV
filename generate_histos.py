@@ -87,11 +87,13 @@ for semestre in semestres:
         # Getting PV information (and using the patch DM-S6 to merge all PVs)
         logger.info("Lecture da la version XML du PV " + my_parcours + " pour le semestre " + semestre);
         PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, my_parcours));
-        all_PVs[semestre] = Patch_DM(PV_tmp, all_PVs[semestre]);
 
-    # Checks and extra calculations
-    tag = 'DM' if parcours.startswith('DM') else my_parcours;
-    logger.disabled = True; all_PVs[semestre]= SanityCheck(all_PVs[semestre],tag,semestre); logger.disabled = False;
+        # Checks and extra calculations
+        tag = 'DM' if parcours.startswith('DM') else my_parcours;
+        logger.disabled = True; PV_tmp = SanityCheck(PV_tmp,tag,semestre); logger.disabled = False;
+
+        # Merging
+        all_PVs[semestre] = Patch_DM(PV_tmp, all_PVs[semestre]);
 
 
 ## Merging 1st and 2nd session

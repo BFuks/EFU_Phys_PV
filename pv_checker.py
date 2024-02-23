@@ -184,8 +184,8 @@ def CalculBlocsDisc(pv_etu, semestre):
     except: MIN = '';
 
     # calcul de la moyenne
-    MAJ1 = [ [float(str(pv_etu[x]['note']).replace('COVID','0')), UEs[x]['ects']] for x in phys if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];
-    MAJ2 = [ [float(str(pv_etu[x]['note']).replace('COVID','0')), UEs[x]['ects']] for x in MIN  if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];
+    MAJ1 = [ [float(str(pv_etu[x]['note']).replace('???','0')), UEs[x]['ects']] for x in phys if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];
+    MAJ2 = [ [float(str(pv_etu[x]['note']).replace('???','0')), UEs[x]['ects']] for x in MIN  if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];
     logger.debug("  > Bloc Disc Phys = " + str(MAJ1));
     logger.debug("  > Bloc Disc " + tag+ " = " + str(MAJ2));
 
@@ -240,7 +240,8 @@ def SanityCheck(pv, parcours, semestre):
 
             ## Extraction du PV + some hack to reduce the amount of blocknames
             new_label = my_label
-            if my_label in ['LK3PYJ06']: new_label = 'LK3PYJ05';
+            if   my_label in ['LK3PYJ06']: new_label = 'LK3PYJ05';
+            elif my_label in ['LK5PYJ01']: new_label = 'LK5PYJ00';
             elif my_label.startswith('LY') and  data_UE['UE']!=None: new_label = data_UE['UE'];
 ##             if my_label == 'LY5PY090': new_label = data_UE['UE'];
 ##             elif my_label == 'LY5PY092': new_label = data_UE['UE'] + '_GS';

@@ -161,7 +161,7 @@ def MakePlot1(variable, data, title, filename):
     for percentile in percentiles:
         value = np.percentile(data, percentile)
         ax.axvline(value, color='darkgreen', linestyle='dashdot', linewidth=1, label=f'{percentile}% percentile')
-        ax.text(value, 6, f'{percentile}%', rotation=90, verticalalignment='center')
+        ax.text(value, ax.get_ylim()[1]*.90, f'{percentile}%', rotation=90, verticalalignment='center')
 
     # Layout
     ax.set_title(title, fontdict=font1);
