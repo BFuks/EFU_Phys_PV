@@ -44,6 +44,7 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom, nobloc=True, parcours='', 
     # Calcul de la note
     note = float(data_UE['note'])/float(data_UE['bareme'])*100. if nom_UE!='total' and nobloc else float(data_UE['note']);
     if nom_UE in IsModule or (nom_UE.startswith('LK') and nobloc): return note;
+    if parcours in ['PADMAJ', 'PADMONO']: return note
 
     # Verification du statut de validation
     threshold = 50. if nom_UE!='total' else 10.
@@ -69,6 +70,9 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     blocs_pv       = sorted([x for x in data_pv.keys() if (x.startswith('LK') or x.startswith('1SL') or not x in UEs) and not x in ['total', '999999']])
     blocs_maquette = [x for x in blocs_maquette if not x in [x for x in UEs if x.startswith('LK')] or x in blocs_pv]
 
+    # Init threshold
+    threshold = 0.002 if (not '1SLPY001' in data_pv.keys()) and (not parcours in ['PADMONO', 'PADMAJ']) else 0.1
+
     # Comparaison de la maquette et du pv au niveau des blocs
     logger.debug('  > Comparaison de la maquette et du pv au niveau des blocs')
     logger.debug('     * blocs maq=' + str(blocs_maquette))
@@ -79,7 +83,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     # Ajout des blocs manquants
     to_del = [];
     for missing_bloc in [x for x in blocs_maquette if not x in blocs_pv]:
-        logger.warning("  > Adding block " + missing_bloc  + " dans le PV de " + etu_nom + " (" + etu_id + ")")
+        if data_pv['total']['note']!='NCAE':
+            logger.warning("  > Adding block " + missing_bloc  + " dans le PV de " + etu_nom + " (" + etu_id + ")")
         data_pv[missing_bloc] =  {'tag': Maquette[missing_bloc]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '???', 'annee_val': None, 'UE': None};
         blocs_pv.append(missing_bloc);
 
@@ -88,7 +93,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     missings = [  [x for x in z if not x in list(data_pv.keys()) ] for z in GetUEsMaquette(blocs_maquette) ];
     missings = [x for x in missings if len(x)==min([len(y) for y in missings]) ][0];
     for missing_ue in missings:
-        logger.warning("  > Ajout de l'UE manquante " + missing_ue + " dans le PV de " + etu_nom + " (" + etu_id + ")");
+        if data_pv['total']['note']!='NCAE':
+            logger.warning("  > Ajout de l'UE manquante " + missing_ue + " dans le PV de " + etu_nom + " (" + etu_id + ")");
 
         # UE remplacée par une autre
         grossac = [x for x in data_pv.keys() if x in Swap.keys() and missing_ue in Swap[x]];
@@ -96,9 +102,11 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             logger.warning("    -> UE remplacée par " + grossac[0])
             data_pv[missing_ue] = data_pv[grossac[0]].copy()
             data_pv[grossac[0]]['SX'] = True
+            if 'SX' in data_pv[missing_ue].keys(): del data_pv[missing_ue]['SX']
             to_del.append(missing_ue)
 
         else: data_pv[missing_ue] =  {'tag': UEs[missing_ue]['nom'], 'bareme': '100', 'validation': 'AJ', 'note': '???', 'annee_val': None, 'UE': None};
+
 
     # Verification des moyennes (blocs)
     moyenne_tot  = 0.; coeff_tot    = 0.;
@@ -131,7 +139,6 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             data_pv[bloc]['note']=moyenne_bloc;
 
         ## Verification de la moyenne du bloc
-        threshold = 0.002 if not '1SLPY001' in data_pv.keys() else 0.1
         if data_pv['total']['note']!='NCAE' and abs(moyenne_bloc-float(data_pv[bloc]['note']))>threshold:
             logger.error("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
             logger.error("  *** Moyenne calculee " + bloc + " : " + str(moyenne_bloc));
@@ -142,6 +149,8 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
     # Verification du nombre de credits
     creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys()]);
+
+#    print ([ [x, UEs[x]['ects']] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys()]) 
 
     if creds!=30 and data_pv['total']['note']!='NCAE':
         logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(creds) + " ECTS");
@@ -157,7 +166,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         logger.warning("Problemes de moyenne totale non calculee dans le PV de " + etu_nom + " (" + etu_id + ")");
         logger.warning("  > Moyenne calculee = " + str(moyenne_tot));
         data_pv['total']['note'] = moyenne_tot;
-    if abs(moyenne_tot-float(data_pv['total']['note'])) > 0.001:
+    if abs(moyenne_tot-float(data_pv['total']['note'])) > threshold:
         logger.error("Problemes de moyenne totale dans le PV de "  + etu_nom + " (" + etu_id + "):");
         logger.error("  *** Moyenne calculee : " + str(moyenne_tot));
         logger.error("  *** Moyenne Apogee   : " + str(data_pv['total']['note']));
