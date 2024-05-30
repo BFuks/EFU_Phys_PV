@@ -251,6 +251,7 @@ def SanityCheck(pv, parcours, semestre):
             new_label = my_label
             if   my_label in ['LK3PYJ06']: new_label = 'LK3PYJ05';
             elif my_label in ['LK5PYJ01']: new_label = 'LK5PYJ00';
+            elif my_label in ['LK6PYJ01']: new_label = 'LK6PYJ00';
             elif my_label.startswith('LY') and  data_UE['UE']!=None: new_label = data_UE['UE'];
 ##             if my_label == 'LY5PY090': new_label = data_UE['UE'];
 ##             elif my_label == 'LY5PY092': new_label = data_UE['UE'] + '_GS';

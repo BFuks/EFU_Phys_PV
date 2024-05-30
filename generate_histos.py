@@ -56,12 +56,17 @@ if 'SPRINT' in PV_dico[niveau][annee]: all_parcours.append('SPRINT')
 if 'CMI'    in PV_dico[niveau][annee]: all_parcours.append('CMI')
 if 'DM'     in PV_dico[niveau][annee]: all_parcours.extend(['DM-PM', 'DM'])
 if {'PADMAJ', 'PADMONO'} & set(PV_dico[niveau][annee].keys()): all_parcours.append('PAD')
+if 'PADMONO' in PV_dico[niveau][annee] and 'MONO' in PV_dico[niveau][annee]: all_parcours.append('all MONOs')
+if 'PADMAJ' in PV_dico[niveau][annee] and 'MAJ' in PV_dico[niveau][annee]: all_parcours.append('all MAJs')
+
 
 parcours = Parcours(all_parcours);
 if   parcours in ['MONO', 'MAJ', 'SPRINT', 'CMI'] : list_parcours = [parcours];
 elif parcours.startswith('DM'): list_parcours = ['DM'];
 elif parcours == 'MAJ+DM'     : list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'DM']));
 elif parcours == 'PAD'        : list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['PADMAJ', 'PADMONO']));
+elif parcours == 'all MONOs'  : list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['MONO', 'PADMONO']));
+elif parcours == 'all MAJs'   : list_parcours = list(set(PV_dico[niveau][annee].keys()) & set(['MAJ', 'PADMAJ']));
 
 # Semestres disponibles
 semestres = [];
