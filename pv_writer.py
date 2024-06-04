@@ -153,7 +153,6 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee, etu_id
 
 
 # Formattage des notes
-from maquette import GrosSac, GrosSacP2;
 def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
     ## Initialisation
     notes_string = [];
