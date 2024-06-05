@@ -67,17 +67,17 @@ from maquette import Swap;
 def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     # Obtentien des blocs et verification que la liste est complete
     blocs_maquette = GetBlocsMaquette(semestre, parcours)
-    blocs_pv       = sorted([x for x in data_pv.keys() if (x.startswith('LK') or x.startswith('1SL') or not x in UEs) and not x in ['total', '999999']])
+    blocs_pv       = sorted([x for x in data_pv.keys() if (x.startswith('LK') or x.startswith('1SL') or x.startswith('2SL') or not x in UEs) and not x in ['total', '999999']])
     blocs_maquette = [x for x in blocs_maquette if not x in [x for x in UEs if x.startswith('LK')] or x in blocs_pv]
 
     # Init threshold
-    threshold = 0.002 if (not '1SLPY001' in data_pv.keys()) and (not parcours in ['PADMONO', 'PADMAJ']) else 0.1
+    threshold = 0.002 if (not '1SLPY001' in data_pv.keys() and not '2SLPY001' in data_pv.keys()) and (not parcours in ['PADMONO', 'PADMAJ']) else 0.1
 
     # Comparaison de la maquette et du pv au niveau des blocs
     logger.debug('  > Comparaison de la maquette et du pv au niveau des blocs')
     logger.debug('     * blocs maq=' + str(blocs_maquette))
     logger.debug('     * blocs pv =' + str(blocs_pv))
-    if (len(blocs_pv)!=2 and blocs_pv!=['1SLPY001']) and data_pv['total']['note']!='NCAE':
+    if (len(blocs_pv)!=2 and not blocs_pv in [ ['1SLPY001'], ['2SLPY001']]) and data_pv['total']['note']!='NCAE':
        logger.warning("Problemes de bloc manquant dans le PV de " + etu_nom + " (" + etu_id + "). Blocs detectes : " + ", ".join(blocs_maquette)  );
 
     # Ajout des blocs manquants
@@ -227,6 +227,7 @@ def SanityCheck(pv, parcours, semestre):
             if 'LU1' in label or '1SL' in label and not 'UE' in data_UE.keys():
                 data_UE['UE'] = label.split('-')[1].strip()
                 data_UE['annee_val'] = None
+            if 'S2' in semestre and label[3:-1] in ['1SLPY001', 'LU1MA001', 'LU1MEPY3', 'LU1CI001', 'LU1PY001', 'LU1SXM06', 'tota']: continue
 
             ## Ici l'element est vide : on l'ignore
             if 'UE' not in data_UE.keys() : continue;
@@ -269,6 +270,7 @@ def SanityCheck(pv, parcours, semestre):
 ##             if my_label == 'LK3PYC00' and parcours=='PADMONO': new_label='LK3PYC02';
             mynote = CheckValidation(new_label, data_UE, str(etudiant), pv[etudiant]['nom'])
             if '1SL' in label: pv_individuel['total'] = {'note':mynote/5., 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']}
+            if '2SL' in label: pv_individuel['total'] = {'note':mynote/5., 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']}
             pv_individuel[new_label] = {'note':mynote, 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']};
 
         # patch philo

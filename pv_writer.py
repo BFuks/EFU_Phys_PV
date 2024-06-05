@@ -162,7 +162,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
     if 'note2' in notes['total'].keys(): compensation2 = ( moyenne_annee[1]>=10. or float(notes['total']['note2'])>10.) if notes['total']['note2'] not in ['NCAE','ENCO'] else False;
 
     ## Boucle sur les UE
-    l1 = True if '1SLPY001' in notes.keys() else False
+    l1 = True if ('1SLPY001' in notes.keys() or '2SLPY001' in notes.keys() )else False
     list1 = [x for x in notes.keys() if not x in ues]
     list2 = [x for x in notes.keys() if x in Maquette.keys() and Maquette[x]['nom']=='MIN' and not x in list1]
     list3 = [x for x in notes.keys() if x in ['LK3PYC03', 'LK4PYC03', 'LK5PYMI0', 'LK6PYMI0']] 
@@ -182,7 +182,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
         if ue.startswith('L5PH') or ue.startswith('L3LACH') or ue.startswith('L4LACH') or ue.startswith('L6PH'): continue;
         if ue.startswith('L5LACH') or ue.startswith('L6LACH'): continue;
         if ue.startswith('L3PH') or ue.startswith('L4PH'): continue;
-        if ue in ['total', '1SLPY001']: continue
+        if ue in ['total', '1SLPY001', '2SLPY001']: continue
 
         ### Redoublant deja valide
         validation_tag = "<br /><font color='grey' size='8'>("+notes[ue]['annee_val']+')</font>' if notes[ue]['annee_val']!=None else '';

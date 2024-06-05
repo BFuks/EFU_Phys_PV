@@ -36,10 +36,10 @@ UEs = {
     'LK3STM00': {'ects': 12, 'nom':'MinSDT0'  },    'LK5STM00': {'ects':12,  'nom':'MinSdT0'  },
 
     'LU1CI001': {'ects':6,   'nom':'Chimie-1' },
-    'LU1MA001': {'ects':9,   'nom':'Maths-1'  },
-    'LU1MEPY3': {'ects':9,   'nom':'McPhs-1'  },
+    'LU1MA001': {'ects':9,   'nom':'Maths-1'  },           'LU1MA002': {'ects':6,   'nom':'Maths-2'  },  'LU1MA003': {'ects':9,   'nom':'Maths-3'  },
+    'LU1MEPY3': {'ects':9,   'nom':'McPhs-1'  },           'LU1MEPY2': {'ects':9,   'nom':'McPhs-2'  },
     'LU1PY001': {'ects':6,   'nom':'Phys-1'   },
-    'LU1SXM06': {'ects':3,   'nom':'Methodo', 'SX':True },
+    'LU1SXM06': {'ects':3,   'nom':'Methodo', 'SX':True }, 'LU1SXARE': {'ects':3,   'nom':'ARE'      },  'LU1PY002': {'ects':3,   'nom':'PAD', 'SX':True },
 
     'LU2PY041': {'ects':6,   'nom':'PhysActn' },    'LU3PY015': {'ects': 6, 'nom':'PhysExp2'},
     'LU2PY103': {'ects':6,   'nom':'Thermo'   },    'LU3PY101': {'ects': 6, 'nom':'PhysQ1'  },
@@ -69,7 +69,7 @@ UEs = {
                                                     'LU3PY537': {'ects': 6, 'nom':'InfoQ',   'SX':True},
                                                     'LU3PYOIP': {'ects': 3, 'nom':'OIP'     },
 
-    'LU2LVAN1': {'ects':3,   'nom':'Anglais'  },    'LU3LVAN2': {'ects': 3, 'nom':'Anglais' },
+    'LU1LVAN2': {'ects':3,   'nom':'Anglais'  },    'LU2LVAN1': {'ects':3,   'nom':'Anglais'  },    'LU3LVAN2': {'ects': 3, 'nom':'Anglais' },
     'LU2FLE01': {'ects':3,   'nom':'FLE'      },
     'LU3LVAD1': {'ects':3,   'nom':'Anglais'  },
 
@@ -457,6 +457,12 @@ Maquette = {
       'parcours': ['SPRINT'],
       'nom'     : "MAJ",
       'semestre': "S1"
+    },
+    '2SLPY001': {
+      'UE'      : [ ['LU1MA002', 'LU1MA003', 'LU1MEPY2', 'LU1PY002', 'LU1SXARE', 'LU1LVAN2'] ],
+      'parcours': ['SPRINT'],
+      'nom'     : "MAJ",
+      'semestre': "S2"
     },
 
     # bloc Majeure
