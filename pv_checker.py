@@ -228,9 +228,12 @@ def SanityCheck(pv, parcours, semestre):
                 data_UE['UE'] = label.split('-')[1].strip()
                 data_UE['annee_val'] = None
             if 'S2' in semestre and label[3:-1] in ['1SLPY001', 'LU1MA001', 'LU1MEPY3', 'LU1CI001', 'LU1PY001', 'LU1SXM06', 'tota']: continue
+            if '2SL' in label:
+                data_UE['UE']='2SLPY001'
+                data_UE['annee_val']=None
 
             ## Ici l'element est vide : on l'ignore
-            if 'UE' not in data_UE.keys() : continue;
+            if 'UE' not in data_UE.keys(): continue;
 
             ## Simplification -> quelques blocs sont ignorés
             if my_label in ['LK5PY092', 'LK3STM01', 'LK3PYDM0', '999999', 'LY3PYJ11', 'LY3PYDM0', 'LK3PYJ04']: continue
