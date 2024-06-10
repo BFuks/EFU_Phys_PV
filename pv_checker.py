@@ -236,7 +236,7 @@ def SanityCheck(pv, parcours, semestre):
             if 'UE' not in data_UE.keys(): continue;
 
             ## Simplification -> quelques blocs sont ignorés
-            if my_label in ['LK5PY092', 'LK3STM01', 'LK3PYDM0', '999999', 'LY3PYJ11', 'LY3PYDM0', 'LK3PYJ04']: continue
+            if my_label in ['LK5PY092', 'LK3STM01', 'LK3PYDM0', '999999', 'LY3PYJ11', 'LY3PYDM0', 'LK3PYJ04', 'LK4PYJ11']: continue
             if my_label in ['LK3PYJ05'] and parcours in ['DM']: continue
 
 
@@ -254,6 +254,8 @@ def SanityCheck(pv, parcours, semestre):
             ## Extraction du PV + some hack to reduce the amount of blocknames
             new_label = my_label
             if   my_label in ['LK3PYJ06']: new_label = 'LK3PYJ05';
+            if   my_label in ['LK4PYJ06', 'LK4PYJ00']: new_label = 'LK4PYJ05';
+            if   my_label in ['LK4PYJ23', 'LK4PYJ24']: new_label = 'LK4PYJ22';
             elif my_label in ['LK5PYJ01']: new_label = 'LK5PYJ00';
             elif my_label in ['LK6PYJ01']: new_label = 'LK6PYJ00';
             elif my_label.startswith('LY') and  data_UE['UE']!=None: new_label = data_UE['UE'];
@@ -276,7 +278,19 @@ def SanityCheck(pv, parcours, semestre):
             if '2SL' in label: pv_individuel['total'] = {'note':mynote/5., 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']}
             pv_individuel[new_label] = {'note':mynote, 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']};
 
-        # patch philo
+            # patch elec
+            if 'LU3EE200' in pv_individuel.keys() and 'LU3EE204' in pv_individuel.keys():
+                if 'LU2EE203' in pv_individuel.keys():
+                    pv_individuel['LK6EED00'] = {'tag': 'Bloc DM EEA S6',  'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
+                else:
+                    pv_individuel['LK6EEM00'] = {'tag': 'Bloc MAJ EEA S6', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
+            # patch SdT
+            if 'LU2ST403' in pv_individuel.keys() and 'LU2ST402' in pv_individuel.keys() and 'LU2ST045' in pv_individuel.keys():
+                pv_individuel['LK4STD00'] = {'tag': 'Bloc DM SdT S4', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
+            # patch CMI
+            if parcours=='CMI' and 'S4' in semestre:
+                pv_individuel['LK4PYJ05'] = {'tag': 'Bloc Mono Phys', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
+
 ##         if 'LU2SXPH2' in pv_individuel.keys(): pv_individuel['LK4PHD00'] = pv_individuel['LU2SXPH2'];
 ##         elif 'LU2SXHI2' in pv_individuel.keys(): pv_individuel['LK4HID00'] = pv_individuel['LU2SXHI2'];
 ##         elif 'LU2EE201' in pv_individuel.keys() and 'LU2PY123' in pv_individuel.keys() and \

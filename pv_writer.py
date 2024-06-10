@@ -411,7 +411,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
             ### Notes des UE
             num_ue = GetLength(semestres, parcours);
             if parcours=='CMI':num_ue-=2;
-            if parcours in ['PADMAJ']: num_ue+=1;
+            if parcours in ['PADMAJ', 'MAJ', 'DM']: num_ue+=1;
 ##             if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
 ##             if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
 ##             if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
