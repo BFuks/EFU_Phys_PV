@@ -78,7 +78,7 @@ UEs = {
                                                         'LU3PYOIP': {'ects': 3, 'nom':'OIP'     },
 
     'LU1LVAN2': {'ects':3,   'nom':'Anglais'  },    'LU2LVAN1': {'ects':3,   'nom':'Anglais'  },    'LU3LVAN2': {'ects': 3, 'nom':'Anglais' },
-    'LU2FLE01': {'ects':3,   'nom':'FLE'      },
+    'LU2FLE01': {'ects':3,   'nom':'FLE'      },    'LU2LVAL2': {'ects':3,   'nom':'Allemand' },
     'LU3LVAD1': {'ects':3,   'nom':'Anglais'  },
 
 ##     'LU3PY014': {'ects':6,  'nom':'MicMac'},
@@ -816,7 +816,7 @@ Maquette = {
 
 };
 
-Irrelevant = ['LU2LVAN1'];
+Irrelevant = ['LU2LVAN1', 'LU2LVAL2'];
 
 Swap = {
     'LU2PY041' : ['LU2PY212'],
