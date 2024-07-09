@@ -63,7 +63,7 @@ def CheckValidation(nom_UE, data_UE, etu_id, etu_nom, nobloc=True, parcours='', 
 ###                                                    ###
 ##########################################################
 from misc import GetBlocsMaquette, GetUEsMaquette;
-from maquette import Swap;
+from maquette import Swap, HorsContrat;
 def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     # Obtentien des blocs et verification que la liste est complete
     blocs_maquette = GetBlocsMaquette(semestre, parcours)
@@ -120,7 +120,9 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
         for ue in bloc_ues:
             if data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO', 'VAC']: continue;
-            if not parcours in ['DM', 'SPRINT', 'CMI'] or (not 'SX' in UEs[ue].keys()):
+            # Patch DK
+            if ue=='LU2PY123' and any([x for x in data_pv.keys() if x in ['LU2SXPH2', 'LU2SXHI2', 'LU2SXAL2']]): continue
+            if (not parcours in ['DM', 'SPRINT', 'CMI'] or (not 'SX' in UEs[ue].keys())) or (ue=='LU3PY537' and parcours=='DM'):
                 if data_pv[ue]['note'] != '???' and not 'SX' in data_pv[ue].keys():
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
                     moyenne_tot  += float(data_pv[ue]['note'])*UEs[ue]['ects'];
@@ -139,7 +141,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             data_pv[bloc]['note']=moyenne_bloc;
 
         ## Verification de la moyenne du bloc
-        if data_pv['total']['note']!='NCAE' and abs(moyenne_bloc-float(data_pv[bloc]['note']))>threshold:
+        if not data_pv['total']['note'] in ['NCAE', 'ENCO'] and abs(moyenne_bloc-float(data_pv[bloc]['note']))>threshold:
             logger.error("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
             logger.error("  *** Moyenne calculee " + bloc + " : " + str(moyenne_bloc));
             logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
@@ -148,9 +150,12 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
         CheckValidation(bloc, data_pv[bloc], str(etu_id), etu_nom, nobloc=False, parcours=parcours, compensation=compensated)
 
     # Verification du nombre de credits
-    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys()]);
+    creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys() and not x in HorsContrat]);
+    if 'LU2PY123' in data_pv.keys() and any([x for x in data_pv.keys() if x in ['LU2SXPH2', 'LU2SXHI2', 'LU2SXAL2']]): creds-=3
+    if 'LK6IND00' in data_pv.keys(): creds+=6
 
-#    print ([ [x, UEs[x]['ects']] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys()]) 
+    # print ([ [x, UEs[x]['ects']] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys()]) 
+    # print(etu_nom, data_pv.keys())
 
     if creds!=30 and data_pv['total']['note']!='NCAE':
         logger.warning("Problemes de nombre total d'ECTS dans le PV de " + etu_nom + " (" + etu_id + "): " + str(creds) + " ECTS");
@@ -258,21 +263,10 @@ def SanityCheck(pv, parcours, semestre):
             if   my_label in ['LK4PYJ23', 'LK4PYJ24']: new_label = 'LK4PYJ22';
             elif my_label in ['LK5PYJ01']: new_label = 'LK5PYJ00';
             elif my_label in ['LK6PYJ01']: new_label = 'LK6PYJ00';
+            elif my_label in ['LK6PYJ20']: new_label = 'LK6PYJ30';
+            elif my_label in ['LK5PYDK0']: new_label = 'LK5SSD00';
+            elif my_label in ['LK6PYDK0']: new_label = 'LK6SSD00';
             elif my_label.startswith('LY') and  data_UE['UE']!=None: new_label = data_UE['UE'];
-##             if my_label == 'LY5PY090': new_label = data_UE['UE'];
-##             elif my_label == 'LY5PY092': new_label = data_UE['UE'] + '_GS';
-##             else: new_label = my_label;
-##             if my_label == 'LK3PYJ01': new_label = 'LK3PYJ00';
-##             if my_label == 'LK4PYJ01': new_label = 'LK4PYJ00';
-##             if my_label == 'LK5PYJ01' and parcours!='SPRINT': new_label = 'LK5PYJ00';
-##             if my_label == 'LK5PYJ01' and parcours=='SPRINT': new_label = 'LK5PYJ03';
-##             if my_label == 'LK6PYJ20' and parcours=='DK': new_label = 'LK6PYDK0';
-##             if my_label == 'LK4PYJ22': new_label = 'LK4PYJ21';
-##             if my_label == 'LK3STM00': new_label = 'LK3STM01';
-##             if my_label == 'LK4PYJ23': new_label = 'LK4PYJ21';
-##             if my_label == 'LK5PY092' and parcours=='CMI': new_label = 'LK5PYMI0';
-##             if my_label in ['LY5PY090', 'LY5PY092']: data_UE['UE']=None;
-##             if my_label == 'LK3PYC00' and parcours=='PADMONO': new_label='LK3PYC02';
             mynote = CheckValidation(new_label, data_UE, str(etudiant), pv[etudiant]['nom'])
             if '1SL' in label: pv_individuel['total'] = {'note':mynote/5., 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']}
             if '2SL' in label: pv_individuel['total'] = {'note':mynote/5., 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']}

@@ -142,7 +142,7 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee, etu_id
             except:
                 notebloc = 0
                 logger.error('Étudiant ' + str(etu_id) + ' - Problème de maquette pour le bloc ' + nombloc + " : " + str(notes[semestre][nombloc]));
-        if notes['total']['note'] not in ['NCAE', 'ENCO']:
+        if not notes['total']['note'] in ['NCAE', 'ENCO'] and not notebloc in ['NCAE', 'ENCO']:
             colour = 'red' if float(notebloc)<50 else 'black';
             moyennes_string += '<br />' + nombloc + ' :  <font color=\'' + colour + '\'>' + '{:.3f}'.format(notebloc) + '/100</font>';
     moyennes_string += '</para>';
@@ -213,7 +213,7 @@ def GetNotes(notes, ues, ncases, moyenne_annee, etu_id, semestre):
              '<font color=\'grey\' size=\'8\'><super>[' + UEs[ue]['nom'].replace('0','') + ' - ' + str(UEs[ue]['ects']) + ' ECTS]</super></font><br />';
         if 'note2' in notes[ue].keys() and current_note.split('<')[0] != current_note2.split('<')[0]:
             # Check session 2 > session 1
-            if current_note!='???' and notes[ue]['note2']<notes[ue]['note']:
+            if current_note!='???' and not notes[ue]['note2'] in ['ENCO'] and notes[ue]['note2']<notes[ue]['note']:
                 logger.critical(semestre[:2] + ' - ' + str(etu_id) + " :  Note session 2 < note session1 - " + ue + " (" + str(round(notes[ue]['note'],2)) +  ' > ' +  str(round(notes[ue]['note2'],2)) + ")");
             current_note =  current_note.replace('<br />',' ').replace('#','[#').replace('</font>',']</font>').replace('8','7');
             tmp_string = tmp_string + '<font color=' + fontcolor + ' size=\'7\'>' + current_note + '</font><br />';

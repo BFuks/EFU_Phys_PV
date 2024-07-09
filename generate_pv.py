@@ -62,7 +62,7 @@ all_PVs = {};
 for semestre in semestres:
     logger.info("Lecture da la version XML du PV pour le semestre " + semestre);
     print("         *** Decodage des infos dans le PV");
-    if parcours in ['DM'] and 'S3' in semestre:
+    if parcours in ['DM']:
         PV_semestre = {};
         for i in range(1,3):
             PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, parcours+str(i)));
