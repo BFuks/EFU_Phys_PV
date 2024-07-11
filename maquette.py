@@ -8,7 +8,7 @@
 UEs = {
     'LK3PYC00': {'ects': 12, 'nom':'PYComp0'  },    'LK5PYC02': {'ects': 12, 'nom':'PYComp0'  },  'LK6PYC00': {'ects': 9, 'nom':'PYComp0'   },
     'LK3PYC01': {'ects': 12, 'nom':'PYComp0'  },
-    'LK3PYC03': {'ects': 12, 'nom':'MinCMI0'  },    'LK5PYMI0': {'ects': 12, 'nom':'MinCMI0'  },
+    'LK3PYC03': {'ects': 12, 'nom':'MinCMI0'  },    'LK5PYMI0': {'ects': 12, 'nom':'MinCMI0'  },  'LK6PYMI0': {'ects': 15,'nom':'MinCMI0'   },
     'LK3ALD00': {'ects': 12, 'nom':'MajAlmd0' },    'LK4ALD00': {'ects': 12, 'nom':'MajAlmd0' },
     'LK3CHM00': {'ects': 12, 'nom':'Chinois0' },    'LK4CHM00': {'ects':  9, 'nom':'Chinois0' },  'LK5CHM00': {'ects': 12, 'nom':'Chinois0' },
     'LK3CID00': {'ects': 12, 'nom':'MajChim0' },    'LK4CID00': {'ects': 12, 'nom':'MajChim0' },  'LK5CID00': {'ects': 12, 'nom':'MajChim0' },   'LK6CID00': {'ects': 9, 'nom':'MajChim0' },
@@ -339,7 +339,6 @@ UEs = {
 ##     'LU3HNP52': {'ects': 3, 'nom':'MinHNP2'},
 ##     'LU3HNP53': {'ects': 6, 'nom':'MinHNP3'},
 ##     'LK4PYC03': {'ects': 18,'nom':'MinCMI0'},
-##     'LK6PYMI0': {'ects': 18,'nom':'MinCMI0'},
 ##     'LU6SX21E': {'ects': 21,'nom':'Moblite'},
 ##     'LU3HI000': {'ects': 12, 'nom':'MinHist1'},
 ##     'LK5HIM00': {'ects': 12, 'nom':'MinHist'},
@@ -592,6 +591,12 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S4"
     },
+    'LK4PYC03': {
+        'UE'      : [['LU2CI101', 'LU2CI102', 'LU2PY102'], ['LU2EE201', 'LU2EE204', 'LU2PY102'] ],
+        'parcours': ['CMI'],
+        'nom'     : "CMP",
+        'semestre': "S4"
+    },
     'LK5PYC00': {
       'UE'      : [['LU3PY213', 'LU3PY214', 'LU3PY215']],
       'parcours': ['MONO', 'PADMONO'],
@@ -641,11 +646,11 @@ Maquette = {
         'nom'     : "CMP",
         'semestre': "S6"
     },
-    'LK4PYC03': {
-        'UE'      : [['LU2CI101', 'LU2CI102', 'LU2PY102'], ['LU2EE201', 'LU2EE204', 'LU2PY102'] ],
+    'LK6PYMI0': {
+        'UE'      : [['LU3CI141', 'LU3CI113', 'LU3PY105'], ['LU3EE204', 'LU3EE200', 'LU3PY105']  ],
         'parcours': ['CMI'],
         'nom'     : "CMP",
-        'semestre': "S4"
+        'semestre': "S6"
     },
 
 
@@ -658,12 +663,6 @@ Maquette = {
 ##         'semestre': "S3"
 ##     },
 
-##     'LK6PYMI0': {
-##         'UE'      : [['LU3CI141', 'LU3CI113', 'LU3PY105'], ['LU3EE204', 'LU3EE200', 'LU3PY105'] , ['LU3CI021', 'LU3CI013'], ['LU3EE204', 'LU3EE200'] ],
-##         'parcours': ['CMI'],
-##         'nom'     : "CMP",
-##         'semestre': "S6"
-##     },
 ## 
 ##     'LK6PYC00': {
 ##         'UE'      : [ 

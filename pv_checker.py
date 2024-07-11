@@ -122,6 +122,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             if data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO', 'VAC']: continue;
             # Patch DK
             if ue=='LU2PY123' and any([x for x in data_pv.keys() if x in ['LU2SXPH2', 'LU2SXHI2', 'LU2SXAL2']]): continue
+            if ue=='LU3PY105' and parcours=='CMI': continue
             if (not parcours in ['DM', 'SPRINT', 'CMI'] or (not 'SX' in UEs[ue].keys())) or (ue=='LU3PY537' and parcours=='DM'):
                 if data_pv[ue]['note'] != '???' and not 'SX' in data_pv[ue].keys():
                     moyenne_bloc += float(data_pv[ue]['note'])*UEs[ue]['ects'];
@@ -131,7 +132,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
                 if data_pv[ue]['note'] == '???' or float(data_pv[ue]['note']) < 50: compensated = True;
         try:    moyenne_bloc = round(moyenne_bloc/coeff_bloc,3);
         except: moyenne_bloc = 0.
-        logger.debug('       -> moyenne bloc  calculée = ' + str(moyenne_bloc) + ' : ' + str(compensated))
+        logger.debug('       -> moyenne bloc calculée = ' + str(moyenne_bloc) + ' : ' + str(compensated))
         data_pv[bloc]['compensation']=compensated;
 
         ## Output and save if necessary
@@ -152,6 +153,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     # Verification du nombre de credits
     creds = sum([UEs[x]['ects'] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys() and not x in HorsContrat]);
     if 'LU2PY123' in data_pv.keys() and any([x for x in data_pv.keys() if x in ['LU2SXPH2', 'LU2SXHI2', 'LU2SXAL2']]): creds-=3
+    if 'LU3PY105' in data_pv.keys() and parcours=='CMI': creds-=6
     if 'LK6IND00' in data_pv.keys(): creds+=6
 
     # print ([ [x, UEs[x]['ects']] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys()]) 
@@ -273,7 +275,7 @@ def SanityCheck(pv, parcours, semestre):
             pv_individuel[new_label] = {'note':mynote, 'annee_val':data_UE['annee_val'], 'validation':data_UE['validation']};
 
             # patch elec
-            if 'LU3EE200' in pv_individuel.keys() and 'LU3EE204' in pv_individuel.keys():
+            if 'LU3EE200' in pv_individuel.keys() and 'LU3EE204' in pv_individuel.keys() and parcours!='CMI':
                 if 'LU2EE203' in pv_individuel.keys():
                     pv_individuel['LK6EED00'] = {'tag': 'Bloc DM EEA S6',  'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
                 else:
@@ -282,17 +284,9 @@ def SanityCheck(pv, parcours, semestre):
             if 'LU2ST403' in pv_individuel.keys() and 'LU2ST402' in pv_individuel.keys() and 'LU2ST045' in pv_individuel.keys():
                 pv_individuel['LK4STD00'] = {'tag': 'Bloc DM SdT S4', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
             # patch CMI
-            if parcours=='CMI' and 'S4' in semestre:
-                pv_individuel['LK4PYJ05'] = {'tag': 'Bloc Mono Phys', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
-
-##         if 'LU2SXPH2' in pv_individuel.keys(): pv_individuel['LK4PHD00'] = pv_individuel['LU2SXPH2'];
-##         elif 'LU2SXHI2' in pv_individuel.keys(): pv_individuel['LK4HID00'] = pv_individuel['LU2SXHI2'];
-##         elif 'LU2EE201' in pv_individuel.keys() and 'LU2PY123' in pv_individuel.keys() and \
-##             'LU2EE203' in pv_individuel.keys() and 'LU2EE204' in pv_individuel.keys():
-##             pv_individuel['LK4EED00'] = {'tag': 'Bloc DM EEA S4', 'bareme': '100', 'validation': 'ADM', 'note': '-1', 'annee_val': None, 'UE': None}
-##         elif 'LU2ST045' in pv_individuel.keys() and 'LU2ST402' in pv_individuel.keys() and \
-##             'LU2ST403' in pv_individuel.keys() and 'LU2PY123' in pv_individuel.keys():
-##             pv_individuel['LK4STD00'] = {'tag': 'Bloc DM ST S4', 'bareme': '100', 'validation': 'ADM', 'note': '-1', 'annee_val': None, 'UE': None}
+#            if parcours=='CMI' and 'S4' in semestre:
+#                print(pv_individuel)
+#                pv_individuel['LK4PYJ05'] = {'tag': 'Bloc Mono Phys', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
 
         # Verification des moyennes (blocs et semestre)
         CheckMoyennes(pv_individuel, parcours, semestre.split('_')[0], str(etudiant), pv[etudiant]['nom']);
