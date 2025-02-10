@@ -88,6 +88,7 @@ for semestre in semestres:
     for my_parcours in sorted(list_parcours):
         # Safety
         if not os.path.isfile(os.path.join(os.getcwd(),'data', niveau+'_'+annee+'_'+semestre+'_'+my_parcours+'.dat')): continue;
+        #if "Session2" in semestre: continue
 
         # Getting PV information (and using the patch DM-S6 to merge all PVs)
         logger.info("Lecture da la version XML du PV " + my_parcours + " pour le semestre " + semestre);
@@ -145,6 +146,7 @@ if len(semestres)>1:
     logger.info("Extra plots : " + parcours+'_' +annee.replace('_','-') + '_' + niveau)
     MakePlot1(niveau, all_stats['year'], title, filename);
     MakePie(title, all_stats['year_validation'],filename.replace('histo_','pie_'));
+    print("  -> ", all_stats['year_validation'].count(-1)+all_stats['year_validation'].count(0)+all_stats['year_validation'].count(1), "etudiants")
 
 # Physics mastering
 for variable in all_stats.keys():

@@ -58,22 +58,8 @@ def MakeHeaders(annee, semestres, parcours):
     # number of columns in the table
     num_ue = GetLength(semestres, parcours);
     if parcours=='CMI': num_ue-=2;
+    if parcours=='CMI' and int(annee.split('_')[0])>=2024 and 'S5_Session1' in semestres: num_ue-=1;
     if parcours in ['DM', 'MAJ', 'PADMAJ']: num_ue+=1;
-###     if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
-###     if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
-###     if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
-###     if parcours in ['DM', 'MAJ', 'DK', 'PADMAJ'] and semestres[0].startswith('S3'): num_ue+=1;
-###     if parcours in ['DM', 'DK'] and semestres[0].startswith('S5'): num_ue+=1;
-###     if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
-###     if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
-###     if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
-###     if parcours in ['MONO'] and num_ue>12: num_ue-=7;
-###     if parcours in ['MAJ'] and num_ue>12: num_ue-=8;
-###     if parcours in ['CMI'] and num_ue>9: num_ue-=5;
-###     if parcours in ['MAJ', 'CMI'] and num_ue>8: num_ue-=4;
-###     if parcours in ['DM', 'MONO'] and num_ue>8: num_ue-=4;
-###     if parcours=='PADMONO' and num_ue>8: num_ue-=6;
-###     if parcours in ['PADMAJ','DM'] and num_ue>7: num_ue-=3;
 
     # The header themselves
     Headers = [[
@@ -412,21 +398,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
             num_ue = GetLength(semestres, parcours);
             if parcours=='CMI':num_ue-=2;
             if parcours in ['PADMAJ', 'MAJ', 'DM']: num_ue+=1;
-##             if parcours=='MONO' and semestres[0].startswith('S5'): num_ue+=1;
-##             if parcours=='MAJ' and semestres[0].startswith('S5'): num_ue+=2;
-##             if parcours=='PADMAJ' and semestres[0].startswith('S5'): num_ue+=1;
-##             if parcours in ['MAJ','DM', 'DK', 'PADMAJ'] and semestres[0].startswith('S3'): num_ue+=1;
-##             if parcours in ['DM', 'DK'] and semestres[0].startswith('S5'): num_ue+=1;
-##             if parcours=='CMI' and semestres[0].startswith('S5') and 'S6_Session1' in semestres:num_ue-=1;
-##             if parcours=='CMI' and semestres[0].startswith('S5') and not 'S6_Session1' in semestres:num_ue-=2;
-##             if parcours in ['MAJ', 'MONO'] and semestres[0].startswith('S5') and int(annee.split('_')[0])>2021: num_ue-=1;
-##             if parcours in ['MONO'] and num_ue>12: num_ue-=7;
-##             if parcours in ['MAJ'] and num_ue>12: num_ue-=8;
-##             if parcours in ['CMI'] and num_ue>9: num_ue-=5;
-##             if parcours in ['MAJ', 'CMI'] and num_ue>8: num_ue-=4;
-##             if parcours in['DM', 'MONO'] and num_ue>8: num_ue-=4;
-##             if parcours=='PADMONO' and num_ue>8: num_ue-=6;
-##             if parcours in ['PADMAJ', 'DM'] and num_ue>7: num_ue-=3;
+            if parcours=='CMI' and int(annee.split('_')[0])>=2024 and 'S5_Session1' in semestres: num_ue-=1;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];

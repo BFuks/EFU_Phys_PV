@@ -136,8 +136,8 @@ import matplotlib.pyplot as plt;
 import numpy             as np;
 def MakePlot1(variable, data, title, filename):
     # Histograms
-    font1 = {'family':'sans-serif', 'color':'darkred',  'size':15};
-    font2 = {'family':'sans-serif', 'color':'darkblue', 'size':13};
+    font1 = {'family':'sans-serif', 'color':'darkred',  'fontsize':15};
+    font2 = {'family':'sans-serif', 'color':'darkblue', 'fontsize':13};
 
     # canvas
     fig = plt.figure();
@@ -176,8 +176,8 @@ def MakePlot1(variable, data, title, filename):
 
 def MakePlot2(variable, data, title, filename):
     # Histograms
-    font1 = {'family':'sans-serif', 'color':'darkred',  'size':15};
-    font2 = {'family':'sans-serif', 'color':'darkblue', 'size':13};
+    font1 = {'family':'sans-serif', 'color':'darkred',  'fontsize':15};
+    font2 = {'family':'sans-serif', 'color':'darkblue', 'fontsize':13};
 
     # canvas
     fig = plt.figure();
@@ -218,8 +218,8 @@ def MakePlot2(variable, data, title, filename):
 
 def MakePie(variable, raw_data, filename):
     # Layout
-    font1  = {'family':'sans-serif', 'color':'darkred',  'size':15};
-    font2  = {'family':'sans-serif', 'color':'darkblue', 'size':13};
+    font1  = {'family':'sans-serif', 'color':'darkred',  'fontsize':15};
+    font2  = {'family':'sans-serif', 'color':'darkblue', 'fontsize':13};
     colors = ["Brown", "Cornsilk", "DarkSeaGreen"]
 
     # formatting data

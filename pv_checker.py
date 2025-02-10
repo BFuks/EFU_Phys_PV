@@ -142,10 +142,11 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
             data_pv[bloc]['note']=moyenne_bloc;
 
         ## Verification de la moyenne du bloc
-        if not data_pv['total']['note'] in ['NCAE', 'ENCO'] and abs(moyenne_bloc-float(data_pv[bloc]['note']))>threshold:
-            logger.error("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
-            logger.error("  *** Moyenne calculee " + bloc + " : " + str(moyenne_bloc));
-            logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
+        if not data_pv['total']['note'] in ['NCAE', 'ENCO', -1] and not data_pv[bloc]['note'] in ['ENCO']:
+            if not data_pv['total']['note'] in ['NCAE', 'ENCO'] and abs(moyenne_bloc-float(data_pv[bloc]['note']))>threshold:
+                logger.error("Problemes de moyenne de blocs dans le PV de "  + etu_nom + " (" + etu_id + "):");
+                logger.error("  *** Moyenne calculee " + bloc + " : " + str(moyenne_bloc));
+                logger.error("  *** Moyenne Apogee   " + bloc + " : " + str(data_pv[bloc]['note']));
 
         ## Verification du résultat du bloc
         CheckValidation(bloc, data_pv[bloc], str(etu_id), etu_nom, nobloc=False, parcours=parcours, compensation=compensated)
