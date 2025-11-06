@@ -59,6 +59,7 @@ def MakeHeaders(annee, semestres, parcours):
     num_ue = GetLength(semestres, parcours);
     if parcours=='CMI': num_ue-=2;
     if parcours=='CMI' and int(annee.split('_')[0])>=2024 and 'S5_Session1' in semestres: num_ue-=1;
+    if parcours=='CMI' and int(annee.split('_')[0])>=2024 and 'S4_Session1' in semestres: num_ue-=2;
     if parcours in ['DM', 'MAJ', 'PADMAJ']: num_ue+=1;
 
     # The header themselves
@@ -128,7 +129,7 @@ def GetAverages(parcours, semestre, notes, blocs_maquette, moyenne_annee, etu_id
             except:
                 notebloc = 0
                 logger.error('Étudiant ' + str(etu_id) + ' - Problème de maquette pour le bloc ' + nombloc + " : " + str(notes[semestre][nombloc]));
-        if not notes['total']['note'] in ['NCAE', 'ENCO'] and not notebloc in ['NCAE', 'ENCO']:
+        if not notes['total']['note'] in ['NCAE', 'ENCO'] and not notebloc in ['NCAE', 'ENCO', 'DIS']:
             colour = 'red' if float(notebloc)<50 else 'black';
             moyennes_string += '<br />' + nombloc + ' :  <font color=\'' + colour + '\'>' + '{:.3f}'.format(notebloc) + '/100</font>';
     moyennes_string += '</para>';
@@ -399,6 +400,7 @@ def PDFWriter(pv, annee, niveau, parcours, semestres, redoublants=False, success
             if parcours=='CMI':num_ue-=2;
             if parcours in ['PADMAJ', 'MAJ', 'DM']: num_ue+=1;
             if parcours=='CMI' and int(annee.split('_')[0])>=2024 and 'S5_Session1' in semestres: num_ue-=1;
+            if parcours=='CMI' and int(annee.split('_')[0])>=2024 and 'S4_Session1' in semestres: num_ue-=2;
             list_ues = [ [x for x in z if x in list(pv_ind['results'].keys()) ] for z in UEs_maquette[semestre] ];
             list_ues = [x for x in list_ues if set(x).issubset(set(pv_ind['results'].keys()))];
             list_ues = [x for x in list_ues if len(x)==max([len(y) for y in list_ues])][0];

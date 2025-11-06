@@ -1,319 +1,123 @@
 ##########################################################
 ###                                                    ###
-###                    XML Reader                      ###
+###                New XML Reader                      ###
+###                                                    ###
+###                Date: 05/11/2025                    ###
 ###                                                    ###
 ##########################################################
+from pprint import pprint
+import re
+import sys
 import xml.etree.ElementTree as ET
-from misc import Bye
-
-##########################################################
-###                                                    ###
-###                       Logger                       ###
-###                                                    ###
-##########################################################
-import logging;
-logger = logging.getLogger('mylogger');
 
 
 ##########################################################
 ###                                                    ###
 ###                Import du fichier XML               ###
 ###                                                    ###
-##########################################################
-import os
-def GetXML(niveau, annee, semestre, parcours):
-
-    # reading
-    data = open(os.path.join(os.getcwd(),'data', niveau+'_'+annee+'_'+semestre+'_'+parcours+'.dat'));
-    tree = ET.parse(data).getroot();
-    data.close();
-
-    # output
-    return tree;
-
-def GetXMLStats(annee):
-
-    # reading
-    data = open(os.path.join(os.getcwd(),'data', 'stats_'+annee+'.dat'), encoding='ISO-8859-1');
-    for line in data: tree = ET.parse(data).getroot();
-    data.close();
-
-    # output
-    return tree;
-
-
-##########################################################
-###                                                    ###
-###      Decodage de l'information XML  (wrapper)      ###
+###        Conversion en un dictionnaire Python        ###
 ###                                                    ###
 ##########################################################
-from apogee_config import apogee_structure        as Struct;
-from apogee_config import apogee_pvind_structure  as PVStruct;
-from apogee_config import apogee_resume_structure as ResumeStruct;
-def DecodeXML(xml_data, structure=Struct):
-    # Initialisation
-    decoded_data = {};
+def parse_xml_to_dict(filename, logger=None):
+    # Read the XML
+    tree = ET.parse(filename)
+    root = tree.getroot()
 
-    # Navigation dans l'arbre XML
-    for child in xml_data:
+    # Header : determination de la VET
+    header = root.find(".//LIST_G_ENTETE/G_ENTETE")
 
-        # Elements de structure generaux
-        if 'irrelevant' in structure.keys() and child.tag in structure['irrelevant']:
-            continue;
-        elif not child.tag in structure.keys():
-            logger.error("Element d'Apogee inconnu (ajouter dans apogee_structure) : " + child.tag)
-            Bye();
-        elif child.tag in structure.keys() and structure[child.tag] != {}:
-            decoded_data.update(DecodeXML(child, structure[child.tag]));
-            continue;
+    # Recehrche du code VET alphanumérique à 8 caractères
+    code_pattern = re.compile(r"\b([A-Z0-9]{8})\b")
+    match_def = code_pattern.search(header.findtext("LIC_LIB_PRV_DEF", ""))
+    match_prov = code_pattern.search(header.findtext("LIC_LIB_PRV_PROV", ""))
+    VET_def = match_def.group(1) if match_def else None
+    VET_prov = match_prov.group(1) if match_prov else None
 
-        # PV individuel pour un etudiant
-        elif child.tag in ['G_IND']:
-            pv_individuel = DecodeBloc(child, PVStruct);
-            # cleaning
-            id_etudiant = int(pv_individuel['id'].split(':')[-1].strip());
-            del pv_individuel['id'];
-            if id_etudiant in decoded_data.keys():
-                old=len([ k for k in decoded_data[id_etudiant]['results'].keys() if 'note' in decoded_data[id_etudiant]['results'][k]]);
-                new=len([ k for k in pv_individuel['results'].keys() if 'note' in pv_individuel['results'][k]]);
-                if new>=old: decoded_data[id_etudiant] = pv_individuel;
-            else:
-                decoded_data[id_etudiant] = pv_individuel;
-            continue;
-
-        # resume du PV
-        elif child.tag in ['G_TOT']:
-            resume = DecodeBloc(child, ResumeStruct);
-            decoded_data['resume'] = resume;
-            continue;
-
-    #output
-    return decoded_data;
+    if not VET_def or not VET_prov or VET_def != VET_prov:
+        logger.error("Impossibilité de déterminer le code de la VET dans le header du fichier " + 
+           filename.split('/')[-1])
+        sys.exit()
 
 
+    # Boucle sur les étudiants
+    students = {}
+    for g_ind in root.findall(".//LIST_G_TAB/G_TAB/LIST_G_IND/G_IND"):
 
-from apogee_config import apogee_stats, apogee_bloc_stats;
-def DecodeXMLStats(xml_data, structure=apogee_stats):
-    # Initialisation
-    decoded_data = {};
+        # numero étudiant
+        student_id = re.search(r"\d+", g_ind.findtext(".//COD_ETU_TPW_IND", ""))
+        student_id = student_id.group(0)
 
-    # Navigation dans l'arbre XML
-    for child in xml_data:
+        # données génerales
+        student_data = {}
 
-        # Elements de structure generaux
-        if 'irrelevant' in structure.keys() and child.tag in structure['irrelevant']: continue;
-        elif not child.tag in structure.keys():
-            logger.error("Element Apogee inconnu (a ajouter dans apogee_stats) : " + child.tag)
-            Bye();
-        elif child.tag in structure.keys() and structure[child.tag] != {}:
-            decoded_data.update(DecodeXMLStats(child, structure[child.tag]));
-            continue;
+        for child in g_ind:
+            tag = child.tag
+            text = (child.text or "").strip()
 
-        # stats individuelles pour un etudiant
-        elif child.tag in ['G_COD_ETU']: stats_individuel = DecodeBlocStats(child, apogee_bloc_stats);
+            # info inutile
+            if not text or tag.startswith("COL"): continue
+            if tag in ("NAI_ETU_LI1_TPW_IND", "NAI_ETU_LI2_TPW_IND", "COD_ETU_TPW_IND"): continue
 
-        # Boursier ?
-        stats_individuel['bourse']='non' if stats_individuel['bourse']==None else 'oui';
+            # nom
+            if tag == "LIB_NOM_PAT_IND_TPW_IND": student_data["nom"] = text
+            else: student_data[tag] = text
 
-        # Parcours
-        if   stats_individuel['parcours'] == 'L2PY01(20)': stats_individuel['parcours'] = 'L2 MONO';
-        elif stats_individuel['parcours'] == 'G1PY01(21)': stats_individuel['parcours'] = 'L3 SPRINT';
-        elif stats_individuel['parcours'] == 'L3PY01(21)': stats_individuel['parcours'] = 'L3 MONO';
-        elif stats_individuel['parcours'] == 'V2PY01(20)': stats_individuel['parcours'] = 'L2 Bi-Di';
-        elif stats_individuel['parcours'] == 'V3PY01(21)': stats_individuel['parcours'] = 'L3 Bi-Di';
-        elif stats_individuel['parcours'] == 'Q2PYDM(21)': stats_individuel['parcours'] = 'L2 DM';
-        elif stats_individuel['parcours'] == 'Q3PYDM(21)': stats_individuel['parcours'] = 'L3 DM';
-        elif stats_individuel['parcours'] in ['Q2PYDK(20)', 'Q2PHSX(19)']: stats_individuel['parcours'] = 'L2 DK';
-        elif stats_individuel['parcours'] in ['Q3PYDK(21)', 'Q3PHSX(19)']: stats_individuel['parcours'] = 'L3 DK';
-        elif stats_individuel['parcours'] == 'L2PY51(20)': stats_individuel['parcours'] = 'L2 CMI';
-        elif stats_individuel['parcours'] == 'L3PY51(21)': stats_individuel['parcours'] = 'L3 CMI';
-        elif stats_individuel['parcours'] == 'P3PY01(19)': stats_individuel['parcours'] = 'L3 LIOVIS';
-        elif stats_individuel['parcours'] == 'W1SX03(19)': stats_individuel['parcours'] = 'UE isolee';
-        else: logger.warning('VET inconnue : ' + stats_individuel['parcours'] + ' (' + stats_individuel['nom'] + ')');
+            # PV lui-même
+            PV = {}
+            for g_tpw in g_ind.findall("LIST_G_TPW/G_TPW"):
+                element = {}
 
-        # Numero etudiant  = key du dico
-        id_su = int(stats_individuel['id_su']);
-        del stats_individuel['id_su'];
+                # code UE/bloc ou nom de l'élément si non disponible
+                code = g_tpw.findtext("COD_OBJ_MNP_TPW", "").strip()
+                if not code: code = g_tpw.findtext("LIB_CMT_TPW", "").strip()
 
-        # Etudiant avec deux inscriptions -> fusion des blocs
-        if id_su in decoded_data.keys():
-          for k,v in stats_individuel.items():
-              if v==decoded_data[id_su][k]: continue;
-              decoded_data[id_su][k] = [ decoded_data[id_su][k], v ];
+                # Obtention des données des children elements
+                children_data = {}
+                for c in g_tpw:
+                    if c.tag in ["COD_OBJ_MNP_TPW", "LIST_G_TPW_IND"]: continue
+                    val = (c.text or "").strip()
+                    if val != "": children_data[c.tag] = val
 
-              # cleaning (UE isolees != parcours
-              if k=='parcours':
-                  decoded_data[id_su][k] = [x for x in decoded_data[id_su][k] if x !='UE isolee'];
-                  if any([ 'DM' in x for x in decoded_data[id_su][k] ]) and any([ 'DK' in x for x in decoded_data[id_su][k] ]): decoded_data[id_su][k] = [x for x in decoded_data[id_su][k] if 'DK' in x];
-                  if len(decoded_data[id_su][k])==1: decoded_data[id_su][k] = decoded_data[id_su][k][0];
+                # Data dans G_TPW_IND
+                g_tpw_ind = g_tpw.find("LIST_G_TPW_IND/G_TPW_IND")
+                for i_child in g_tpw_ind:
+                    itag = i_child.tag
+                    itext = (i_child.text or "").strip()
+                    if itext!="": children_data[itag] = itext
 
-              # cleaning : etre boursier n'est pas une superposition
-              if k=='bourse':
-                  decoded_data[id_su][k]='oui'if 'oui' in decoded_data[id_su][k] else 'non';
+                # Formatage
+                # 1) Bareme 
+                bareme = children_data.get("BAR_SAI_TPW")
+                if bareme: match = re.search(r"/\s*(\d+)", bareme)
+                element["bareme"] = int(match.group(1)) if match else None
 
-        # Cas standard
-        else: decoded_data[id_su] = stats_individuel;
+                # 2) resultat
+                resu_values = [v for k, v in children_data.items() if "COD_TRE" in k]
+                if len(set(resu_values)) > 1:
+                    logger.warning(f"Multiples valeurs du résultat pour l'étudiant {student_data['nom']} ({student_id}) dans l'élément {code}: {resu_values}")
+                element["resultat"] = resu_values[0] if resu_values else None
 
-    #output
-    return decoded_data;
+                # 3) note
+                pattern = re.compile(r'^(?=.*NOT)(?=.*TPW)(?!.*ETA)(?!.*MEI)')
+                note_values = [v for k, v in children_data.items() if pattern.search(k) ]
+                if len(set(note_values)) > 1:
+                    logger.warning(f"Multiples valeurs de la note pour l'étudiant {student_data['nom']} ({student_id}) dans l'élément {code}: {note_values}")
+                element["note"] = float(note_values[0]) if note_values else None
 
+                # 4) Libelle
+                libelle = children_data.get("LIB_CMT_TPW")
+                element["libelle"] = libelle if libelle else ""
 
+                # 5) ECTSlle
+                ects = children_data.get("C_NBR_CRD")
+                element["ects"] = int(ects) if ects else ""
 
-##########################################################
-###                                                    ###
-###          Decodage d'un bloc d'information          ###
-###                                                    ###
-##########################################################
-from apogee_config import apogee_blocpv_structure  as PVindStruct;
-def DecodeBloc(xml_data, structure):
-    # init
-    bloc_individuel = {};
+                PV[code] = element
 
-    # decoding the data
-    for child in xml_data:
-        # elements inutiles
-        if 'irrelevant' in structure.keys() and child.tag in structure['irrelevant']:
-            continue;
-
-        # element a sauvegarder
-        if child.tag in structure['relevant'].keys():
-            if child.tag == 'LIST_G_TPW':
-                bloc_individuel[structure['relevant'][child.tag]] = DecodePV(child,PVindStruct);
-            else:
-                bloc_individuel[structure['relevant'][child.tag]] = child.text;
-            continue;
-
-        # safety check
-        logger.error('Tag XML inconnu (au sein d\'un bloc XML) : ' + child.tag);
-        Bye();
-
-    # output
-    return bloc_individuel;
-
-
-
-def DecodeBlocStats(xml_data, structure):
-    # init
-    bloc_individuel = {};
-
-    # decoding the data
-    for child in xml_data:
-        # elements inutiles
-        if child.tag in structure['irrelevant']: continue;
-
-        # element a sauvegarder
-        elif child.tag in structure['relevant'].keys():
-            # name defined through NOM_USUEL -> safety
-            if child.tag=='NOM' and 'nom' in bloc_individuel.keys() and not bloc_individuel['nom']!=None: continue;
-            if child.tag=='NOM_USUEL' and child.text==None: continue;
-            #  general case -> saving information
-            bloc_individuel[structure['relevant'][child.tag]] = child.text;
-
-        # safety check
-        else:
-            logger.error('Tag XML inconnu (au sein d\'un bloc XML) : ' + child.tag);
-            Bye();
-
-    # output
-    return bloc_individuel;
-
-
-
-
-##########################################################
-###                                                    ###
-###         Decodage du PV individuel lui-meme         ###
-###                                                    ###
-##########################################################
-from apogee_config import apogee_notes_structure  as NotesStruct;
-def DecodePV(xml_data,structure):
-    # init
-    resultats = {};
-
-    # run over the different sub-blocs
-    for child in xml_data:
-
-        # Bloc interessant
-        if child.tag == xml_data.tag.replace('LIST_',''):
-            bloc = {};
-            for grandchild in child:
-
-                # information inutile
-                if grandchild.tag in structure['irrelevant']:
-                    continue
-
-                # information a sauvegarder
-                if grandchild.tag in structure['relevant'].keys():
-                    if grandchild.tag == 'LIST_G_TPW_IND':
-                        if structure['relevant'][grandchild.tag] in bloc.keys():
-                            bloc[structure['relevant'][grandchild.tag]].update(DecodePV(grandchild,NotesStruct));
-                        else:
-                            bloc[structure['relevant'][grandchild.tag]] = DecodePV(grandchild,NotesStruct);
-                    else:
-                        bloc[structure['relevant'][grandchild.tag]] = grandchild.text;
-                    continue;
-
-                # safety check
-                logger.error('Tag XML inconnu (au sein d\'un bloc XML) : ' + grandchild.tag);
-                Bye();
-
-            # cleaning
-            if 'bareme' in bloc.keys():
-                bloc['bareme'] = bloc['bareme'].split('/')[-1].strip();
-            if 'notes' in bloc.keys():
-                bloc.update(bloc['notes']);
-                del bloc['notes'];
-            if 'ABI' in bloc.keys() and bloc['ABI'] in ['U VAC', 'VAC', 'DIS', 'ABJ', 'ENCO']: bloc['validation'] = bloc['ABI']
-            if 'ABI' in bloc.keys() and bloc['ABI'] in [None, 'U VAC', 'VAC', 'DIS', 'ABJ', 'ENCO']: del bloc['ABI'];
-            elif 'ABI' in bloc.keys(): bloc['note']=0.;
-
-            # Bloc ID
-            if 'id0' in bloc.keys() and 'id1' in bloc.keys():
-               bloc['id'] = (bloc['id0']+bloc['id1']).replace('00','00-total');
-               if bloc['code'] != None:
-                   bloc['id']=bloc['id']+'-'+bloc['code'];
-               for x in ['id0', 'id1', 'code']: del bloc[x];
-
-            # Sauvegarde des donnees
-            if 'id' in bloc.keys():
-                resultats[bloc['id']] = bloc;
-                del resultats[bloc['id']]['id'];
-            else:
-                resultats.update(bloc);
-            continue;
-
-        # safety check
-        logger.error('Tag XML inconnu (au sein d\'un bloc de PV) : ' + child.tag);
-        Bye();
-
-    # output
-    return resultats;
-
-
-
-##########################################################
-###                                                    ###
-###                 Patch pour le S6 DM                ###
-###                                                    ###
-##########################################################
-def Patch_DM(pv_in, pv_out):
-    # Initialisation
-    PV_result = pv_out;
-
-    # Updating the pv_out if necessary
-    for key in pv_in.keys():
-        # Basic info
-        if key=='resume': continue;
-
-        # New info to store
-        if not key in PV_result.keys(): PV_result[key] = pv_in[key];
-
-        # Existing entry to maybe store
-        else:
-            old_keys = [x for x in PV_result[key]['results'].keys() if 'note' in PV_result[key]['results'][x].keys()];
-            new_keys = [x for x in pv_in[key]['results'].keys() if 'note' in pv_in[key]['results'][x].keys()];
-            if len(new_keys)>len(old_keys): PV_result[key] = pv_in[key];
+        student_data["pv"] = PV
+        students[student_id] = student_data
 
     # Output
-    return PV_result;
+    return { "VET": VET_def, "students": students }
+
 

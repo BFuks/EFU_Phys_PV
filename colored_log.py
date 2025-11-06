@@ -1,39 +1,47 @@
-################################################################################
-# Nice colored logger
-# Taken from MadAnalysis 5 ;)
-################################################################################
-
+##########################################################
+###                                                    ###
+###                Coloured logger                     ###
+###                                                    ###
+###                Date: 05/11/2025                    ###
+###                                                    ###
+##########################################################
 import logging
 import sys
 
+
+# Gestion des couleurs et du niveau
 class ColoredFormatter(logging.Formatter):
+    COLORS = {
+        'DEBUG': '\x1b[36m',   # Cyan
+        'INFO': '\x1b[0m',     # Default
+        'WARNING': '\x1b[33m', # Yellow
+        'ERROR': '\x1b[31m',   # Red
+    }
 
-    def __init__(self, msg):
-        logging.Formatter.__init__(self, msg)
+    RESET = '\x1b[0m'
 
-    def format(self,record):
-        if   (record.levelno >= 50):   #SUPER INFO
-            color = '\x1b[33mERROR  : '
-        elif (record.levelno >= 40):   #FATAL
-            color = '\x1b[31mERROR  : '
-        elif (record.levelno >= 30): #WARNING
-            color = '\x1b[35mINFO   : '
-        elif (record.levelno >= 20): #INFO
-            color = '\x1b[0mINFO   : '
-        elif (record.levelno >= 10): #DEBUG
-            color = '\x1b[36mDEBUG  : '
-        else:                          #ANYTHING ELSE
-            color = '\x1b[0m'
-        record.msg = color + str( record.msg ) + '\x1b[0m'
-        return logging.Formatter.format(self, record)
+    def format(self, record):
+        levelname = record.levelname
+        color = self.COLORS.get(levelname, self.RESET)
+        message = super().format(record)
+        return f"{color}{levelname:<7}: {message}{self.RESET}"
 
-def Init(LoggerStream=sys.stdout):
-    logger = logging.getLogger('mylogger')
-    for hdlr in logger.handlers:
+
+# Initialisation du logger
+def Init(LoggerStream=sys.stdout, level=logging.INFO):
+    logger = logging.getLogger("mylogger")
+    logger.setLevel(level)
+    logger.propagate = False
+
+    # Remove old handlers (useful for repeated calls)
+    for hdlr in list(logger.handlers):
         logger.removeHandler(hdlr)
-    hdlr = logging.StreamHandler(LoggerStream)
-    fmt = ColoredFormatter('%(message)s')
-    hdlr.setFormatter(fmt)
-    logger.addHandler(hdlr)
-    logger.propagate=False
-    logger.setLevel(logging.INFO)
+
+    # Create stream handler
+    handler = logging.StreamHandler(LoggerStream)
+    formatter = ColoredFormatter("%(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    return logger
+

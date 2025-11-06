@@ -113,6 +113,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     logger.debug('  > Vérification des moyennes des blocs')
     for bloc in blocs_pv:
         moyenne_bloc = 0.; coeff_bloc = 0.; compensated = False;
+        if data_pv[bloc]['note']=='DIS': continue
 
         ## Calcul de la moyenne du bloc
         bloc_ues = [x for x in Maquette[bloc]['UE'] if set(x).issubset(set(data_pv.keys())) ][0];
@@ -120,6 +121,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
 
         for ue in bloc_ues:
             if data_pv[ue]['note'] in ['U VAC', 'DIS', 'ENCO', 'VAC']: continue;
+            if '6STD' in bloc and 'PY' in ue: continue
             # Patch DK
             if ue=='LU2PY123' and any([x for x in data_pv.keys() if x in ['LU2SXPH2', 'LU2SXHI2', 'LU2SXAL2']]): continue
             if ue=='LU3PY105' and parcours=='CMI': continue
@@ -156,6 +158,7 @@ def CheckMoyennes(data_pv, parcours, semestre, etu_id, etu_nom):
     if 'LU2PY123' in data_pv.keys() and any([x for x in data_pv.keys() if x in ['LU2SXPH2', 'LU2SXHI2', 'LU2SXAL2']]): creds-=3
     if 'LU3PY105' in data_pv.keys() and parcours=='CMI': creds-=6
     if 'LK6IND00' in data_pv.keys(): creds+=6
+    if 'LK6STD00' in data_pv.keys(): creds-=6
 
     # print ([ [x, UEs[x]['ects']] for x in data_pv.keys() if x in UEs.keys() and not x.startswith('LK') and (not parcours in ['DM', 'SPRINT', 'CMI'] or not 'SX' in UEs[x].keys()) and not 'SX' in data_pv[x].keys()]) 
     # print(etu_nom, data_pv.keys())
@@ -193,6 +196,9 @@ from maquette import BlocsDisc;
 def CalculBlocsDisc(pv_etu, semestre):
     # list UEs
     ues = [x for x in pv_etu.keys() if x=='LK5EEJ13' or ('LU' in x and not 'LV' in x and not 'OIP' in x)];
+    if ues==['LU3PY403', 'LU3PY411', 'LU3MA120']:
+        ues=['LU3PY403', 'LU3PY411', 'LU3MA120', 'LU3PY124']
+        pv_etu['LU3PY124'] = {'note': '???', 'annee_val': None, 'validation': 'AJ'}
     phys= [x for x in BlocsDisc[semestre]['PY'] if all([y in ues for y in x])][0];
     tag = list(set([x[3:5] for x in [y.replace('SX','').replace('XS','') for y in ues] if x[3:5]!='PY']));
     if len(tag)==0: tag=''; MIN='';
@@ -244,7 +250,7 @@ def SanityCheck(pv, parcours, semestre):
             if 'UE' not in data_UE.keys(): continue;
 
             ## Simplification -> quelques blocs sont ignorés
-            if my_label in ['LK5PY092', 'LK3STM01', 'LK3PYDM0', '999999', 'LY3PYJ11', 'LY3PYDM0', 'LK3PYJ04', 'LK4PYJ11']: continue
+            if my_label in ['LK5PY092', 'LK3STM01', 'LK3PYDM0', '999999', 'LY3PYJ11', 'LY3PYDM0', 'LK3PYJ04', 'LK4PYJ11', 'LK4STM02']: continue
             if my_label in ['LK3PYJ05'] and parcours in ['DM']: continue
 
 
@@ -284,10 +290,23 @@ def SanityCheck(pv, parcours, semestre):
             # patch SdT
             if 'LU2ST403' in pv_individuel.keys() and 'LU2ST402' in pv_individuel.keys() and 'LU2ST045' in pv_individuel.keys():
                 pv_individuel['LK4STD00'] = {'tag': 'Bloc DM SdT S4', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
+            if all(k in pv_individuel for k in ['LU2ST403', 'LU2ST044', 'LU2ST045', 'LU2ST043']):
+                pv_individuel['LK4STD00'] = {'tag': 'Bloc DM SdT S4', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
+
             # patch CMI
-#            if parcours=='CMI' and 'S4' in semestre:
-#                print(pv_individuel)
-#                pv_individuel['LK4PYJ05'] = {'tag': 'Bloc Mono Phys', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
+            if parcours=='CMI' and 'S6' in semestre:
+                pv_individuel['LK6PYMI0'] = {'tag': 'Bloc Comp Phys', 'bareme': '100', 'validation': 'ADM', 'note': '???', 'annee_val': None, 'UE': None}
+
+            # patch DK
+            if new_label in ['LU3SXDE1'] and 'LK5SSD00' in pv_individuel.keys():
+               pv_individuel['LK5DEK00'] =  pv_individuel['LK5SSD00']
+               del pv_individuel['LK5SSD00']
+            if new_label in ['LU3SXDE2'] and 'LK6SSD00' in pv_individuel.keys():
+               pv_individuel['LK6DEK00'] =  pv_individuel['LK6SSD00']
+               del pv_individuel['LK6SSD00']
+            if new_label in ['LU3SXDR1'] and 'LK5SSD00' in pv_individuel.keys():
+               pv_individuel['LK5DRK00'] =  pv_individuel['LK5SSD00']
+               del pv_individuel['LK5SSD00']
 
         # Verification des moyennes (blocs et semestre)
         CheckMoyennes(pv_individuel, parcours, semestre.split('_')[0], str(etudiant), pv[etudiant]['nom']);

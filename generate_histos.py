@@ -86,13 +86,19 @@ for semestre in semestres:
 
     # Now the loop
     for my_parcours in sorted(list_parcours):
-        # Safety
-        if not os.path.isfile(os.path.join(os.getcwd(),'data', niveau+'_'+annee+'_'+semestre+'_'+my_parcours+'.dat')): continue;
-        #if "Session2" in semestre: continue
-
-        # Getting PV information (and using the patch DM-S6 to merge all PVs)
-        logger.info("Lecture da la version XML du PV " + my_parcours + " pour le semestre " + semestre);
-        PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, my_parcours));
+        if my_parcours in ['DM']:
+            PV_tmp = {};
+            for i in range(1,3):
+                # Safety
+                if not os.path.isfile(os.path.join(os.getcwd(),'data', niveau+'_'+annee+'_'+semestre+'_'+my_parcours+str(i)+'.dat')): continue;
+                logger.info("Lecture da la version XML du PV " + my_parcours + str(i) + " pour le semestre " + semestre);
+                PV_sem = DecodeXML(GetXML(niveau, annee, semestre, my_parcours+str(i)));
+                PV_semestre = Patch_DM(PV_sem, PV_tmp);
+        else:
+            # Safety
+            if not os.path.isfile(os.path.join(os.getcwd(),'data', niveau+'_'+annee+'_'+semestre+'_'+my_parcours+'.dat')): continue;
+            logger.info("Lecture da la version XML du PV " + my_parcours + " pour le semestre " + semestre);
+            PV_tmp = DecodeXML(GetXML(niveau, annee, semestre, my_parcours));
 
         # Checks and extra calculations
         tag = 'DM' if parcours.startswith('DM') else my_parcours;
