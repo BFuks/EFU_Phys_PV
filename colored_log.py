@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Coloured logger                     ###
 ###                                                    ###
-###                Date: 05/11/2025                    ###
+###                Date: 26/11/2025                    ###
 ###                                                    ###
 ##########################################################
 import logging
@@ -12,12 +12,11 @@ import sys
 # Gestion des couleurs et du niveau
 class ColoredFormatter(logging.Formatter):
     COLORS = {
-        'DEBUG': '\x1b[36m',   # Cyan
-        'INFO': '\x1b[0m',     # Default
-        'WARNING': '\x1b[33m', # Yellow
-        'ERROR': '\x1b[31m',   # Red
+        'DEBUG':   '\x1b[94m',  # Bleu clair
+        'INFO':    '\x1b[0m',   # Défaut
+        'WARNING': '\x1b[35m',  # Magenta
+        'ERROR':   '\x1b[91m',  # Rouge
     }
-
     RESET = '\x1b[0m'
 
     def format(self, record):
