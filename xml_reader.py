@@ -2,10 +2,9 @@
 ###                                                    ###
 ###                New XML Reader                      ###
 ###                                                    ###
-###                Date: 05/11/2025                    ###
+###                Date: 17/12/2025                    ###
 ###                                                    ###
 ##########################################################
-from pprint import pprint
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -18,7 +17,7 @@ import xml.etree.ElementTree as ET
 ###        Conversion en un dictionnaire Python        ###
 ###                                                    ###
 ##########################################################
-def parse_xml_to_dict(filename, logger=None):
+def Parse_xml_to_Dict(filename, logger=None):
     # Read the XML
     tree = ET.parse(filename)
     root = tree.getroot()
@@ -46,6 +45,7 @@ def parse_xml_to_dict(filename, logger=None):
         # numero étudiant
         student_id = re.search(r"\d+", g_ind.findtext(".//COD_ETU_TPW_IND", ""))
         student_id = student_id.group(0)
+        logger.debug(f"Processing student {student_id}")
 
         # données génerales
         student_data = {}
@@ -53,6 +53,7 @@ def parse_xml_to_dict(filename, logger=None):
         for child in g_ind:
             tag = child.tag
             text = (child.text or "").strip()
+            logger.debug(f"  ** processing tag {tag} with value {text}")
 
             # info inutile
             if not text or tag.startswith("COL"): continue
@@ -70,6 +71,7 @@ def parse_xml_to_dict(filename, logger=None):
                 # code UE/bloc ou nom de l'élément si non disponible
                 code = g_tpw.findtext("COD_OBJ_MNP_TPW", "").strip()
                 if not code: code = g_tpw.findtext("LIB_CMT_TPW", "").strip()
+                logger.debug(f"  ** processing code '{code}'")
 
                 # Obtention des données des children elements
                 children_data = {}
@@ -80,10 +82,12 @@ def parse_xml_to_dict(filename, logger=None):
 
                 # Data dans G_TPW_IND
                 g_tpw_ind = g_tpw.find("LIST_G_TPW_IND/G_TPW_IND")
-                for i_child in g_tpw_ind:
-                    itag = i_child.tag
-                    itext = (i_child.text or "").strip()
-                    if itext!="": children_data[itag] = itext
+                if g_tpw_ind:
+                    for i_child in g_tpw_ind:
+                        itag = i_child.tag
+                        itext = (i_child.text or "").strip()
+                        logger.debug(f"    ** processing tag '{itag}' with value '{itext}'")
+                        if itext!="": children_data[itag] = itext
 
                 # Formatage
                 # 1) Bareme 
@@ -92,27 +96,40 @@ def parse_xml_to_dict(filename, logger=None):
                 element["bareme"] = int(match.group(1)) if match else None
 
                 # 2) resultat
-                resu_values = [v for k, v in children_data.items() if "COD_TRE" in k]
+                resu_values = [v.replace('U ','') for k, v in children_data.items() if "COD_TRE" in k]
                 if len(set(resu_values)) > 1:
                     logger.warning(f"Multiples valeurs du résultat pour l'étudiant {student_data['nom']} ({student_id}) dans l'élément {code}: {resu_values}")
                 element["resultat"] = resu_values[0] if resu_values else None
 
                 # 3) note
-                pattern = re.compile(r'^(?=.*NOT)(?=.*TPW)(?!.*ETA)(?!.*MEI)')
-                note_values = [v for k, v in children_data.items() if pattern.search(k) ]
-                if len(set(note_values)) > 1:
-                    logger.warning(f"Multiples valeurs de la note pour l'étudiant {student_data['nom']} ({student_id}) dans l'élément {code}: {note_values}")
-                element["note"] = float(note_values[0]) if note_values else None
+                pattern = re.compile(r'^(?=.*NOT)(?=.*TPW)(?!.*ETA)(?!.*MEI)(?!.*CF)')
+                note_values = []
+                for k, v in children_data.items():
+                    if pattern.search(k) and v.strip() not in ["VAC"]:
+                        if 'CAL' in k: element['note']=v
+                        elif 'PNT' in k: element['pnt_jury']=v
+                        else: element['tmp']=v
+                for key in ['note', 'pnt_jury', 'tmp']:
+                    if key in element.keys():
+                        try: element[key] = round(float(element[key].replace(',', '.')), 3)
+                        except ValueError: element[key].strip()
+                if not 'note' in element.keys() and 'tmp' in element.keys():
+                    element['note']=element['tmp']
+                if 'note' in element.keys() and 'tmp' in element.keys() and element['note']==element['tmp']:
+                    del element['tmp']
 
                 # 4) Libelle
                 libelle = children_data.get("LIB_CMT_TPW")
                 element["libelle"] = libelle if libelle else ""
 
-                # 5) ECTSlle
+                # 5) ECTS
                 ects = children_data.get("C_NBR_CRD")
                 element["ects"] = int(ects) if ects else ""
 
-                PV[code] = element
+                # 6) Liste à choix
+                if code.startswith('LY'): code = children_data.get("COD_ELP_LSE_TPW")
+
+                if code is not None: PV[code] = element
 
         student_data["pv"] = PV
         students[student_id] = student_data

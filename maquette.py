@@ -2,30 +2,58 @@
 ###                                                    ###
 ###                Maquette  Apogee                    ###
 ###                                                    ###
-###                Date: 26/11/2025                    ###
+###                Date: 17/12/2025                    ###
 ###                                                    ###
 ###                                                    ###
 ##########################################################
 
 # Blocs
 Blocs = {
+    'LK5PYJ00': { 'nom': "MAJ", 'UE': [['LU3PY101', 'LU3PY121', 'LU3PYOIP'] ] },
     'LK5PYJ01': { 'nom': "MAJ", 'UE': [['LU3PY401', 'LU3PY421', 'LU3PYOIP'] ] },
+    'LK5PYC00': { 'nom': "CMP", 'UE': [['LU3PY213', 'LU3PY214', 'LU3PY215'] ] },
     'LK5PYC01': { 'nom': "CMP", 'UE': [['LU3PY513', 'LU3PY514', 'LU3PY215', 'LU3PY536']], 'SX': ['LU3PY536']},
+    'LK6PYJ00': { 'nom': "MAJ", 'UE': [['LU3PY103','LU3PY111','LY6PY120','LU3LVAN2']] },
+    'LK6PYC00': { 'nom': "CMP", 'UE': [['LY6PY220','LU3PY205']] }
 }
+
+Listes = {
+    'LY6PY120':['LU3PY122', 'LU3PY124', 'LU3PY126'],
+    'LY6PY220':['LU3PY231', 'LU3PY232', 'LU3PY233', 'LU3PY234', 'LU3PY235']
+}
+
 
 
 # Liste des UE avec le nombre de credits
 UEs = {
-  # L2
-  'LU2PY421': {'ects':12, 'nom':'OEM'    },
-  # L3
+  # L2 Phys
+  'LU2PY421': {'ects':12, 'nom':'OEM'     },
+  # L3 Phys
+  'LU3PY101': {'ects': 6, 'nom':'PhysQ1'  },
+  'LU3PY103': {'ects': 6, 'nom':'Thermo'  },
+  'LU3PY111': {'ects': 6, 'nom':'PhysQ2'  },
+  'LU3PY121': {'ects': 9, 'nom':'OEM'     },
+  'LU3PY122': {'ects': 6, 'nom':'ProjNmXp'},
+  'LU3PY126': {'ects': 6, 'nom':'ProjNum' },
+  'LU3PY124': {'ects': 6, 'nom':'ProjNmXp'},
+  'LU3PY205': {'ects': 3, 'nom':'Stage'   },
+  'LU3PY213': {'ects': 3, 'nom':'Math-S5' },
+  'LU3PY214': {'ects': 6, 'nom':'MilCont' },
   'LU3PY215': {'ects': 3, 'nom':'PhysExp3'},
+  'LU3PY231': {'ects': 6, 'nom':'MatMat'  },
+  'LU3PY232': {'ects': 6, 'nom':'Astro'   },
+  'LU3PY233': {'ects': 6, 'nom':'PhysTheo'},
+  'LU3PY234': {'ects': 6, 'nom':'OcnAtm'  },
+  'LU3PY235': {'ects': 6, 'nom':'MecaAnl' },
   'LU3PY401': {'ects': 6, 'nom':'PhysQ1'  },
   'LU3PY421': {'ects': 9, 'nom':'OEM'     },
   'LU3PY513': {'ects': 3, 'nom':'Math-S5' },
   'LU3PY514': {'ects': 6, 'nom':'MilCont' },
   'LU3PY536': {'ects': 6, 'nom':'MecaRel' },
-  'LU3PYOIP': {'ects': 3, 'nom':'OIP'     }
+  'LU3PYOIP': {'ects': 3, 'nom':'OIP'     },
+
+   # L3 Langues
+  'LU3LVAN2': {'ects': 3, 'nom':'Anglais' }
 }
 
 ## 
@@ -75,25 +103,25 @@ UEs = {
 ##     'LU2PY102': {'ects':6,   'nom':'Stage', 'SX':True}, 'LU3PY015': {'ects': 6, 'nom':'PhysExp2'},
 ##     'LU2PY103': {'ects':6,   'nom':'Thermo'   },        'LU3PY024': {'ects': 6, 'nom':'Projet'  },
 ##     'LU2PY104': {'ects':6,   'nom':'Meca'     },        'LU3PY101': {'ects': 6, 'nom':'PhysQ1'  },
-##     'LU2PY110': {'ects':6,   'nom':'Math-S3'  },        'LU3PY103': {'ects': 6, 'nom':'Thermo'  },
+##     'LU2PY110': {'ects':6,   'nom':'Math-S3'  },        
 ##     'LU2PY121': {'ects':12,  'nom':'OEM'      },        'LU3PY105': {'ects':6,  'nom':'Stage'   },
-##     'LU2PY123': {'ects':3,   'nom':'Math-S4'  },        'LU3PY111': {'ects': 6, 'nom':'PhysQ2'  },
+##     'LU2PY123': {'ects':3,   'nom':'Math-S4'  },        
 ##     'LU2PY124': {'ects':3,   'nom':'Relat'    },        'LU3PY121': {'ects': 9, 'nom':'OEM'     },
-##     'LU2PY125': {'ects':3,   'nom':'ITE'      },        'LU3PY122': {'ects': 6, 'nom':'Projet'  },
-##     'LU2PY126': {'ects':6,   'nom':'MecaRel'  },        'LU3PY124': {'ects': 6, 'nom':'ProjExp' },
+##     'LU2PY125': {'ects':3,   'nom':'ITE'      },        
+##     'LU2PY126': {'ects':6,   'nom':'MecaRel'  },        
 ##     'LU2PY127': {'ects':6,   'nom':'Satllts'  },
-##     'LU2PY212': {'ects':6 ,  'nom':'PhysExp1' },        'LU3PY126': {'ects': 6, 'nom':'Projet'  },
-##     'LU2PY215': {'ects':3,   'nom':'PhysExp2' },        'LU3PY205': {'ects': 3, 'nom':'Stage'   },
+##     'LU2PY212': {'ects':6 ,  'nom':'PhysExp1' },        
+##     'LU2PY215': {'ects':3,   'nom':'PhysExp2' },        
 ##     'LU2PY220': {'ects':6,   'nom':'MathCmp'  },        'LU3PY206': {'ects': 3, 'nom':'HistMeca'},
-##     'LU2PY222': {'ects':6,   'nom':'PhysNum'  },        'LU3PY213': {'ects': 3, 'nom':'Math-S5' },
-##     'LU2PY403': {'ects':6,   'nom':'Thermo'   },        'LU3PY214': {'ects': 6, 'nom':'MilCont' },
+##     'LU2PY222': {'ects':6,   'nom':'PhysNum'  },        
+##     'LU2PY403': {'ects':6,   'nom':'Thermo'   },        
 ##     'LU2PY404': {'ects':6,   'nom':'Meca'     },        
 ##     'LU2PY410': {'ects':6,   'nom':'Math-S3'  },        'LU3PY216': {'ects': 3, 'nom':'MicroElc'},
-##             'LU3PY231': {'ects': 6, 'nom':'MatMat'  },
-##     'LU2PY423': {'ects':3,   'nom':'Math-S4'  },        'LU3PY232': {'ects': 6, 'nom':'Astro'   },
-##     'LU2PY424': {'ects':3,   'nom':'Relat'    },        'LU3PY233': {'ects': 6, 'nom':'PhysTheo'},
-##     'LU2PY520': {'ects':6,   'nom':'MathCmp'  },        'LU3PY234': {'ects': 6, 'nom':'OcnAtm'  },
-##     'LU2PY531': {'ects':6,   'nom':'Astro', 'SX':True}, 'LU3PY235': {'ects': 6, 'nom':'MecaAnl' },
+##             
+##     'LU2PY423': {'ects':3,   'nom':'Math-S4'  },        
+##     'LU2PY424': {'ects':3,   'nom':'Relat'    },        
+##     'LU2PY520': {'ects':6,   'nom':'MathCmp'  },        
+##     'LU2PY531': {'ects':6,   'nom':'Astro', 'SX':True}, 
 ##     'LU2PY532': {'ects':6,   'nom':'ML',    'SX':True}, 'LU3PY238': {'ects': 6, 'nom':'MesuPhys'},
 ##                                                         'LU3PY23X': {'ects': 6, 'nom':'Option'  },
 ##                                                         
@@ -103,8 +131,7 @@ UEs = {
 ##                                                         'LU3PY537': {'ects': 6, 'nom':'InfoQ',   'SX':True},
 ##                                                         
 ## 
-##     'LU1LVAN2': {'ects':3,   'nom':'Anglais'  },    'LU2LVAN1': {'ects':3,   'nom':'Anglais'  },    'LU3LVAN2': {'ects': 3, 'nom':'Anglais' },
-##     'LU2FLE01': {'ects':3,   'nom':'FLE'      },    'LU2LVAL2': {'ects':3,   'nom':'Allemand' },
+##     'LU1LVAN2': {'ects':3,   'nom':'Anglais'  },    'LU2LVAN1': {'ects':3,   'nom':'Anglais'  },    ##     'LU2FLE01': {'ects':3,   'nom':'FLE'      },    'LU2LVAL2': {'ects':3,   'nom':'Allemand' },
 ##     'LU3LVAD1': {'ects':3,   'nom':'Anglais'  },
 ##     'LU3LVRU1': {'ects':3,   'nom':'Russe', 'SX':True },
 ##     'LU3LVRU2': {'ects':3,   'nom':'Russe', 'SX':True },

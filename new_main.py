@@ -1,11 +1,12 @@
-import getopt, sys;
+import getopt, sys, time
 from colored_log import Init
-from xml_reader import parse_xml_to_dict
-from pv_checker import SanityCheck
-import pprint
+from misc import scan_pv_files, choose, build_pv
+from pv_writer import generate_pv_pdf
+
 
 # Initialisation et options
 logger = Init(level=20)
+logger.info('\nDebut du run le ' + time.asctime(time.localtime(time.time())))
 try: optlist, arglist = getopt.getopt(sys.argv[1:], "d", ["debug"]);
 except getopt.GetoptError as err:
     logger.error(str(err));
@@ -13,11 +14,22 @@ except getopt.GetoptError as err:
 for o,a in optlist:
     if o in ["-d", "--debug"]: logger.setLevel(10);
 
-# Reading the PV
-data = parse_xml_to_dict("/Users/fuks/Documents/sdrive/LicencePhysique/Python_Tools/data/L3_2025_2026_S5_Session1_MONO.dat", logger=logger)
-data = parse_xml_to_dict("/Users/fuks/Documents/sdrive/LicencePhysique/Python_Tools/data/L3_2024_2025_S5_Session1_SPRINT.dat", logger=logger)
-# pprint.pprint(data)
+# Initialisation et liste des PV
+base = "/Users/fuks/Documents/sdrive/LicencePhysique/Python_Tools/data"
+catalogue = scan_pv_files(base)
 
-# Checking the PV
-SanityCheck(data['students'], logger=logger)
+# Choix du PV
+annee    = choose("Choisir l'année", catalogue.keys())
+niveau   = choose("Choisir le niveau", catalogue[annee].keys())
+parcours = choose("Choisir le parcours", catalogue[annee][niveau].keys())
+logger.info(f"PV sélectionné : {annee} | {niveau} | {parcours}")
+
+# Construction du dictionnaire
+data = build_pv(catalogue[annee][niveau][parcours], logger=logger)
+
+# Génération du fichier PDF
+generate_pv_pdf(data, '2024-2025', 'L3', 'MONO', logger=logger)
+
+# Bye bye
+logger.info('Fin du run le ' + time.asctime(time.localtime(time.time())))
 
