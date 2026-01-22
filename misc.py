@@ -2,14 +2,14 @@
 ###                                                    ###
 ###                Boîte à outils                      ###
 ###                                                    ###
-###                Date: 17/12/2025                    ###
+###                Date: 15/01/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
 from merging_tools import MergeSessions, MergeSemesters
 from pathlib import Path
 from pv_checker import SanityCheck
-from stat_tools import AddRankings, MoyenneAnnuelle
+from stat_tools import AddRankings, MoyenneAnnuelle, BlocsDisciplinaires
 from xml_reader import Parse_xml_to_Dict
 
 ##########################################################
@@ -59,7 +59,7 @@ def scan_pv_files(base):
 def choose(prompt, options):
     # Safety Liste vide
     if not options: raise ValueError("Aucune option disponible")
-    options = sorted(options)
+    options = sorted(options, reverse=False)
 
     # Choix de l'utilisateur
     while True:
@@ -84,21 +84,26 @@ def choose(prompt, options):
 ###          Fonction principale: choix du PV          ###
 ###                                                    ###
 ##########################################################
-def build_pv(liste_pvs, logger=None):
+def build_pv(liste_pvs, logger=None, newmaquette=False, dm=False):
     # Initialsation
     data = {}
-    for sem, sem_data in liste_pvs.items():
+    for sem, sem_data in sorted(liste_pvs.items()):
         logger.info(f"Traitement {sem}...")
-        data[sem] = load_semester(sem_data, logger=logger)
+        data[sem] = load_semester(sem_data, logger=logger, newmaquette=newmaquette)
 
     logger.info("Fusion des semestres...")
     data = MergeSemesters(data, logger=logger)
 
     logger.info("Calcul de la moyenne annuelle...")
-    MoyenneAnnuelle(data, logger=logger)
+    MoyenneAnnuelle(data, logger=logger, newmaquette=newmaquette)
+
+    if dm and not newmaquette:
+        logger.info("Calcul des Blocs disciplinaires...")
+        BlocsDisciplinaires(data, logger=logger)
 
     logger.info("Calcul des classements...")
     AddRankings(data, logger=logger)
+
 
     return data
 
@@ -108,16 +113,18 @@ def build_pv(liste_pvs, logger=None):
 ###               Traitement fichier PV                ###
 ###                                                    ###
 ##########################################################
-def load_semester(sem_data, logger=None):
+def load_semester(sem_data, logger=None, newmaquette=False):
     # Safety
     if 'Session1' not in sem_data: raise ValueError("Session1 absente, impossible de construire le PV")
 
     # Lecture session 1
+    logger.info("  -> Session 1...")
     dic_sess1 = Parse_xml_to_Dict(sem_data['Session1'], logger=logger)
-    SanityCheck(dic_sess1['students'], logger=logger)
+    SanityCheck(dic_sess1['students'], logger=logger, newmaquette=newmaquette)
 
     # Lecture session 2
     if 'Session2' in sem_data:
+        logger.info("  -> Session 2...")
         dic_sess2 = Parse_xml_to_Dict(sem_data['Session2'], logger=logger)
         SanityCheck(dic_sess2['students'], logger=logger)
         return MergeSessions(dic_sess1, dic_sess2, logger=logger)

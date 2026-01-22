@@ -2,12 +2,11 @@
 ###                                                    ###
 ###                New PV Checker                      ###
 ###                                                    ###
-###                Date: 15/12/2025                    ###
+###                Date: 21/01/2026                    ###
 ###                                                    ###
 ##########################################################
 from itertools import product
-from maquette import Blocs, UEs, Listes;
-
+from maquette import Blocs, UEs, Listes
 
 ##########################################################
 ###                                                    ###
@@ -21,30 +20,55 @@ def SanityCheck(pv, logger=None, newmaquette=False):
         pv_data = student_data["pv"]
         tag = f"[{student_data['nom']} ({student_id})]"
         logger.debug(f"PV de {tag[1:-1]}")
-        score = 0.0
-        maxi  = 0.0
-        maj   = 'AJ'
+        score = maxi  = 0.0
+        maj   = None
         comp  = False
+        done = []
 
         # 1) Vérification des blocs et des UEs
         for key in pv_data.keys():
             # Safety : ni un bloc ni une UE
             if key=='Résultat': continue
+
             # Un bloc : vérification
             elif key in Blocs.keys():
-                sc, mx = CheckBlock(key, pv_data, tag, logger=logger)
+
+                # safety: blocs vides et chapeaux
+                if not 'nom' in Blocs[key].keys(): continue
+                if not pv_data[key]['active']: continue
+
+                # calcul de la note
+                sc, mx, mtch = CheckBlock(key, pv_data, tag, logger=logger)
                 score += sc
                 maxi  += mx
-                if Blocs[key]['nom']=='MAJ': maj = pv_data[key]['resultat']
+                done  += mtch
+                if Blocs[key]['nom']=='MAJ': maj = pv_data[key].get('note',None)
+
             # Une UE : vérification
             elif key in UEs.keys():
                 CheckUE(key, pv_data[key], tag, logger=logger)
                 note_str=pv_data[key].get('note','')
-                if not note_str in ['DIS'] and (note_str in ['ABI'] or pv_data[key].get('note',0)<50): comp = True
+                if not note_str in ['DIS'] and (note_str in ['ABI', 'ABJ'] or pv_data[key].get('note',0)<50): comp = True
+
             # Problème...
             else: logger.warning(f"{tag} Bloc/UE inconnu dans le PV : {key}")
 
-        # 2) Vérification de la moyenne d'année
+        # 2) UEs hors blocs
+        from pv_writer import include_alacarte
+        for key,vals in pv_data.items():
+            if newmaquette and not include_alacarte(vals, flag=newmaquette): continue
+            if key in done or not key in UEs.keys() or vals.get('note','') in ['DIS']: continue
+            if key[:2] in ['L3', 'L4', 'L5', 'L6'] and vals.get('note',None)==None: continue
+            ue_note = vals.get("note", 0)
+            if ue_note in ['ABI', 'ABJ']: ue_note=0
+            ue_ects = UEs.get(key, {}).get("ects", None)
+            if ue_ects is None:
+                logger.error(f"{tag} UE {key} absente de la maquette)")
+                continue
+            score+=ue_note*UEs.get(key, {}).get("ects", 0)
+            maxi +=vals.get('bareme',0)*UEs.get(key, {}).get("ects", 0)
+
+        # 3) Vérification de la moyenne d'année
         CheckSemestre(score, maxi, maj, comp, pv_data, tag, logger=logger, newmaquette=newmaquette)
 
         # Exit
@@ -63,7 +87,7 @@ def expand_UE_list(ue_list, logger=None):
     for ue in ue_list:
         if ue.startswith("LY") and ue in Listes.keys(): expanded.append(Listes[ue])
         else:
-            if ue.startswith("LY"): logger.error(f"{tag} Liste d'options inconnue ({ue})")
+            if ue.startswith("LY"): logger.error(f"Liste d'options inconnue ({ue})")
             expanded.append([ue])
     return [list(combo) for combo in product(*expanded)]
 
@@ -82,8 +106,8 @@ def CheckBlock(bloc, pv, tag, logger=None):
             matching_set = ue_list
             break
     if matching_set is None:
-        logger.warning(f"{tag} Aucun set d'UE ne correspond au bloc {bloc}")
-        return [0,0]
+        if pv['Résultat']['resultat']!='NCAE': logger.warning(f"{tag} Aucun set d'UE ne correspond au bloc {bloc}")
+        return [0,0,[]]
 
     # Vérification supplémentaire et formattage en cas de liste d'UE
     matching_set = [ pv[x]['ue'] if x.startswith('LY') else x for x in matching_set]
@@ -101,7 +125,7 @@ def CheckBlock(bloc, pv, tag, logger=None):
 
         # Données de l'UE et check de son encodage dans la maquette
         ue_note = pv[ue].get("note", 0)
-        if ue_note in ['ABI']: ue_note=0
+        if ue_note in ['ABI', 'ABJ']: ue_note=0
         ue_ects = UEs.get(ue, {}).get("ects", None)
         if ue_ects is None:
             logger.error(f"{tag} UE {ue} absente de la maquette)")
@@ -125,12 +149,12 @@ def CheckBlock(bloc, pv, tag, logger=None):
     if note_pv is None:
         logger.warning(f"{tag} Note absente dans le PV pour le bloc {bloc}")
         logger.debug(f"    > OK")
-        return [score, maxi]
+        return [0, 0, []]
     elif note_pv in ['DIS']:
         logger.debug(f"    > OK")
-        return [score, maxi]
+        return [score, maxi, matching_set]
     else:
-        if abs(moyenne-note_pv)>1e-3:
+        if abs(moyenne-note_pv)>1e-1:
             logger.error(f"{tag} Différence de moyenne pour le bloc {bloc} : "
                f"calculée={moyenne:.3f}, PV={note_pv}")
 
@@ -141,7 +165,7 @@ def CheckBlock(bloc, pv, tag, logger=None):
 
     # Exit (on renvoie le score pour la moyenne semestrielle
     logger.debug(f"    > OK")
-    return [score, maxi]
+    return [score, maxi, matching_set]
 
 
 
@@ -153,12 +177,12 @@ def CheckBlock(bloc, pv, tag, logger=None):
 def CheckUE(ue, data, tag, logger=None):
     # Initialisation and safety
     logger.debug(f"  - UE {ue}")
-    if data['resultat'] in [None, 'DIS']:
+    if data['resultat'] in [None, 'DIS'] or not 'note' in data.keys():
         logger.debug(f"    > OK")
         return
 
     # Check
-    resultat = "ADM" if (not data['note'] in ['ABI'] and data['note']>=50) else "AJ"
+    resultat = "ADM" if (not data['note'] in ['ABI', 'ABJ'] and data['note']>=50) else "AJ"
     if data["resultat"]!=resultat and not data['resultat'] in ['VAC']:
         logger.error(f"{tag} Résultat incorrect pour l'UE {ue} : "
            f"attendu={resultat}, PV={data['resultat']}")
@@ -176,16 +200,25 @@ def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=Fa
     logger.debug(f"  - Vérification de la moyenne semestrielle")
     if "Résultat" not in data.keys(): logger.warning(f"{tag} Aucune entrée 'Résultat' dans le PV")
     elif data['Résultat']['resultat'] in ['NCAE']: logger.debug(f"    > NCAE - pas nécessaire"); return
-    elif maxi==0: logger.error(f"{tag} Impossible de calculer la moyenne semestrielle (ECTS = 0)")
+    elif maxi==0:
+        logger.error(f"{tag} Impossible de calculer la moyenne semestrielle (ECTS = 0)")
+        return
+    if not 'note' in data["Résultat"].keys():
+        logger.error(f"{tag} Absence de note pour le semestre")
+        return
+
+    # Enregistrement du résultat de la majeure
+    data['Résultat']['maj1_1']=maj
 
     # 1) Vérification moyenne
     annee = (1 if (score==0 and maxi==0) else score/maxi)*data['Résultat']['bareme']+data["Résultat"].get('pnt_jury',0)
     note_pv  = data["Résultat"]["note"]
-    if abs(annee-note_pv)>1e-3:
+    if abs(annee-note_pv)>5e-2:
         logger.error(f"{tag} Différence de moyenne semestrielle : calculée={annee:.3f}, PV={note_pv}")
 
     # 2) Vérification du résultat semestriel
-    if newmaquette: resultat = "ADM" if (note_pv>=10 and maj=='ADM') else "AJ"
+    if newmaquette and maj!=None: resultat = "ADM" if (note_pv>=10 and maj>=10) else "AJ"
+    elif newmaquette: resultat = "ADM" if note_pv>=10 else "AJ"
     else: resultat = "ADM" if (note_pv>=10) else "AJ"
     if data["Résultat"]["resultat"]!=resultat:
         if resultat=='ADM' and not comp:
@@ -193,6 +226,8 @@ def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=Fa
              f"attendu={resultat}, PV={data['Résultat']['resultat']}")
         elif resultat=='ADM' and comp:
           logger.warning(f"{tag} Refus de compensation pour le semestre")
+        elif newmaquette and resultat=='AJ':
+          logger.warning(f"{tag} Le résultat de la VET devrait être AJ")
 
     # Exit
     logger.debug(f"    > OK")

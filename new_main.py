@@ -2,7 +2,8 @@ import getopt, sys, time
 from colored_log import Init
 from misc import scan_pv_files, choose, build_pv
 from pv_writer import generate_pv_pdf
-
+from stat_tools import generate_stats
+from plots import pies, histos, save_plots
 
 # Initialisation et options
 logger = Init(level=20)
@@ -24,11 +25,20 @@ niveau   = choose("Choisir le niveau", catalogue[annee].keys())
 parcours = choose("Choisir le parcours", catalogue[annee][niveau].keys())
 logger.info(f"PV sélectionné : {annee} | {niveau} | {parcours}")
 
+# Nouvelle maquette
+newmaquette = True if int(annee.split('-')[0])>2024 and niveau=='L2' else False
+
 # Construction du dictionnaire
-data = build_pv(catalogue[annee][niveau][parcours], logger=logger)
+data = build_pv(catalogue[annee][niveau][parcours], logger=logger, newmaquette=newmaquette, dm=(parcours=='DM'))
 
 # Génération du fichier PDF
-generate_pv_pdf(data, '2024-2025', 'L3', 'MONO', logger=logger)
+generate_pv_pdf(data, annee, niveau, parcours, logger=logger, filtre='')
+
+# Génération des données 'stats' et production des histos et tartes
+stat_data = generate_stats(data, logger=logger, filtre='')
+pies  = pies(stat_data, title = niveau + ' (' + annee + ') - ' + parcours)
+hists = histos(stat_data, title = niveau + ' (' + annee + ') - ' + parcours)
+save_plots(pies, hists, annee, niveau, parcours)
 
 # Bye bye
 logger.info('Fin du run le ' + time.asctime(time.localtime(time.time())))

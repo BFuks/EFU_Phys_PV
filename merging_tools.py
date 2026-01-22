@@ -2,7 +2,7 @@
 ###                                                    ###
 ###               Outils de Fusion de PV               ###
 ###                                                    ###
-###                Date: 12/12/2025                    ###
+###                Date: 19/01/2025                    ###
 ###                                                    ###
 ##########################################################
 
@@ -46,13 +46,16 @@ def MergeSessions(session1, session2, logger=None):
 
                 # UE présente dans les deux sessions
                 # 1) Check la note n'a pas diminué
-                if pv[etu_id]['pv'][session1['VET']][ue]["note"] > data['note']:
+                note1 = 0 if pv[etu_id]['pv'][session1['VET']][ue]["note"] in ['ABI', 'ABJ'] else pv[etu_id]['pv'][session1['VET']][ue]["note"]
+                note2 = 0 if data["note"] in ['ABI', 'ABJ'] else data['note']
+                if note1 > note2:
                     logger.error(f"[{pv[etu_id]['nom']} ({etu_id})] note de {ue} en session 2 ({data['note']}) "
                        f"inférieure à la note en session1 ({pv[etu_id]['pv'][session1['VET']][ue]['note']})")
                 # 2) Sauvegarde
-                if pv[etu_id]['pv'][session1['VET']][ue]["note"] != data['note']:
-                    pv[etu_id]['pv'][session1['VET']][ue]["note2"] = data["note"]
-                    pv[etu_id]['pv'][session1['VET']][ue]["resultat2"] = data["resultat"]
+                if note1 != note2:
+                    pv[etu_id]['pv'][session1['VET']][ue]["note2"] = data['note']
+                    pv[etu_id]['pv'][session1['VET']][ue]["maj1_2"] = data.get('maj1_1',None)
+                if data['resultat'] != pv[etu_id]['pv'][session1['VET']][ue]["resultat"]: pv[etu_id]['pv'][session1['VET']][ue]["resultat2"] = data["resultat"]
 
     # Output
     return pv

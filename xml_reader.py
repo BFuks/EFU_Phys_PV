@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New XML Reader                      ###
 ###                                                    ###
-###                Date: 17/12/2025                    ###
+###                Date: 20/01/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -81,13 +81,17 @@ def Parse_xml_to_Dict(filename, logger=None):
                     if val != "": children_data[c.tag] = val
 
                 # Data dans G_TPW_IND
+                list_g_tpw_ind = g_tpw.find("LIST_G_TPW_IND")
                 g_tpw_ind = g_tpw.find("LIST_G_TPW_IND/G_TPW_IND")
+                element['active'] = False if list_g_tpw_ind is not None and g_tpw_ind is None else True
+
                 if g_tpw_ind:
                     for i_child in g_tpw_ind:
                         itag = i_child.tag
                         itext = (i_child.text or "").strip()
                         logger.debug(f"    ** processing tag '{itag}' with value '{itext}'")
                         if itext!="": children_data[itag] = itext
+                elif code.startswith('LU'): continue
 
                 # Formatage
                 # 1) Bareme 
@@ -129,7 +133,7 @@ def Parse_xml_to_Dict(filename, logger=None):
                 # 6) Liste à choix
                 if code.startswith('LY'): code = children_data.get("COD_ELP_LSE_TPW")
 
-                if code is not None: PV[code] = element
+                if code is not None and not code in ['Observat.']: PV[code] = element
 
         student_data["pv"] = PV
         students[student_id] = student_data

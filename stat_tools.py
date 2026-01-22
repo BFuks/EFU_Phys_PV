@@ -2,11 +2,12 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 15/12/2025                    ###
+###                Date: 21/01/2026                    ###
 ###                                                    ###
 ##########################################################
-from maquette import Blocs
-
+from collections import defaultdict
+from maquette import Blocs, UEs
+from pv_writer import include_alacarte
 
 
 ##########################################################
@@ -45,14 +46,14 @@ def AddRankings(data, logger=None):
                 # notes session1
                 note = vals.get('note')
                 if isinstance(note, (int, float)): ue_notes1.setdefault(ue, []).append((etu_id, note))
-                elif note=='ABI': ue_notes1.setdefault(ue, []).append((etu_id, 0))
+                elif note in ['ABI', 'ABJ']: ue_notes1.setdefault(ue, []).append((etu_id, 0))
                 elif note in ['DIS', None]: continue
                 else: logger.warning(f"[{etu_data['nom']} ({etu_id})] Type de note inconnue ({note}) dans le pv")
 
                 # notes session2
                 note = vals.get('note2', vals.get('note'))
                 if isinstance(note, (int, float)): ue_notes2.setdefault(ue, []).append((etu_id, note))
-                elif note=='ABI': ue_notes2.setdefault(ue, []).append((etu_id, 0))
+                elif note in ['ABI', 'ABJ']: ue_notes2.setdefault(ue, []).append((etu_id, 0))
                 elif note in ['DIS', None]: continue
                 else: logger.warning(f"[{etu_data['nom']} ({etu_id})] Type de note inconnue ({note}) dans le pv")
 
@@ -95,7 +96,7 @@ def AddRankings(data, logger=None):
 ###                  Moyenne annuelle                  ###
 ###                                                    ###
 ##########################################################
-def MoyenneAnnuelle(data, logger=None):
+def MoyenneAnnuelle(data, logger=None, newmaquette=False):
 
     # Boucle sur les étudiants
     for etu_id, etu_data in data.items():
@@ -120,135 +121,234 @@ def MoyenneAnnuelle(data, logger=None):
 
                 # Calculs
                 if note2 not in (None, 'DIS') and resu['ects']!='':
-                    session2 += note2*resu['ects']
+                    session2 += note2*resu['ects']/resu['bareme']*100
                     if 'maj' in resu['libelle'].lower():
-                        maj2     += note2*resu['ects']
+                        maj2     += note2*resu['ects']/resu['bareme']*100
                         maj_ects += resu['ects']
                     ects += resu['ects']
                 if note1 not in (None, 'DIS') and resu['ects']!='':
-                    session1 += note1*resu['ects']
-                    if 'maj' in resu['libelle'].lower(): maj1 += note1*resu['ects']
+                    session1 += note1*resu['ects']/resu['bareme']*100
+                    if 'maj' in resu['libelle'].lower(): maj1 += note1*resu['ects']/resu['bareme']*100
+
+
+            # Parcours à la carte
+            if newmaquette and session1==0 and ects==0:
+                for name, resu in etu_data['pv'][vet].items():
+
+                    # On ne garde que les UEs
+                    if not name in UEs.keys() or not include_alacarte(resu, flag=newmaquette): continue
+
+                    # Notes sessions 1 et 2
+                    note1 = resu.get('note')
+                    note2 = resu.get('note2', note1)
+
+                    # Calculs
+                    if note2 not in (None, 'DIS'):
+                        session2 += note2*UEs[name]['ects']/resu['bareme']*100
+                        ects += UEs[name]['ects']
+                    if note1 not in (None, 'DIS'):
+                        session1 += note1*UEs[name]['ects']/resu['bareme']*100
 
         # Résultats
         if ects:
             session1 = session1/(5.*ects)
             session2 = session2/(5.*ects)
-            maj1 = maj1/maj_ects
-            maj2 = maj2/maj_ects
-            resu1 = 'ADM' if (session1>=10 and maj1>=50) else 'AJ'
-            resu2 = 'ADM' if (session2>=10 and maj2>=50) else 'AJ'
-            etu_data['annee'] = {'note':session1, 'resultat':resu1, 'note2':session2, 'resultat2':resu2}
+            if maj_ects:
+                maj1 = maj1/maj_ects
+                maj2 = maj2/maj_ects
+            if newmaquette and maj_ects:
+                resu1 = 'ADM' if (session1>=10 and maj1>=50) else 'AJ'
+                resu2 = 'ADM' if (session2>=10 and maj2>=50) else 'AJ'
+            else:
+                resu1 = 'ADM' if session1>=10 else 'AJ'
+                resu2 = 'ADM' if session2>=10 else 'AJ'
+            etu_data['annee'] = {'note':session1, 'resultat':resu1, 'note2':session2, 'resultat2':resu2, 'maj1_1':maj1, 'maj1_2':maj2}
 
 
-## 
-### from misc      import GetBlocsMaquette, GetUEsMaquette;
-### from pv_writer import GetList;
-### import functools, operator;
-### 
-### def GetMoyenneAnnuelle(pv):
-###     # Init
-###     pv["full"]  = {};
-###     pv["full2"] = {};
-### 
-###     for etu in GetList(pv.values()):
-###          # initialisation etudiant
-###          logger.debug("etudiant = " + str(etu));
-###          moyenne_annee = 0.;
-###          moyenne_annee2= 0.;
-###          nbr_semestres = len([y for y in [etu[0] in pv[x].keys() for x in pv.keys()] if y]);
-###          # 1ere session
-###          for semestre in [x for x in pv.keys() if not 'full' in x]:
-###              if not etu[0] in pv[semestre].keys() or moyenne_annee in ['ENCO', 'NCAE']: continue;
-###              if pv[semestre][etu[0]]['results']['total']['note'] == 'ENCO': moyenne_annee = 'ENCO'; continue;
-###              if pv[semestre][etu[0]]['results']['total']['note'] == 'NCAE': moyenne_annee = 'NCAE'; continue;
-###              moyenne_annee += pv[semestre][etu[0]]['results']['total']['note']/nbr_semestres;
-### 
-###          #2eme session
-###          for semestre in [x for x in pv.keys() if not 'full' in x]:
-###              if not etu[0] in pv[semestre].keys() or moyenne_annee2 in ['NCAE', 'ENCO']: continue;
-###              if 'note2' in pv[semestre][etu[0]]['results']['total'].keys() and pv[semestre][etu[0]]['results']['total']['note2'] == 'ENCO':
-###                  moyenne_annee2 = 'ENCO'; continue;
-###              if 'note2' in pv[semestre][etu[0]]['results']['total'].keys() and pv[semestre][etu[0]]['results']['total']['note2'] == 'NCAE':
-###                  moyenne_annee2 = 'NCAE'; continue;
-###              if 'note2' in pv[semestre][etu[0]]['results']['total'].keys(): moyenne_annee2 += pv[semestre][etu[0]]['results']['total']['note2']/nbr_semestres;
-###              elif moyenne_annee not in ['NCAE', 'ENCO']: moyenne_annee2 += pv[semestre][etu[0]]['results']['total']['note']/nbr_semestres;
-###              else: moyenne_annee2=moyenne_annee;
-### 
-###          # Debug messages
-###          logger.debug("  -> session1: " + str(moyenne_annee))
-###          if moyenne_annee != moyenne_annee2: logger.debug("  -> session2: " + str(moyenne_annee2))
-### 
-###          # output
-###          pv["full"][str(etu[0])]  = moyenne_annee;
-###          pv["full2"][str(etu[0])] = moyenne_annee2;
-### 
-###     # Rankings
-###     all_notes  = sorted([x for x in list(pv["full"].values()) if x not in ['NCAE', 'ENCO'] ], reverse=True);
-###     all_notes2 = sorted([x for x in list(pv["full2"].values()) if x not in ['ENCO', 'NCAE'] ], reverse=True);
-###     for etu in pv["full"].keys():
-###         if pv["full"][etu]not in ['NCAE', 'ENCO']:
-###             pv["full"][etu] = [pv["full"][etu], str(all_notes.index(pv["full"][etu])+1) + '/' + str(len(all_notes))];
-###     for etu in pv["full2"].keys():
-###         if pv["full2"][etu] not in ['NCAE', 'ENCO']:
-###             pv["full2"][etu] = [pv["full2"][etu], str(all_notes2.index(pv["full2"][etu])+1) + '/' + str(len(all_notes2))];
-### 
-###     return pv;
-### 
-### 
-### 
-### def GetStatistics(pv, parcours, semestre):
-### 
-###     # UEs
-###     blocs = [x for x in GetBlocsMaquette(semestre.split('_')[0], parcours) ];
-###     ues = [x for x in list(set(functools.reduce(operator.iconcat, GetUEsMaquette(blocs), []))) if 'PY' in x or 'LVAN' in x or x.startswith('LU1')];
-###     blocs = [x for x in blocs if 'PY' in blocs];
-### 
-###     # Init of the output
-###     notes = {}; notes2 = {};
-###     for x in (ues+blocs+['total']):
-###         notes[x]  = [];
-###         notes2[x] = [];
-### 
-###     # loop over all students
-###     for etudiant in [x for x in pv.keys() if isinstance(x, int)]:
-###         # adding the notes
-###         for label, data_UE in pv[etudiant]['results'].items():
-### 
-###            # no stats needed
-###            key = label.split('-')[-1].strip();
-###            if not key in notes.keys(): continue
-###            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
-### 
-###            # get the notes
-###            mynote2 = data_UE['note2'] if ('note2' in data_UE.keys() and data_UE['note2'] not in ['U VAC', 'DIS', '???', 'ENCO', 'NCAE', 'VAC']) else '';
-###            if 'note'  in data_UE.keys() and data_UE['note']  not in ['U VAC', 'DIS', '???', 'ENCO', 'NCAE', 'VAC']:
-###                notes[key].append(data_UE['note']);
-###            if mynote2!='': notes2[key].append(mynote2);
-###            elif  'note'  in data_UE.keys() and data_UE['note'] not in ['U VAC', 'DIS', '???', 'ENCO', 'NCAE', 'VAC']: notes2[key].append(data_UE['note']);
-### 
-###     # formatting
-###     for key in notes.keys() : notes[key]  = sorted([float(x) for x in  notes[key]],reverse=True);
-###     for key in notes2.keys(): notes2[key] = sorted([float(x) for x in notes2[key]],reverse=True);
-### 
-###     # adding the ranking information to each PV.
-###     for etudiant in [x for x in pv.keys() if isinstance(x, int)]:
-###         # adding the notes
-###         for label, data_UE in pv[etudiant]['results'].items():
-### 
-###            # no stats needed
-###            key = label.split('-')[-1].strip();
-###            if not key in notes.keys(): continue
-###            if 'UE' in data_UE.keys() and data_UE['UE']=='GrosSac': continue;
-### 
-###            # get the notes
-###            if 'note' in data_UE.keys() and data_UE['note'] not in ['ENCO', 'VAC', 'U VAC', 'DIS', '???', 'NCAE']:
-###                pv[etudiant]['results'][label]['ranking']  =  str(notes[key].index(float(data_UE['note']))+1)+'/'+str(len(notes[key]));
-### 
-###            if 'note2' in data_UE.keys() and data_UE['note2'] not in ['ENCO', 'U VAC', 'VAC', 'DIS', '???', 'NCAE']:
-###                pv[etudiant]['results'][label]['ranking2'] = str(notes2[key].index(float(data_UE['note2']))+1)+'/'+str(len(notes2[key]));
-### 
-###     # output
-###     return pv;
-### 
-### 
-### 
+##########################################################
+###                                                    ###
+###                Blocs disciplinaires                ###
+###                                                    ###
+##########################################################
+def BlocsDisciplinaires(data, logger=None):
+
+    # Boucle sur les étudiants
+    for etu_id, etu_data in data.items():
+
+        # Initialisation année
+        annee_bdisc1 = defaultdict(float)
+        annee_bdisc2 = defaultdict(float)
+        annee_bects  = defaultdict(float)
+
+        # Boucle sur les VETs
+        for vet in etu_data['VET']:
+            # Initialisation
+            logger.debug(f"[{etu_data['nom']} ({etu_id})] Calcul des blocs disciplinaires pour la VET {vet}")
+            pv_vet = etu_data['pv'][vet]
+
+            # Calcul non nécessaire
+            if etu_data['pv'][vet]['Résultat']['resultat'] in ['NCAE']: continue
+
+            # Liste disciplines
+            blocs = [ bloc[3:5] for bloc, v in pv_vet.items() if bloc in Blocs and v.get('active')]
+            if not blocs: continue
+
+            # Initialisation
+            bdisc1 = {b:0 for b in blocs}
+            bdisc2 = {b:0 for b in blocs}
+            bects  = {b:0 for b in blocs}
+
+            # Calcul de la note
+            for ue, resu in pv_vet.items():
+                # Safety
+                if not ue in UEs or 'OIP' in ue: continue
+                ects = UEs[ue].get('ects')
+                if not ects: continue
+
+                # Notes sessions 1 et 2 et bloc associé à l'UE
+                bloc = next((b for b in blocs if b in ue), None)
+                if bloc is None: continue
+                note1 = resu.get('note') if not resu.get('note') in ['ABI','ABJ'] else 0
+                note2 = resu.get('note2',note1) if not resu.get('note2',note1) in ['ABI','ABJ'] else 0
+
+                # Calculs session 2
+                if note2 not in (None, 'DIS'):
+                    val = note2*ects/resu['bareme']*100
+                    bdisc2[bloc] += val
+                    bects[bloc]  += ects
+                    annee_bdisc2[bloc] += val
+                    annee_bects[bloc]  += ects
+
+                # Calcul session 1
+                if note1 not in (None, 'DIS'):
+                    val = note1*ects/resu['bareme']*100
+                    bdisc1[bloc] += val
+                    annee_bdisc1[bloc] += val
+
+            # Normalisation VET et stockage
+            for b in blocs:
+                if bects[b]:
+                    bdisc1[b] /= bects[b]
+                    bdisc2[b] /= bects[b]
+            pv_vet['Résultat']['bdisc1'] = bdisc1
+            pv_vet['Résultat']['bdisc2'] = bdisc2
+
+        # Normalisation année et stockage
+        if 'annee' in etu_data:
+            bdisc1_annee = {}
+            bdisc2_annee = {}
+            for b in annee_bects:
+                if annee_bects[b]:
+                    bdisc1_annee[b] = annee_bdisc1[b] / annee_bects[b]
+                    bdisc2_annee[b] = annee_bdisc2[b] / annee_bects[b]
+            etu_data['annee']['bdisc1'] = bdisc1_annee
+            etu_data['annee']['bdisc2'] = bdisc2_annee
+
+
+
+##########################################################
+###                                                    ###
+###            Données statistiques anonymes           ###
+###                                                    ###
+##########################################################
+
+# Fonction auxiliaire : pour récupérer les flags de compensation et ajouter les notes à la liste
+def collect_notes(elem, key, notes, notes2):
+    # Initialisation
+    n1 = elem.get('note') if not elem.get('note',100) in ['ABI','ABJ'] else 0
+    n2 = elem.get('note2',n1) if not elem.get('note2',n1) in ['ABI','ABJ'] else 0
+    comp1 = comp2 = False
+
+    # 1ere session
+    if isinstance(n1, (int, float)):
+        notes[key].append(n1)
+        comp1 = n1 < 50
+
+    # 2nd session
+    if isinstance(n2, (int, float)):
+        notes2[key].append(n2)
+        comp2 = n2 < 50
+
+    # Output
+    return comp1, comp2
+
+
+# Fonction auxiliaire : modification du résultat en "COMP" si nécessaire
+def update_result(res, comp, maj):
+    # Rien à faire si ce n'est pas ADM
+    if res!='ADM': return res
+
+    # Pas de note MAJ
+    if not maj: return 'COMP' if comp else 'ADM'
+
+    # note MAJ présente
+    if maj>=50: return 'COMP' if comp else 'ADM'
+    else: return 'COMP-MAJ' if comp else 'ADM-MAJ'
+
+
+# Fonction principale
+def generate_stats(data, logger=None, filtre=''):
+    # Initialisation
+    logger.info(f"Génération des statistiques de réussite globales")
+    resultats  = defaultdict(list)   # les 'AJ', 'ADM', ...
+    resultats2 = defaultdict(list)   # les 'AJ', 'ADM' après session2
+    notes      = defaultdict(list)   # notes session1
+    notes2     = defaultdict(list)   # notes après session2
+
+    # Boucle principale sur les PV
+    for etu_data in data.values():
+        # Filtre
+        if 'mineure' in etu_data.keys() and filtre!='' and etu_data['mineure']!=filtre: continue
+
+        # Résultats annuels
+        comp1_an = comp2_an = False
+        maj1_1 = maj1_2 = None
+        if 'annee' in etu_data:
+            pv_annee = etu_data['annee']
+            collect_notes(pv_annee, 'annee', notes, notes2)
+            r1_an = pv_annee.get('resultat')
+            r2_an = pv_annee.get('resultat2',r1_an)
+            maj1_an = pv_annee.get('bdisc1').get('PY', None) if 'bdisc1' in pv_annee else pv_annee.get('maj1_1', None)
+            maj2_an = pv_annee.get('bdisc2').get('PY', maj1_an) if 'bdisc2' in pv_annee else pv_annee.get('maj1_2', maj1_an)
+
+        # Boucle sur les semestres
+        for vet, pv in etu_data['pv'].items():
+            # Initialisation VET
+            comp1_vet = comp2_vet= False
+            pv_vet = pv.get('Résultat', {})
+            r1_vet=r2_vet=None
+
+            # Résultat semestriel
+            collect_notes(pv_vet, vet, notes, notes2)
+            n1_vet = pv_vet.get('note', None)
+            n2_vet = pv_vet.get('note2', n1_vet)
+            maj1_vet = pv_vet.get('bdisc1').get('PY', None) if 'bdisc1' in pv_vet else pv_vet.get('maj1_1', None)
+            maj2_vet = pv_vet.get('bdisc2').get('PY', maj1_vet) if 'bdisc2' in pv_vet else pv_vet.get('maj1_2', maj1_vet)
+            if n1_vet: r1_vet = 'ADM' if n1_vet>=10 else 'AJ'
+            if n2_vet: r2_vet = 'ADM' if n2_vet>=10 else 'AJ'
+
+            # Tous les autres éléments du PV : UEs / blocs
+            for code, elem in pv.items():
+                # Ignore : pas besoin pour les stats
+                if code == 'Résultat' or 'PY' not in code: continue
+
+                # Stats UE/Bloc
+                c1, c2 = collect_notes(elem, code, notes, notes2)
+                comp1_vet |= c1
+                comp2_vet |= c2
+
+            # Finalisation résultats semestre
+            if r1_vet: resultats[vet].append(update_result(r1_vet, comp1_vet, maj1_vet))
+            if r2_vet: resultats2[vet].append(update_result(r2_vet, comp2_vet, maj2_vet))
+            comp1_an |= (r1_vet=='AJ')
+            comp2_an |= (r2_vet=='AJ')
+
+
+        # Finalisaton résultats annuels
+        if 'annee' in etu_data.keys():
+            if r1_an: resultats['annee'].append(update_result(r1_an, comp1_an, maj1_an))
+            if r2_an: resultats2['annee'].append(update_result(r2_an, comp2_an, maj2_an))
+
+    # Output
+    return { "resultats": dict(resultats), 'resultats2': dict(resultats2), "notes": dict(notes), "notes2": dict(notes2) }
+

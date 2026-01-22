@@ -3,6 +3,7 @@ output/*
 histos/*
 trash/*
 cci/*
+logs/*
 SU_data
 genessai.*
 *.swp
