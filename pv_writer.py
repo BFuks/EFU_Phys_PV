@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Générateur de PV PDF                ###
 ###                                                    ###
-###                Date: 21/01/2026                    ###
+###                Date: 31/01/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -111,7 +111,7 @@ def format_session(label, note, resultat, rank, comp):
     color = colors.black if resultat=='ADM' and not comp else (colors.orange if resultat=='ADM' else colors.red)
 
     # Cas spécial - NCAE
-    if note == 'NCAE': return f"<b>{label} : {note}</b><br />"
+    if resultat == 'NCAE': return f"<b>{label} : {resultat}</b><br />"
 
     # Cas standard
     return f"<b>{label} : <font color='{color}'>{note}</font></b><font color='grey'> (#{rank})</font><br />"
@@ -182,7 +182,7 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
             txt+='<br />'
 
             # Moyenne blocs
-            if parcours.startswith('DM'):
+            if parcours.startswith('DM') and not res.get('resultat2', res.get('resultat'))=='NCAE' and 'bdisc1' in pv['Résultat']:
                 bdisc2 = pv['Résultat'].get('bdisc2',pv['Résultat'].get('bdisc1',{}))
                 bdisc1 = pv['Résultat'].get('bdisc1',{})
                 for bloc in ([b for b in bdisc2.keys() if b=='PY']+ sorted([b for b in bdisc2.keys() if b!='PY'])):
@@ -192,7 +192,7 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
                     if pv['Résultat'].get('bdisc2').get(bloc)!=pv['Résultat'].get('bdisc1').get(bloc):
                         txt += f" => <font color=\'{colorname}\'>{bdisc2[bloc]:.2f}/100</font><br />"
                     txt+='<br />'
-            else:
+            elif not res.get('resultat2', res.get('resultat'))=='NCAE':
                 for bloc in list_blocs:
                     colorname = colors.blue if Blocs[bloc]['nom']=='MAJ' else colors.green
                     if pv[bloc].get('resultat') in ('DIS', 'NCAE'): continue
@@ -205,7 +205,7 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
             for idx, ue in enumerate(list_ues, start=2):
                 # Safety
                 res = pv.get(ue)
-                if (alacarte and not include_alacarte(res, flag=alacarte)) or (ue.startswith(('L3', 'L4', 'L5', 'L6')) and res.get('note',None)==None):
+                if (alacarte and not include_alacarte(res, flag=alacarte) and res.get('note',None)==None) or (ue.startswith(('L3', 'L4', 'L5', 'L6')) and res.get('note',None)==None):
                     offset+=1
                     continue
 
@@ -251,9 +251,9 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
 ##########################################################
 mineures = {
    'CH': 'Chinois', 'CI':'Chimie', 'DS':'DataScience', 'EE': 'Elec',
-   'EV': 'Environnement', 'GS':'Gestion', 'HN':'HistNat', 'IA':'InnovSanté',
-   'IN':'Info', 'MA':'Maths', 'ME':'Meca', 'PH':'Philo', 'PT':'ProfEcole',
-   'ST':'SdT'
+   'EV': 'Environnement', 'GS':'Gestion', 'HI':'Histoire',
+   'HN':'HistNat', 'IA':'InnovSanté', 'IN':'Info', 'MA':'Maths',
+   'ME':'Meca', 'PH':'Philo', 'PT':'ProfEcole', 'ST':'SdT'
 }
 
 # Fonctions auxiliaires : formattage texte
@@ -279,21 +279,25 @@ def format_annee_bdisc(label, note, resultat, rank, comp, bdisc):
 def build_student_cell(etu_id, data, logger=None, filtre=''):
 
     # Parcours
-    pattern_mono = re.compile(r"(\dSLPY|S\dLPY)")
-    pattern_maj  = re.compile(r"(\dSVPY|S\dVPY)")
-    pattern_dm   = re.compile(r"(\dSQPY|S\dQPY)")
-    if all(pattern_mono.search(vet) for vet in data['VET']): parcours = 'MONO'
+    pattern_mono   = re.compile(r"(\dSLPY|S\dLPY)")
+    pattern_cmi    = re.compile(r"(\dSLPYSD6|S\dLPYSD6)")
+    pattern_sprint = re.compile(r"(\dSLPYII|S\dLPYII)")
+    pattern_maj    = re.compile(r"(\dSVPY|S\dVPY)")
+    pattern_dm     = re.compile(r"(\dSQPY|S\dQPY|Q2PYDL)")
+    if all(pattern_cmi.search(vet) for vet in data['VET']): parcours = 'CMI'
+    elif all(pattern_sprint.search(vet) for vet in data['VET']): parcours = 'SPRINT'
+    elif all(pattern_mono.search(vet) for vet in data['VET']): parcours = 'MONO'
     elif all(pattern_maj.search(vet) for vet in data['VET']):
         MIN = next((k[3:5] for k,v in data['pv'][sorted(data['VET'])[-1]].items() if k in Blocs and k[3:5] != "PY" and v.get('note','')!=''), '')
         data['mineure'] = MIN
         parcours = 'MajPhys - Min' + mineures.get(MIN,'') if MIN!='' else 'MajPhys'
-        if filtre!='' and MIN!=mineures.get(filtre): return None, None, None
+        if filtre!='' and MIN!=filtre: return None, None
     elif all(pattern_dm.search(vet) for vet in data['VET']):
         MAJ2 = next((k[3:5] for k,v in data['pv'][sorted(data['VET'])[-1]].items() if k in Blocs and k[3:5] != "PY" and v.get('note','')!=''), '')
         if not MAJ2: MAJ2 = next((k[3:5] for k,v in data['pv'][sorted(data['VET'])[0]].items() if k in Blocs and k[3:5] != "PY" and v.get('note','')!=''), '')
         data['majeure2'] = MAJ2
         parcours = 'DMPhys - ' + mineures.get(MAJ2,'') if MAJ2!='' else 'DMPhys'
-        if filtre!='' and MAJ2!=mineures.get(filtre): return None, None, None
+        if filtre!='' and MAJ2!=filtre: return None, None
     else:
         parcours = '???'
         logger.error(f"[{data['nom']} ({etu_id})] Parcours indéfini (pv_writer, {data['VET']})")
@@ -311,7 +315,7 @@ def build_student_cell(etu_id, data, logger=None, filtre=''):
         # Notes et classement
         # 1. une seule note
         if data['annee']['note']==data['annee']['note2']:
-            if parcours.startswith('DM'):
+            if parcours.startswith('DM') and 'bdisc1' in data['annee']:
                 txt+=format_annee_bdisc('Session1', data['annee']['note'], data['annee']['resultat'], data['annee']['rank'], comp1 and comp2, data['annee']['bdisc1'])
             else:
                 txt+=format_annee('Session1', data['annee']['note'], data['annee']['maj1_1'], data['annee']['resultat'], data['annee']['rank'], comp1 and comp2)

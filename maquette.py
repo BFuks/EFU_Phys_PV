@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Maquette  Apogee                    ###
 ###                                                    ###
-###                Date: 21/01/2026                    ###
+###                Date: 31/01/2026                    ###
 ###                                                    ###
 ###                                                    ###
 ##########################################################
@@ -11,12 +11,17 @@
 Blocs = {
     # Physique
     'LB3PYJ00': { 'nom': "MAJ", 'UE': [['UL2PY103', 'UL2PY110', 'UL2PY126']]},
+    'LB3PYJ04': { 'nom': "MAJ", 'UE': [['UL2PY103', 'UL2PY110', 'UL2PY126']]},
     'LB3PY013': { 'nom': "MAJ", 'UE': [['UL2PY103', 'UL2PY110', 'UL2PY126']]},
     'LK3PYJ03': { 'nom': "MAJ", 'UE': [['LU2PY403', 'LU2PY410', 'LU2PY424', 'LU2LVAN1']]},
-    'LK3PYJ05': { 'nom': "MAJ", 'UE': [['LU2PY103', 'LU2PY110', 'LU2PY125', 'LU2LVAN1']]},
+    'LK3PYJ04': { 'nom': "MAJ", 'UE': [['LU2PY403', 'LU2PY424', 'LU2PY222', 'LU2LVAN1']]},
+    'LK3PYJ05': { 'nom': "MAJ", 'UE': [['LU2PY103', 'LU2PY110', 'LU2PY125', 'LU2LVAN1'], ['LU2PY103', 'LU2PY110', 'LU2PY124', 'LU2LVAN1']]},
     'LK3PYJ06': { 'nom': "MAJ", 'UE': [['LU2PY103', 'LU2PY222', 'LU2PY125', 'LU2LVAN1']]},
+    'LK3PYJ11': { },
     'LB3PYC00': { 'nom': "CMP", 'UE': [['UL2PY212', 'UL2PY222']]},
-    'LK3PYC00': { 'nom': "CMP", 'UE': [['LU2PY212', 'LU2PY220']]},
+    'LB3PYC04': { 'nom': "CMP", 'UE': [['UL2PY212', 'UL2PY222']]},
+    'LK3PYC04': { 'nom': "CMP", 'UE': [['LU2PY220', 'LU2PY222', 'LU2GSG31'], ['LU2PY220', 'LU2EE200', 'LU2GSG31']], 'SX':['LU2GSG31']},
+    'LK3PYC00': { 'nom': "CMP", 'UE': [['LU2PY212', 'LU2PY220'], ['LU2PY041', 'LU2PY220']]},
     'LK3PYC01': { 'nom': "CMP", 'UE': [['LU2PY212', 'LU2PY520','LU2PY531']], 'SX':['LU2PY531']},
     'LB4PYJ00': { 'nom': "MAJ", 'UE': [['UL2PY125', 'UL2PY130', 'UL2PY131', 'UL2PY210']]},
     'LB4PY013': { 'nom': "MAJ", 'UE': [['UL2PY125', 'UL2PY130', 'UL2PY131', 'UL2PY210']]},
@@ -24,15 +29,20 @@ Blocs = {
     'LK4PYJ05': { 'nom': "MAJ", 'UE': [['LU2PY126', 'LU2PY121', 'LU2PY123'],['LU2PY104','LU2PY121','LU2PY123']]},
     'LK4PYJ06': { 'nom': "MAJ", 'UE': [['LU2PY126', 'LU2PY121', 'LU2PY215']]},
     'LK4PYJ11': { },
+    'LK4PYJ22': { 'nom': "MAJ", 'UE': [['LU2PY404', 'LU2PY421']]},
+    'LK4PYJ23': { 'nom': "MAJ", 'UE': [['LU2PY215', 'LU2PY121', 'LU2PY123']]},
+    'LK4PYJ24': { 'nom': "MAJ", 'UE': [['LU2PY126', 'LU2PY121']]},
     'LB4PYC00': { 'nom': "CMP", 'UE': [['UL2PY215', 'UL2PY216', 'UL2LVAN2']]},
     'LK4PYC00': { 'nom': "CMP", 'UE': [['LU2PY215', 'LU2PY222']]},
-    'LK4PYC01': { 'nom': "CMP", 'UE': [['LU2PY215', 'LU2PY222','LU2PY532']], 'SX':['LU2PY532']},
+    'LK4PYC01': { 'nom': "CMP", 'UE': [['LU2PY215', 'LU2PY222', 'LU2PY532']], 'SX':['LU2PY532']},
+    'LK4PYC04': { 'nom': "CMP", 'UE': [['LU2CI101', 'LU2PY127', 'LU2PY102']], 'SX':['LU2PY102']},
     'LK5PYJ00': { 'nom': "MAJ", 'UE': [['LU3PY101', 'LU3PY121', 'LU3PYOIP']]},
     'LK5PYJ01': { 'nom': "MAJ", 'UE': [['LU3PY401', 'LU3PY421', 'LU3PYOIP']]},
-    'LK5PYC00': { 'nom': "CMP", 'UE': [['LU3PY213', 'LU3PY214', 'LU3PY215']]},
+    'LK5PYC00': { 'nom': "CMP", 'UE': [['LU3PY213', 'LU3PY214', 'LU3PY215', 'LU3SXCE1'], ['LU3PY213', 'LU3PY214', 'LU3PY215']], 'SX':['LU3SXCE1']},
     'LK5PYC01': { 'nom': "CMP", 'UE': [['LU3PY513', 'LU3PY514', 'LU3PY215', 'LU3PY536']], 'SX': ['LU3PY536']},
     'LK6PYJ00': { 'nom': "MAJ", 'UE': [['LU3PY103','LU3PY111','LY6PY120','LU3LVAN2']] },
     'LK6PYJ01': { 'nom': "MAJ", 'UE': [['LU3PY403','LU3PY411','LY6PY120','LU3LVAN2']] },
+    'LK6PYJ20': { 'nom': "MAJ", 'UE': [['LU3PY103','LU3PY111','LY6PY120','LU3LVAN2']] },
     'LK6PYJ30': { 'nom': "MAJ", 'UE': [['LU3PY403','LU3PY411','LU3MA120','LU3LVAN2'], ['LU3PY103','LU3PY111','LU3ST061','LU3LVAN2'],
         ['LU3PY103','LU3PY111','LU3ST062','LU3LVAN2'], ['LU3PY103','LU3PY111','LU3CI121','LU3LVAN2'],
         ['LY6PY120','LU3PY111','LU3ME010','LU3LVAN2'], ['LU3PY103','LU3PY111','LU3PY537','LU3LVAN2'],
@@ -45,10 +55,12 @@ Blocs = {
     'LK6PYC01': { 'nom': "CMP", 'SX': ['LU3PY537'], 'UE': [ ['LU3PY238', 'LU3PY205', 'LU3PY537'],
           ['LU3PY235', 'LU3PY205', 'LU3PY537'], ['LU3PY234', 'LU3PY205', 'LU3PY537'],
           ['LU3PY233', 'LU3PY205', 'LU3PY537'], ['LU3PY232', 'LU3PY205', 'LU3PY537'] ] },
+    'LK5PY092': { },
 
      # Mineures
     'LK5CHM00': { 'nom': "MIN", 'UE': [['L5LACHCI','L5LACHLA']]},
     'LK6CHM00': { 'nom': "MIN", 'UE': [['L6LACHCI','L6LACHLA']]},
+    'LB3CIM00': { 'nom': "MIN", 'UE': [['UL2CI012','UL2CI011']]},
     'LK3CIM00': { 'nom': "MIN", 'UE': [['LU2CI012','LU2CI011']]},
     'LK4CIM00': { 'nom': "MIN", 'UE': [['LU2CI101','LU2CI102']]},
     'LK5CIM00': { 'nom': "MIN", 'UE': [['LU3CI052','LU3CI011']]},
@@ -100,19 +112,38 @@ Blocs = {
     'LK5STM00': { 'nom': "MIN", 'UE': [['LU3ST057','LU3ST059']]},
     'LK6STM01': { 'nom': "MIN", 'UE': [['LU3ST061','LU3ST066']]},
 
-    # Double majeure
+    # Doubles licences
+    'LK3PYDM0': { },
+    'LK3ALD00': { 'nom':'MAJ2', 'UE': [['LU2SXAL1']]},
+    'LK4ALD00': { 'nom':'MAJ2', 'UE': [['LU2SXAL2','LU2PY123']], 'SX':['LU2PY123']},
+    'LK3CID00': { 'nom':'MAJ2', 'UE': [['LU2CI012','LU2CI011','LU2CI031']], 'SX':['LUCI031']},
+    'LK4CID00': { 'nom':'MAJ2', 'UE': [['LU2CI101','LU2CI102','LU2CI105','LU2PY123']], 'SX':['LUCI105']},
     'LK5CID00': { 'nom':'MAJ2', 'UE': [['LU3CI032','LU3CI011','LU3CI035','LU3CI003']], 'SX':['LU3CI003', 'LU3CI035']},
     'LK6CID00': { 'nom':'MAJ2', 'UE': [['LU3CI113', 'LU3CI101','LY6PY120']], 'SX':['LU3CI101']},
     'LK5EED00': { 'nom':'MAJ2', 'UE': [['LU3EE100','LU3EE101','LU3EE105']], 'SX':['LU3EE105']},
     'LK6EED00': { 'nom':'MAJ2', 'UE': [['LU3EE200','LU3EE204','LU3EE210','LY6PY120']], 'SX':['LU3PY122', 'LU3PY124', 'LU3PY126', 'LU3PY105']},
+    'LK3HID00': { 'nom':'MAJ2', 'UE': [['LU2SXHI1']]},
+    'LK4HID00': { 'nom':'MAJ2', 'UE': [['LU2SXHI2','LU2PY123']], 'SX':['LU2PY123']},
+    'LK3MAD00': { 'nom':'MAJ2', 'UE': [['LU2MA221','LU2MA260','LU2MA216']], 'SX':['LU2MA216']},
+    'LK4MAD00': { 'nom':'MAJ2', 'UE': [['LU2MA122','LU2MA211','LU2MA241','LU2PY215']], 'SX':['LU2MA211']},
     'LK5MAD00': { 'nom':'MAJ2', 'UE': [['LU3MA260','LU3MA263','LU3MA232']], 'SX':['LU3MA232']},
     'LK6MAD00': { 'nom':'MAJ2', 'UE': [['LY6PY120','LU3MA210','LU3MA290'], ['LY6PY120','LU3MA210','LU3MA261']], 'SX':['LU3MA290', 'LU3MA261'] },
+    'LK3MED00': { 'nom':'MAJ2', 'UE': [['LU2ME001','LU2ME005','LU2ME006']], 'SX':['LU2ME006']},
+    'LK4MED00': { 'nom':'MAJ2', 'UE': [['LU2ME002','LU2ME003','LU2ME004']], 'SX':['LU2ME003']},
     'LK5MED00': { 'nom':'MAJ2', 'UE': [['LU3ME103', 'LU3ME004', 'LU3ME008']], 'SX':['LU3ME008']},
     'LK6MED00': { 'nom':'MAJ2', 'UE': [['LU3ME006','LU3ME007','LU3ME009']], 'SX':['LU3ME009']},
+    'LK3IND00': { 'nom':'MAJ2', 'UE': [['LU2IN002','LU2IN019','LU2IN005','LU2IN018']], 'SX':['LU2IN005']},
+    'LK4IND00': { 'nom':'MAJ2', 'UE': [['LU2IN003','LU2IN006','LU2IN009']], 'SX':['LU2IN006']},
     'LK5IND00': { 'nom':'MAJ2', 'UE': [['LU3IN029','LU3IN033','LU3IN003']], 'SX':['LU3IN003']},
     'LK6IND00': { 'nom':'MAJ2', 'UE': [['LU2IN024','LU3IN010','LU3IN024']], 'SX':['LU3IN024']},
-    'LK5STD00': { 'nom':'MAJ2', 'UE': [['LU3ST057', 'LU3ST059', 'LU3ST507']], 'SX':['LU3ST507']},
-    'LK6STD00': { 'nom':'MAJ2', 'UE': [['LU3ST060', 'LU3ST603', 'LU3ST605', 'LY6PY120']], 'SX':['LU3PY122', 'LU3PY124', 'LU3PY126', 'LU3PY105']}
+    'LK3PHD00': { 'nom':'MAJ2', 'UE': [['LU2SXPH1']]},
+    'LK4PHD00': { 'nom':'MAJ2', 'UE': [['LU2SXPH2','LU2PY123']], 'SX':['LU2PY123']},
+    'LK3STD00': { 'nom':'MAJ2', 'UE' :[['LU2ST035','LU2ST301','LU2ST302','LU2ST303']], 'SX':['LU2ST302']},
+    'LK4STD00': { 'nom':'MAJ2', 'UE' :[['LU2ST043','LU2ST044','LU2ST045','LU2PY123','LU2ST403']], 'SX':['LU2ST403']},
+    'LK5STD00': { 'nom':'MAJ2', 'UE': [['LU3ST057','LU3ST059','LU3ST507']], 'SX':['LU3ST507']},
+    'LK6STD00': { 'nom':'MAJ2', 'UE': [['LU3ST060','LU3ST603','LU3ST605','LY6PY120']], 'SX':['LU3PY122','LU3PY124','LU3PY126','LU3PY105']},
+    'LK5PYDK0': { 'nom':'MAJ2', 'UE': [['LU3SXDE1'], ['LU3SXDR1']]},
+    'LK6PYDK0': { 'nom':'MAJ2', 'UE': [['LU3SXDE2'], ['LU3SXDR2']]}
 }
 
 Listes = {
@@ -127,6 +158,7 @@ Listes = {
 UEs = {
   # L2 Phys
   'LU2PY041': {'ects': 6, 'nom':'PhysActn'},
+  'LU2PY102': {'ects': 6, 'nom':'Stage'   },
   'LU2PY103': {'ects': 6, 'nom':'Thermo'  },   'UL2PY103': {'ects': 6, 'nom':'Thermo'  },
   'LU2PY104': {'ects': 6, 'nom':'Meca'    },
   'LU2PY110': {'ects': 6, 'nom':'Math-S3' },   'UL2PY110': {'ects': 6, 'nom':'Maths 1' },
@@ -135,6 +167,7 @@ UEs = {
   'LU2PY124': {'ects': 3, 'nom':'Relat'   },
   'LU2PY125': {'ects': 3, 'nom':'Climat'  },   'UL2PY125': {'ects': 3, 'nom':'Climat'  },
   'LU2PY126': {'ects': 6, 'nom':'MecaRel' },   'UL2PY126': {'ects': 6, 'nom':'MecaRel' },
+  'LU2PY127': {'ects': 6, 'nom':'PrjSptil'},
                                                'UL2PY130': {'ects': 6, 'nom':'Ondes'   },
                                                'UL2PY131': {'ects': 6, 'nom':'Elctrmag'},
   'LU2PY215': {'ects': 3, 'nom':'PhysExp2'},   'UL2PY215': {'ects': 3, 'nom':'PhysExp2'},
@@ -142,7 +175,7 @@ UEs = {
   'LU2PY212': {'ects': 6, 'nom':'PhysExp1'},   'UL2PY212': {'ects': 6, 'nom':'PhysExp1'},
   'LU2PY220': {'ects': 6, 'nom':'MathCmp' },   'UL2PY210': {'ects': 6, 'nom':'Maths 2' },
   'LU2PY222': {'ects': 6, 'nom':'PhysNum' },   'UL2PY222': {'ects': 6, 'nom':'PhysNum' },
-  'LU2PY403': {'ects': 6, 'nom':'Thermo'  },
+  'LU2PY403': {'ects': 6, 'nom':'Thermo'  },   'UL2PY403': {'ects': 6, 'nom':'Thermo'  },
   'LU2PY404': {'ects': 6, 'nom':'MecaRel' },
   'LU2PY410': {'ects': 6, 'nom':'Math-S3' },
   'LU2PY421': {'ects':12, 'nom':'OEM'     },
@@ -183,10 +216,13 @@ UEs = {
   'LU3PYOIP': {'ects': 3, 'nom':'OIP'     },
 
   # Autres Departements
-  'LU2CI011': {'ects': 6, 'nom':'Thermo'  },
-  'LU2CI012': {'ects': 6, 'nom':'ChimInrg'},
+  'UL2CI004': {'ects': 3, 'nom':'RsquesCh'},
+  'LU2CI011': {'ects': 6, 'nom':'Thermo'  },   'UL2CI011': {'ects': 6, 'nom':'Thermo'  },
+  'LU2CI012': {'ects': 6, 'nom':'ChimInrg'},   'UL2CI012': {'ects': 6, 'nom':'ChimInrg'},
+  'LU2CI031': {'ects': 6, 'nom':'CinChim' },   'UL2CI031': {'ects': 3, 'nom':'CinChim' },
   'LU2CI101': {'ects': 3, 'nom':'Liaisons'},
   'LU2CI102': {'ects': 6, 'nom':'ChimOrga'},
+  'LU2CI105': {'ects': 6, 'nom':'Spectro' },
   'LU3CI003': {'ects': 3, 'nom':'Polymrs' },
   'LU3CI011': {'ects': 6, 'nom':'Elctroch'},
   'LU3CI032': {'ects': 6, 'nom':'ChiMolec'},
@@ -196,7 +232,7 @@ UEs = {
   'LU3CI113': {'ects': 6, 'nom':'MatInorg'},
   'LU3CI121': {'ects': 3, 'nom':'CaractAv'},
   'LU3CI141': {'ects': 3, 'nom':'AnaStrct'},
-  'LU2DS001': {'ects':12, 'nom':'ScDnnees'},
+  'LU2DS001': {'ects':12, 'nom':'ScDnnees'},    'UL2DS001': {'ects':12, 'nom':'ScDnnees'},
   'LU2DS002': {'ects': 6, 'nom':'DataBDD' },
   'LU2DS003': {'ects': 3, 'nom':'StatProb'},
   'LU3DS001': {'ects': 3, 'nom':'StatsInf'},
@@ -220,6 +256,7 @@ UEs = {
   'LU2EVE03': {'ects': 6, 'nom':'EnjBioDv'},
   'LU2EVE04': {'ects': 3, 'nom':'ChgtClm2'},
   'LU2EVE05': {'ects': 6, 'nom':'StagePrj'},
+  'UL2EV001': {'ects': 3, 'nom':'HstEnv'  },
   'LU3EV001': {'ects': 3, 'nom':'UrbAgri' },
   'LU3EV002': {'ects': 3, 'nom':'Energie' },
   'LU3EV003': {'ects': 6, 'nom':'Vivant'  },
@@ -228,19 +265,25 @@ UEs = {
   'LU2GSG32': {'ects': 6, 'nom':'Economie'},
   'LU2GSG41': {'ects': 6, 'nom':'Entreprs'},
   'LU2GSG42': {'ects': 3, 'nom':'Compta'  },
+  'LU2SXHI1': {'ects':12, 'nom':'Histoire'},
+  'LU2SXHI2': {'ects':12, 'nom':'Histoire'},
   'LU2HNP31': {'ects': 3, 'nom':'AnthrBio'},
-  'LU2HNP32': {'ects': 3, 'nom':'LngstPop'},
+  'LU2HNP32': {'ects': 3, 'nom':'LngstPop'},     'UL2HN002': {'ects': 3, 'nom':'LngstPop'},
   'LU2HNP33': {'ects': 3, 'nom':'PatrmLoc'},
-  'LU2HNP41': {'ects': 3, 'nom':'MilHmPre'},
+  'LU2HNP41': {'ects': 3, 'nom':'MilHmPre'},     'UL2HN004': {'ects': 3, 'nom':'MilHmPre'},
   'LU2HNP34': {'ects': 3, 'nom':'Deplcmnt'},
   'LU2HNP42': {'ects': 3, 'nom':'PaleoPsg'},
   'LU2HNP43': {'ects': 3, 'nom':'Primato' },
+  'UL2IA001': {'ects': 6, 'nom':'SantéPub'},
+  'UL2IA002': {'ects': 6, 'nom':'Medics'  },
   'LU3IAS53': {'ects': 3, 'nom':'PatSoign'},
   'LU3IAS54': {'ects': 9, 'nom':'RechMedc'},
   'LU3IAS61': {'ects': 9, 'nom':'Semantiq'},
   'LU2IN002': {'ects': 6, 'nom':'ProgObj1'},
   'LU2IN003': {'ects': 6, 'nom':'Algo'    },
-  'LU2IN005': {'ects': 6, 'nom':'MathDisc'}, #'SX':True
+  'UL2IN004': {'ects': 6, 'nom':'MchnRepr'},
+  'LU2IN005': {'ects': 6, 'nom':'MathDisc'},
+  'LU2IN006': {'ects': 6, 'nom':'StrcDonn'},
   'LU2IN014': {'ects': 3, 'nom':'ArchOrdi'},
   'LU2IN009': {'ects': 6, 'nom':'BaseDonn'},
   'LU2IN015': {'ects': 3, 'nom':'SysExpl' },
@@ -256,13 +299,13 @@ UEs = {
   'LU3IN033': {'ects': 6, 'nom':'Reseaux' },
   'LU2MA100': {'ects': 3, 'nom':'Python'  },
   'LU2MA122': {'ects': 3, 'nom':'AlgLin2' },
-  'LU2MA211': {'ects': 6, 'nom':'Lebesgue'}, # 'SX':True
+  'LU2MA211': {'ects': 6, 'nom':'Lebesgue'},
   'LU2MA221': {'ects': 6, 'nom':'AlgLin1' },
-  'LU2MA216': {'ects': 6, 'nom':'Topo'    }, # 'SX':True
+  'LU2MA216': {'ects': 6, 'nom':'Topo'    },
   'LU2MA220': {'ects': 6, 'nom':'Algebre' },
   'LU2MA236': {'ects': 6, 'nom':'EquaDiff'},
   'LU2MA241': {'ects': 6, 'nom':'Probas'  },
-  'LU2MA260': {'ects': 6, 'nom':'SerieFct'},
+  'LU2MA260': {'ects': 6, 'nom':'SerieFct'},   'UL2MA260': {'ects': 6, 'nom':'SerieFct'},
   'LU3MA120': {'ects': 3, 'nom':'AlgArthm'},
   'LU3MA210': {'ects': 6, 'nom':'AnlsFct' },
   'LU3MA232': {'ects': 6, 'nom':'AnlNum'  },
@@ -271,9 +314,11 @@ UEs = {
   'LU3MA263': {'ects': 6, 'nom':'MsrProba'},
   'LU3MA290': {'ects': 6, 'nom':'Probas2' },
   'LU2ME001': {'ects': 6, 'nom':'MecaSold'},   'UL2ME001': {'ects': 6, 'nom':'MecaSold'},
+  'LU2ME002': {'ects': 6, 'nom':'Thermo'  },
+  'LU2ME003': {'ects': 6, 'nom':'MathsNm1'},
   'LU2ME004': {'ects': 6, 'nom':'Fluides1'},   'UL2ME004': {'ects': 6, 'nom':'Fluides1'},
   'LU2ME005': {'ects': 6, 'nom':'PrgClcSc'},
-  'LU2ME006': {'ects': 6, 'nom':'AnlsVect'},   'UL2ME006': {'ects': 6, 'nom':'AnlsVect'}, # 'SX':True
+  'LU2ME006': {'ects': 6, 'nom':'AnlsVect'},   'UL2ME006': {'ects': 6, 'nom':'AnlsVect'},
   'LU3ME009': {'ects': 6, 'nom':'MathsNm3'},
   'LU3ME010': {'ects': 3, 'nom':'ThermoAp'},
   'LU2ME102': {'ects': 3, 'nom':'TrsfThrm'},
@@ -286,19 +331,21 @@ UEs = {
   'LU3ME108': {'ects': 3, 'nom':'Eolien'  },
   'LU3ME111': {'ects': 3, 'nom':'Struct'  },
   'LU3MEE01': {'ects': 3, 'nom':'SystRobo'},
+  'UL2MT003': {'ects': 3, 'nom':'AtelSc'  },
   'LU2PT001': {'ects': 6, 'nom':'CltBioCh'},
   'LU2PT003': {'ects': 6, 'nom':'Français'},
   'LU2PT005': {'ects': 3, 'nom':'CltHmnst'},
   'LU2PT007': {'ects': 6, 'nom':'CltScnt' },
-  'LU2ST035': {'ects': 3, 'nom':'DynTerre'},
+  'UL2ST042': {'ects': 3, 'nom':'HstTerre'},
+  'LU2ST035': {'ects': 3, 'nom':'DynTerre'},    'UL2ST035': {'ects': 3, 'nom':'DynTerre'},
   'LU2ST043': {'ects': 3, 'nom':'ExplNat' },
   'LU2ST044': {'ects': 3, 'nom':'Stage'   },
-  'LU2ST045': {'ects': 3, 'nom':'Météo'   },
-  'LU2ST301': {'ects': 6, 'nom':'Cartgrph'},
-  'LU2ST302': {'ects': 6, 'nom':'MPM'     }, #'SX':True
-  'LU2ST303': {'ects': 3, 'nom':'Stage'   },
+  'LU2ST045': {'ects': 3, 'nom':'Météo'   },    'UL2ST045': {'ects': 3, 'nom':'Météo'   },
+  'LU2ST301': {'ects': 6, 'nom':'Cartgrph'},    'UL2ST311': {'ects': 6, 'nom':'Cartgrph'},
+  'LU2ST302': {'ects': 6, 'nom':'MPM'     },
+  'LU2ST303': {'ects': 3, 'nom':'Stage'   },    'UL2ST303': {'ects': 3, 'nom':'Stage'   },
   'LU2ST321': {'ects': 3, 'nom':'Cartgrph'},
-  'LU2ST403': {'ects': 6, 'nom':'Sedimnto'}, # 'SX':True
+  'LU2ST403': {'ects': 6, 'nom':'Sedimnto'},
   'LU2ST421': {'ects': 3, 'nom':'Paléo'   },
   'LU3ST057': {'ects': 6, 'nom':'Seismes' },
   'LU3ST059': {'ects': 6, 'nom':'Ocenano' },
@@ -317,6 +364,15 @@ UEs = {
   'L5LACHLA': {'ects': 8, 'nom':'Langue'  },
   'L6LACHCI': {'ects': 3, 'nom':'Civilstn'},
   'L6LACHLA': {'ects': 6, 'nom':'Langue'  },
+  'LU2SXAL1': {'ects':12, 'nom':'Allemand'},
+  'LU2SXAL2': {'ects':12, 'nom':'Allemand'},
+  'LU2SXPH1': {'ects':12, 'nom':'Philo'   },
+  'LU2SXPH2': {'ects':12, 'nom':'Philo'   },
+  'LU3SXDR1': {'ects':12, 'nom':'Droit'   },
+  'LU3SXDR2': {'ects':12, 'nom':'Droit'   },
+  'LU3SXDE2': {'ects':12, 'nom':'Design'  },
+  'LU3SXDE1': {'ects':12, 'nom':'Design'  },
+  'LU3SXCE1': {'ects': 6, 'nom':'CultnNtr'},
 
   # Langues
   'LU2LVAN1': {'ects': 3, 'nom':'Anglais' },  'UL2LVAN2': {'ects': 3, 'nom':'Anglais' },
@@ -331,13 +387,12 @@ UEs = {
 ##     'LU1SXM06': {'ects':3,   'nom':'Methodo', 'SX':True }, 'LU1SXARE': {'ects':3,   'nom':'ARE'      },  'LU1PY002': {'ects':3,   'nom':'PAD', 'SX':True },
 ## 
 ##       'LU3PY002': {'ects': 6, 'nom':'PhysNum'},
-##     'LU2PY102': {'ects':6,   'nom':'Stage', 'SX':True}, 'LU3PY015': {'ects': 6, 'nom':'PhysExp2'},
+## 'LU3PY015': {'ects': 6, 'nom':'PhysExp2'},
 
 ##          'LU3PY101': {'ects': 6, 'nom':'PhysQ1'  },
 ##        
         
 ##             'LU3PY121': {'ects': 9, 'nom':'OEM'     },
-##     'LU2PY127': {'ects':6,   'nom':'Satllts'  },
 ##     'LU2PY403': {'ects':6,   'nom':'Thermo'   },        
 ##     'LU2PY404': {'ects':6,   'nom':'Meca'     },        
 ##     'LU2PY410': {'ects':6,   'nom':'Math-S3'  },        'LU3PY216': {'ects': 3, 'nom':'MicroElc'},
@@ -374,8 +429,6 @@ UEs = {
 ## ##     'LU3PY042': {'ects':6,  'nom':'HistMeca'},
 ## ##     'LU3CI021': {'ects': 3, 'nom':'MinChim1'},
 ## 
-##     'LU2CI031': {'ects': 6,  'nom':'MinChim3', 'SX':True},
-##     'LU2CI105': {'ects': 6,  'nom':'MinChim2', 'SX':True},      
 ##                                                                 ##     'LU2EE105': {'ects': 3,  'nom':'MinElec2', 'SX':True},      
 
 ##     'LU2EE203': {'ects': 6,  'nom':'MinElec2', 'SX':True},      
@@ -384,14 +437,10 @@ UEs = {
 ##      'LU3GSG53': {'ects': 6, 'nom':'MinGest2' },
 ##                     'LU3GSG61': {'ects': 6, 'nom':'MinGest1' },
 ##                     'LU3GSG62': {'ects': 3, 'nom':'MinGest2' },
-##     'LU2IN006': {'ects': 6,  'nom':'MinInfo3', 'SX':True},
 ## 
-##     'LU2ME002': {'ects': 6,  'nom':'MinMeca1' },                
-##     'LU2ME003': {'ects': 6,  'nom':'MinMeca2', 'SX':True},      
 ##     
 ##                                                                 
 ## 
-##     'LU2ST402': {'ects': 6,  'nom':'MinSDT2'  },
 ##                                                                 'LU3HS009': {'ects': 6, 'nom':'MinHPST2' },
 ##                                                                 'LU3HS015': {'ects': 3, 'nom':'MinHPST1' },
 ##                                                                 'LU3HST51': {'ects': 6, 'nom':'MinHPST1' },
@@ -405,17 +454,13 @@ UEs = {
 ##     'LU2MT001': {'ects': 3,  'nom':'MedSc1'   },                'LU3MT552': {'ects': 3, 'nom':'MedSc2'   },
 ##     'LU2MT002': {'ects': 6,  'nom':'MedSc2'   },                'LU3MT560': {'ects': 6, 'nom':'MedSc1'   },
 ##     'LU2MT018': {'ects': 6,  'nom':'MedSc2'   },                'LU3MT561': {'ects': 3, 'nom':'MedSc2'   },
-##     'LU2SXHI1': {'ects':12,  'nom':'MajHist1' },                'LU2SXHI2': {'ects':12, 'nom':'MajHist1' },
-##     'LU2SXAL1': {'ects':12,  'nom':'MajAlmd'  },                'LU2SXAL2': {'ects':12, 'nom':'MajAlmd0' },
-##     'LU2SXDE1': {'ects':12,  'nom':'MajDsgn'  },                'LU3SXDE1': {'ects':12, 'nom':'MajDsgn'  },     'LU3SXDE2': {'ects':12, 'nom':'MajDsgn'  },
+##     'LU2SXDE1': {'ects':12,  'nom':'MajDsgn'  },                     'LU3SXDE2': {'ects':12, 'nom':'MajDsgn'  },
 ## 
-##     'LU2SXDR1': {'ects':12,  'nom':'MajDroit' },                'LU3SXDR1': {'ects':12, 'nom':'MajDroit' },     'LU3SXDR2': {'ects':12, 'nom':'MajDroit'},
-##     'LU2SXPH1': {'ects':12,  'nom':'MajPhilo1'},                'LU2SXPH2': {'ects':12, 'nom':'MajPhilo1'},
+##     'LU2SXDR1': {'ects':12,  'nom':'MajDroit' },                     'LU3SXDR2': {'ects':12, 'nom':'MajDroit'},
 ##     'L3LACHCI': {'ects': 4,  'nom':'MajChinois1'},              'L4LACHCI': {'ects': 3, 'nom':'MajChinois1'},   
 ##     'L3LACHLA': {'ects': 8,  'nom':'MajChinois2'},              'L4LACHLA': {'ects': 6, 'nom':'MajChinois2'},   
 ##     'LU3SXSS1': {'ects':12,  'nom':'MinDroit0'},
 ## 
-##     'LU3SXCE1': {'ects': 6, 'nom':'MinGestion1', 'SX':True},    # SX for CMI
 ## 
 ## 
 ## ##     'LK3EVE01': {'ects': 3, 'nom':'MinEnv1'},
@@ -745,21 +790,9 @@ UEs = {
 ##       'nom'     : "CMP",
 ##       'semestre': "S3"
 ##     },
-##     'LK3PYC04': {
-##       'UE'      : [['LU2PY220', 'LU2PY222', 'LU2GSG31']],
-##       'parcours': ['CMI'],
-##       'nom'     : "CMP",
-##       'semestre': "S3"
-##     },
 ##     'LK4PYC01': {
 ##         'UE'      : [['LU2PY215', 'LU2PY222', 'LU2PY532']],
 ##         'parcours': ['SPRINT'],
-##         'nom'     : "CMP",
-##         'semestre': "S4"
-##     },
-##     'LK4PYC04': {
-##         'UE'      : [ ['LU2CI101', 'LU2PY127', 'LU2PY102']],
-##         'parcours': ['CMI'],
 ##         'nom'     : "CMP",
 ##         'semestre': "S4"
 ##     },
@@ -842,10 +875,6 @@ UEs = {
 ##     'LK6MTM00' : { 'UE' : [ ['LU3MT560', 'LU3MT561']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S6" },
 ##     'LK5STM00' : { 'UE' : [ ['LU3ST057', 'LU3ST059']             ], 'parcours': ['MAJ'], 'nom' : "MIN", 'semestre': "S5" },
 ##     # bloc double majeure
-##     'LK3ALD00' : { 'UE' : [ ['LU2SXAL1']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
-##     'LK4ALD00' : { 'UE' : [ ['LU2SXAL2', 'LU2PY123']             ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S4" },
-##     'LK3CID00' : { 'UE' : [ ['LU2CI012', 'LU2CI011', 'LU2CI031'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
-##     'LK4CID00' : { 'UE' : [ ['LU2CI101', 'LU2CI102', 'LU2CI105', 'LU2PY123'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S4" },
 ##     'LK3DEK00' : { 'UE' : [ ['LU2SXDE1']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
 ##     'LK5DEK00' : { 'UE' : [ ['LU3SXDE1']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S5" },
 ##     'LK6DEK00' : { 'UE' : [ ['LU3SXDE2']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S6" },
@@ -853,18 +882,6 @@ UEs = {
 ##     'LK6DRK00' : { 'UE' : [ ['LU3SXDR2']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S6" },
 ##     'LK3EED00' : { 'UE' : [ ['LU2EE100', 'LU2EE200', 'LU2EE105', 'LU2EE11A'] ], 'parcours': ['DM'] , 'nom' : "MIN", 'semestre': "S3" },
 ##     'LK4EED00' : { 'UE' : [ ['LU2EE201', 'LU2EE203', 'LU2EE204', 'LU2PY123'] ], 'parcours': ['DM'] , 'nom' : "MIN", 'semestre': "S4" },
-##     'LK3HID00' : { 'UE' : [ ['LU2SXHI1']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
-##     'LK4HID00' : { 'UE' : [ ['LU2SXHI2', 'LU2PY123']             ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S4" },
-##     'LK3IND00' : { 'UE' : [ ['LU2IN002', 'LU2IN019', 'LU2IN005', 'LU2IN018'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
-##     'LK4IND00' : { 'UE' : [ ['LU2IN003', 'LU2IN006', 'LU2IN009'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S4" },
-##     'LK3MAD00' : { 'UE' : [ ['LU2MA221', 'LU2MA260', 'LU2MA216'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
-##     'LK4MAD00' : { 'UE' : [ ['LU2MA122', 'LU2MA211', 'LU2MA241', 'LU2PY215'] ], 'parcours': ['DM' ], 'nom' : "MIN", 'semestre': "S4" },
-##     'LK3MED00' : { 'UE' : [ ['LU2ME001', 'LU2ME005', 'LU2ME006'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
-##     'LK4MED00' : { 'UE' : [ ['LU2ME002', 'LU2ME003', 'LU2ME004'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S4" },
-##     'LK3PHD00' : { 'UE' : [ ['LU2SXPH1']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
-##     'LK4PHD00' : { 'UE' : [ ['LU2SXPH2', 'LU2PY123']             ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S4" },
-##     'LK3STD00' : { 'UE' : [ ['LU2ST035', 'LU2ST301', 'LU2ST302', 'LU2ST303'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S3" },
-##     'LK4STD00' : { 'UE' : [ ['LU2ST402', 'LU2ST045', 'LU2ST403', 'LU2PY123'], ['LU2ST043', 'LU2ST044', 'LU2ST045', 'LU2PY123', 'LU2ST403'] ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S4" },
 ##     'LK5SSD00' : { 'UE' : [ ['LU3SXSS1']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S5" },
 ##     'LK6SSD00' : { 'UE' : [ ['LU3SXSS2']                         ], 'parcours': ['DM'], 'nom' : "MIN", 'semestre': "S6" },
 ## 

@@ -29,7 +29,7 @@ logger.info(f"PV sélectionné : {annee} | {niveau} | {parcours}")
 newmaquette = True if int(annee.split('-')[0])>2024 and niveau=='L2' else False
 
 # Construction du dictionnaire
-data = build_pv(catalogue[annee][niveau][parcours], logger=logger, newmaquette=newmaquette, dm=(parcours=='DM'))
+data = build_pv(catalogue[annee][niveau][parcours], logger=logger, newmaquette=newmaquette, dm=(parcours in ('DM', 'DK')))
 
 # Génération du fichier PDF
 generate_pv_pdf(data, annee, niveau, parcours, logger=logger, filtre='')

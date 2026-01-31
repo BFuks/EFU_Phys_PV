@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New XML Reader                      ###
 ###                                                    ###
-###                Date: 20/01/2026                    ###
+###                Date: 31/01/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -26,15 +26,14 @@ def Parse_xml_to_Dict(filename, logger=None):
     header = root.find(".//LIST_G_ENTETE/G_ENTETE")
 
     # Recehrche du code VET alphanumérique à 8 caractères
-    code_pattern = re.compile(r"\b([A-Z0-9]{8})\b")
+    code_pattern = re.compile(r"\b([A-Z0-9]{6,8})\b")
     match_def = code_pattern.search(header.findtext("LIC_LIB_PRV_DEF", ""))
     match_prov = code_pattern.search(header.findtext("LIC_LIB_PRV_PROV", ""))
     VET_def = match_def.group(1) if match_def else None
     VET_prov = match_prov.group(1) if match_prov else None
-
     if not VET_def or not VET_prov or VET_def != VET_prov:
         logger.error("Impossibilité de déterminer le code de la VET dans le header du fichier " + 
-           filename.split('/')[-1])
+           str(filename).split('/')[-1])
         sys.exit()
 
 

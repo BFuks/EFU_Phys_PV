@@ -2,7 +2,7 @@
 ###                                                    ###
 ###             Pie charts et histogrammes             ###
 ###                                                    ###
-###                Date: 21/01/2026                    ###
+###                Date: 22/01/2026                    ###
 ###                                                    ###
 ##########################################################
 import matplotlib.pyplot as plt
@@ -180,6 +180,7 @@ def histos(stats, title=None):
             maxi = 100 if ue in UEs.keys() or ue in Blocs.keys() else 20
             histo(axes[i%plots_per_page], notes1[ue], f"{title_ue} (Session 1)", maxi=maxi)
             if has_session2: histo(axes[(i%plots_per_page) + plots_per_page], notes2[ue], f"{title_ue} (Session 2)", maxi=maxi)
+            else: axes[(i%plots_per_page) + plots_per_page].axis('off')
 
         # Masquage des plots vides
         for j in range(len(ues_page), plots_per_page):

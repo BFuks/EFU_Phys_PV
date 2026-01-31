@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 21/01/2026                    ###
+###                Date: 22/01/2026                    ###
 ###                                                    ###
 ##########################################################
 from collections import defaultdict
@@ -100,7 +100,7 @@ def MoyenneAnnuelle(data, logger=None, newmaquette=False):
 
     # Boucle sur les étudiants
     for etu_id, etu_data in data.items():
-        # Initialisation
+        if any(vet_data.get('Résultat', {}).get('resultat')=='NCAE' for vet_data in etu_data.get('pv', {}).values()): continue
         session1 = maj1 = session2 = maj2 = ects = maj_ects = 0
 
         # Boucle sur les VET
@@ -190,7 +190,7 @@ def BlocsDisciplinaires(data, logger=None):
             if etu_data['pv'][vet]['Résultat']['resultat'] in ['NCAE']: continue
 
             # Liste disciplines
-            blocs = [ bloc[3:5] for bloc, v in pv_vet.items() if bloc in Blocs and v.get('active')]
+            blocs = list(dict.fromkeys([ bloc[3:5] for bloc, v in pv_vet.items() if bloc in Blocs and v.get('active') and not 'DK' in bloc]))
             if not blocs: continue
 
             # Initialisation

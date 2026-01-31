@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New PV Checker                      ###
 ###                                                    ###
-###                Date: 21/01/2026                    ###
+###                Date: 23/01/2026                    ###
 ###                                                    ###
 ##########################################################
 from itertools import product
@@ -65,8 +65,8 @@ def SanityCheck(pv, logger=None, newmaquette=False):
             if ue_ects is None:
                 logger.error(f"{tag} UE {key} absente de la maquette)")
                 continue
-            score+=ue_note*UEs.get(key, {}).get("ects", 0)
-            maxi +=vals.get('bareme',0)*UEs.get(key, {}).get("ects", 0)
+            score+=ue_note*ue_ects/vals.get('bareme',0)
+            maxi +=ue_ects
 
         # 3) Vérification de la moyenne d'année
         CheckSemestre(score, maxi, maj, comp, pv_data, tag, logger=logger, newmaquette=newmaquette)
@@ -135,14 +135,14 @@ def CheckBlock(bloc, pv, tag, logger=None):
         if ue in Blocs[bloc].get('SX', []) or ue_note in ['DIS']: continue
 
         # Tout va bien, on calcule la moyenne du bloc
-        score += ue_note*ue_ects
-        maxi  += ue_ects*pv[ue]['bareme']
+        score += ue_note*ue_ects/pv[ue]['bareme']
+        maxi  += ue_ects
         if ue_note<pv[ue]['bareme']/2.:  comp = True
         if maxi==0:
             logger.error(f"{tag} Impossible de calculer la moyenne du bloc {bloc} (ECTS = 0)")
             continue
         moyenne = score/maxi*pv[bloc]['bareme']
-        pv[bloc]['ects']=int(maxi/100)
+        pv[bloc]['ects']=maxi
 
     # 3) Comparaison avec la moyenne du PV
     note_pv = pv[bloc].get("note", None)
