@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New PV Checker                      ###
 ###                                                    ###
-###                Date: 23/01/2026                    ###
+###                Date: 02/02/2026                    ###
 ###                                                    ###
 ##########################################################
 from itertools import product
@@ -42,7 +42,7 @@ def SanityCheck(pv, logger=None, newmaquette=False):
                 score += sc
                 maxi  += mx
                 done  += mtch
-                if Blocs[key]['nom']=='MAJ': maj = pv_data[key].get('note',None)
+                if Blocs[key]['nom']=='MAJ': maj = pv_data[key].get('note',None)/pv_data[key].get('bareme',100)*100
 
             # Une UE : vérification
             elif key in UEs.keys():
@@ -132,7 +132,7 @@ def CheckBlock(bloc, pv, tag, logger=None):
             continue
 
         # SX: on ignore
-        if ue in Blocs[bloc].get('SX', []) or ue_note in ['DIS']: continue
+        if ue in Blocs[bloc].get('SX', []) or ue_note in ['DIS'] or pv[ue].get('resultat',None) in ['VAC']: continue
 
         # Tout va bien, on calcule la moyenne du bloc
         score += ue_note*ue_ects/pv[ue]['bareme']
@@ -217,7 +217,7 @@ def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=Fa
         logger.error(f"{tag} Différence de moyenne semestrielle : calculée={annee:.3f}, PV={note_pv}")
 
     # 2) Vérification du résultat semestriel
-    if newmaquette and maj!=None: resultat = "ADM" if (note_pv>=10 and maj>=10) else "AJ"
+    if newmaquette and maj!=None: resultat = "ADM" if (note_pv>=10 and maj>=50) else "AJ"
     elif newmaquette: resultat = "ADM" if note_pv>=10 else "AJ"
     else: resultat = "ADM" if (note_pv>=10) else "AJ"
     if data["Résultat"]["resultat"]!=resultat:
@@ -231,36 +231,4 @@ def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=Fa
 
     # Exit
     logger.debug(f"    > OK")
-
-
-### ##########################################################
-### ###                                                    ###
-### ###             Verification blocs disc.               ###
-### ###                                                    ###
-### ##########################################################
-### from maquette import BlocsDisc;
-### def CalculBlocsDisc(pv_etu, semestre):
-###     # list UEs
-###     ues = [x for x in pv_etu.keys() if x=='LK5EEJ13' or ('LU' in x and not 'LV' in x and not 'OIP' in x)];
-###     if ues==['LU3PY403', 'LU3PY411', 'LU3MA120']:
-###         ues=['LU3PY403', 'LU3PY411', 'LU3MA120', 'LU3PY124']
-###         pv_etu['LU3PY124'] = {'note': '???', 'annee_val': None, 'validation': 'AJ'}
-###     phys= [x for x in BlocsDisc[semestre]['PY'] if all([y in ues for y in x])][0];
-###     tag = list(set([x[3:5] for x in [y.replace('SX','').replace('XS','') for y in ues] if x[3:5]!='PY']));
-###     if len(tag)==0: tag=''; MIN='';
-###     else: tag = tag[0];
-###     try:    MIN = [x for x in BlocsDisc[semestre][tag] if all([y in ues for y in x])][0];
-###     except: MIN = '';
-### 
-###     # calcul de la moyenne
-###     MAJ1 = [ [float(str(pv_etu[x]['note']).replace('???','0')), UEs[x]['ects']] for x in phys if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];
-###     MAJ2 = [ [float(str(pv_etu[x]['note']).replace('???','0')), UEs[x]['ects']] for x in MIN  if not pv_etu[x]['note'] in ['ENCO', 'DIS'] ];
-###     logger.debug("  > Bloc Disc Phys = " + str(MAJ1));
-###     logger.debug("  > Bloc Disc " + tag+ " = " + str(MAJ2));
-### 
-###     return {
-###      'MAJ1':[sum([x[0]*x[1] for x in MAJ1]), sum([x[1] for x in MAJ1])],
-###      'MAJ2':[sum([x[0]*x[1] for x in MAJ2]), sum([x[1] for x in MAJ2])]
-###     };
-### 
 

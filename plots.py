@@ -2,7 +2,7 @@
 ###                                                    ###
 ###             Pie charts et histogrammes             ###
 ###                                                    ###
-###                Date: 22/01/2026                    ###
+###                Date: 02/02/2026                    ###
 ###                                                    ###
 ##########################################################
 import matplotlib.pyplot as plt
@@ -42,7 +42,8 @@ def pie(ax, values, title):
         ('ADM-MAJ',  'DarkSeaGreen', '//',    f"({counts.get('ADM-MAJ',0)})"),
         ('COMP',     'Cornsilk',     '',      f"COMP ({counts.get('COMP',0)})"),
         ('COMP-MAJ', 'Cornsilk',     '//',    f"({counts.get('COMP-MAJ',0)})"),
-        ('AJ',       'Brown',        '',      f"AJ ({counts.get('AJ',0)})")
+        ('AJ',       'Brown',        '',      f"AJ ({counts.get('AJ',0)})"),
+        ('AJ-MAJ',   'Brown',        '//',    f"AJ ({counts.get('AJ-MAJ',0)})")
     ]
 
     # Filtre des éléments absents
@@ -83,7 +84,6 @@ def pies(stats, title=None):
     col_labels = {}
     for k in col_keys:
         col_labels[k] = 'Année' if k == 'annee' else (''.join(sorted(k[:2], key=lambda c: c.isdigit())))
-#    col_labels = { vet1:(''.join(sorted(vet1[:2], key=lambda c: c.isdigit()))), vet2:(''.join(sorted(vet2[:2], key=lambda c: c.isdigit()))), 'annee':'Année' }
     has_session2 = stats['resultats'] != stats['resultats2']
 
     # Remplissage des plots
@@ -95,6 +95,8 @@ def pies(stats, title=None):
         # Session 2 (ligne 1)
         if has_session2 and key and key in stats['resultats2']: pie(axes[1, col], sorted(stats['resultats2'][key]), f"{col_labels[key]} – Session 2" )
         else: axes[1, col].axis('off')
+    if len(col_keys)==2: axes[0,2].axis('off'); axes[1,2].axis('off')
+
 
     # Titre global
     if title: fig.suptitle(title, y=0.95, **Sup_Style)

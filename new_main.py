@@ -35,7 +35,7 @@ data = build_pv(catalogue[annee][niveau][parcours], logger=logger, newmaquette=n
 generate_pv_pdf(data, annee, niveau, parcours, logger=logger, filtre='')
 
 # Génération des données 'stats' et production des histos et tartes
-stat_data = generate_stats(data, logger=logger, filtre='')
+stat_data = generate_stats(data, logger=logger, newmaquette=newmaquette, filtre='')
 pies  = pies(stat_data, title = niveau + ' (' + annee + ') - ' + parcours)
 hists = histos(stat_data, title = niveau + ' (' + annee + ') - ' + parcours)
 save_plots(pies, hists, annee, niveau, parcours)

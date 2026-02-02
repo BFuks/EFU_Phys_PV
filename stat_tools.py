@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 22/01/2026                    ###
+###                Date: 02/02/2026                    ###
 ###                                                    ###
 ##########################################################
 from collections import defaultdict
@@ -139,8 +139,8 @@ def MoyenneAnnuelle(data, logger=None, newmaquette=False):
                     if not name in UEs.keys() or not include_alacarte(resu, flag=newmaquette): continue
 
                     # Notes sessions 1 et 2
-                    note1 = resu.get('note')
-                    note2 = resu.get('note2', note1)
+                    note1 = 0 if resu.get('note') in ('ABI', 'ABJ') else resu.get('note')
+                    note2 = 0 if resu.get('note2', note1) in ('ABI', 'ABJ') else resu.get('note2', note1)
 
                     # Calculs
                     if note2 not in (None, 'DIS'):
@@ -262,21 +262,21 @@ def collect_notes(elem, key, notes, notes2):
     # 1ere session
     if isinstance(n1, (int, float)):
         notes[key].append(n1)
-        comp1 = n1 < 50
+        comp1 = n1 < (elem.get('bareme',20)/2)
 
     # 2nd session
     if isinstance(n2, (int, float)):
         notes2[key].append(n2)
-        comp2 = n2 < 50
+        comp2 = n2 < (elem.get('bareme',20)/2)
 
     # Output
     return comp1, comp2
 
 
 # Fonction auxiliaire : modification du résultat en "COMP" si nécessaire
-def update_result(res, comp, maj):
-    # Rien à faire si ce n'est pas ADM
-    if res!='ADM': return res
+def update_result(res, comp, maj, note):
+    # Ce n'est pas ADM
+    if res!='ADM': return 'AJ-MAJ' if note>=10 else 'AJ'
 
     # Pas de note MAJ
     if not maj: return 'COMP' if comp else 'ADM'
@@ -287,7 +287,7 @@ def update_result(res, comp, maj):
 
 
 # Fonction principale
-def generate_stats(data, logger=None, filtre=''):
+def generate_stats(data, logger=None, filtre='', newmaquette=False):
     # Initialisation
     logger.info(f"Génération des statistiques de réussite globales")
     resultats  = defaultdict(list)   # les 'AJ', 'ADM', ...
@@ -324,8 +324,8 @@ def generate_stats(data, logger=None, filtre=''):
             n2_vet = pv_vet.get('note2', n1_vet)
             maj1_vet = pv_vet.get('bdisc1').get('PY', None) if 'bdisc1' in pv_vet else pv_vet.get('maj1_1', None)
             maj2_vet = pv_vet.get('bdisc2').get('PY', maj1_vet) if 'bdisc2' in pv_vet else pv_vet.get('maj1_2', maj1_vet)
-            if n1_vet: r1_vet = 'ADM' if n1_vet>=10 else 'AJ'
-            if n2_vet: r2_vet = 'ADM' if n2_vet>=10 else 'AJ'
+            if n1_vet: r1_vet = 'ADM' if n1_vet>=10 and (not newmaquette or maj1_vet>=50) else 'AJ'
+            if n2_vet: r2_vet = 'ADM' if n2_vet>=10 and (not newmaquette or maj2_vet>=50) else 'AJ'
 
             # Tous les autres éléments du PV : UEs / blocs
             for code, elem in pv.items():
@@ -338,16 +338,15 @@ def generate_stats(data, logger=None, filtre=''):
                 comp2_vet |= c2
 
             # Finalisation résultats semestre
-            if r1_vet: resultats[vet].append(update_result(r1_vet, comp1_vet, maj1_vet))
-            if r2_vet: resultats2[vet].append(update_result(r2_vet, comp2_vet, maj2_vet))
+            if r1_vet: resultats[vet].append(update_result(r1_vet, comp1_vet, maj1_vet, n1_vet))
+            if r2_vet: resultats2[vet].append(update_result(r2_vet, comp2_vet, maj2_vet, n2_vet))
             comp1_an |= (r1_vet=='AJ')
             comp2_an |= (r2_vet=='AJ')
 
-
         # Finalisaton résultats annuels
         if 'annee' in etu_data.keys():
-            if r1_an: resultats['annee'].append(update_result(r1_an, comp1_an, maj1_an))
-            if r2_an: resultats2['annee'].append(update_result(r2_an, comp2_an, maj2_an))
+            if r1_an: resultats['annee'].append(update_result(r1_an, comp1_an, maj1_an, etu_data['annee'].get('note',None)))
+            if r2_an: resultats2['annee'].append(update_result(r2_an, comp2_an, maj2_an, etu_data['annee'].get('note2',etu_data['annee'].get('note',None))))
 
     # Output
     return { "resultats": dict(resultats), 'resultats2': dict(resultats2), "notes": dict(notes), "notes2": dict(notes2) }
