@@ -100,14 +100,14 @@ def MoyenneAnnuelle(data, logger=None, newmaquette=False):
 
     # Boucle sur les étudiants
     for etu_id, etu_data in data.items():
-        if any(vet_data.get('Résultat', {}).get('resultat')=='NCAE' for vet_data in etu_data.get('pv', {}).values()): continue
+        if any(vet_data.get('Résultat', {}).get('resultat') in ['ENCO', 'NCAE'] for vet_data in etu_data.get('pv', {}).values()): continue
         session1 = maj1 = session2 = maj2 = ects = maj_ects = 0
 
         # Boucle sur les VET
         for vet in etu_data['VET']:
             logger.debug(f"[{etu_data['nom']} ({etu_id})] Calcul de la moyenne pour la VET {vet}")
             # Calcul de moyenne non nécessaire
-            if etu_data['pv'][vet]['Résultat']['resultat'] in ['NCAE']: continue
+            if etu_data['pv'][vet]['Résultat']['resultat'] in ['NCAE', 'ENCO']: continue
 
             # Calcul des moyennes annuelles session1 et session2
             for name, resu in etu_data['pv'][vet].items():
@@ -187,7 +187,7 @@ def BlocsDisciplinaires(data, logger=None):
             pv_vet = etu_data['pv'][vet]
 
             # Calcul non nécessaire
-            if etu_data['pv'][vet]['Résultat']['resultat'] in ['NCAE']: continue
+            if etu_data['pv'][vet]['Résultat']['resultat'] in ['NCAE', 'ENCO']: continue
 
             # Liste disciplines
             blocs = list(dict.fromkeys([ bloc[3:5] for bloc, v in pv_vet.items() if bloc in Blocs and v.get('active') and not 'DK' in bloc]))

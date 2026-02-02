@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Générateur de PV PDF                ###
 ###                                                    ###
-###                Date: 31/01/2026                    ###
+###                Date: 02/02/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -111,7 +111,7 @@ def format_session(label, note, resultat, rank, comp):
     color = colors.black if resultat=='ADM' and not comp else (colors.orange if resultat=='ADM' else colors.red)
 
     # Cas spécial - NCAE
-    if resultat == 'NCAE': return f"<b>{label} : {resultat}</b><br />"
+    if resultat in ['ENCO', 'NCAE']: return f"<b>{label} : {resultat}</b><br />"
 
     # Cas standard
     return f"<b>{label} : <font color='{color}'>{note}</font></b><font color='grey'> (#{rank})</font><br />"
@@ -182,7 +182,7 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
             txt+='<br />'
 
             # Moyenne blocs
-            if parcours.startswith('DM') and not res.get('resultat2', res.get('resultat'))=='NCAE' and 'bdisc1' in pv['Résultat']:
+            if parcours.startswith('DM') and not res.get('resultat2', res.get('resultat')) in ['ENCO', 'NCAE'] and 'bdisc1' in pv['Résultat']:
                 bdisc2 = pv['Résultat'].get('bdisc2',pv['Résultat'].get('bdisc1',{}))
                 bdisc1 = pv['Résultat'].get('bdisc1',{})
                 for bloc in ([b for b in bdisc2.keys() if b=='PY']+ sorted([b for b in bdisc2.keys() if b!='PY'])):
@@ -192,10 +192,10 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
                     if pv['Résultat'].get('bdisc2').get(bloc)!=pv['Résultat'].get('bdisc1').get(bloc):
                         txt += f" => <font color=\'{colorname}\'>{bdisc2[bloc]:.2f}/100</font><br />"
                     txt+='<br />'
-            elif not res.get('resultat2', res.get('resultat'))=='NCAE':
+            elif not res.get('resultat2', res.get('resultat')) in ['ENCO', 'NCAE']:
                 for bloc in list_blocs:
                     colorname = colors.blue if Blocs[bloc]['nom']=='MAJ' else colors.green
-                    if pv[bloc].get('resultat') in ('DIS', 'NCAE'): continue
+                    if pv[bloc].get('resultat') in ('DIS', 'NCAE', 'ENCO'): continue
                     if pv[bloc].get('resultat') == None and pv[bloc].get('note2',pv[bloc].get('note',None))==None: continue
                     txt += f"<font color=\'{colorname}\'>{Blocs[bloc]['nom']} : {pv[bloc].get('note2',pv[bloc].get('note')):.2f}/{pv[bloc].get('bareme','')}</font><br />"
             row.append(Paragraph(txt, StyleCell))

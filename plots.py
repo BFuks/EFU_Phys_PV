@@ -28,7 +28,7 @@ Label_Style = { 'family': 'sans-serif', 'color':'darkblue', 'fontsize': 11}
 # Fonction auxiliaire (single pie chart)
 def pie(ax, values, title):
     # Filtrage NCAE
-    values = [v for v in values if v != 'NCAE']
+    values = [v for v in values if not v in ['NCAE', 'ENCO']]
 
     # Safety : pie vide
     if not values:

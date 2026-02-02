@@ -106,7 +106,7 @@ def CheckBlock(bloc, pv, tag, logger=None):
             matching_set = ue_list
             break
     if matching_set is None:
-        if pv['Résultat']['resultat']!='NCAE': logger.warning(f"{tag} Aucun set d'UE ne correspond au bloc {bloc}")
+        if not pv['Résultat']['resultat'] in ['ENCO', 'NCAE']: logger.warning(f"{tag} Aucun set d'UE ne correspond au bloc {bloc}")
         return [0,0,[]]
 
     # Vérification supplémentaire et formattage en cas de liste d'UE
@@ -199,7 +199,7 @@ def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=Fa
     # Initialisation et safety
     logger.debug(f"  - Vérification de la moyenne semestrielle")
     if "Résultat" not in data.keys(): logger.warning(f"{tag} Aucune entrée 'Résultat' dans le PV")
-    elif data['Résultat']['resultat'] in ['NCAE']: logger.debug(f"    > NCAE - pas nécessaire"); return
+    elif data['Résultat']['resultat'] in ['ENCO', 'NCAE']: logger.debug(f"    > NCAE/ENCO - pas nécessaire"); return
     elif maxi==0:
         logger.error(f"{tag} Impossible de calculer la moyenne semestrielle (ECTS = 0)")
         return
