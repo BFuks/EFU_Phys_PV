@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 02/02/2026                    ###
+###                Date: 03/02/2026                    ###
 ###                                                    ###
 ##########################################################
 from collections import defaultdict
@@ -40,7 +40,8 @@ def AddRankings(data, logger=None):
         # VET et éléments des VET
         for vet, elements in etu_data['pv'].items():
             for myue, vals in elements.items():
-                # init
+                # init and safety
+                if myue==vet: continue
                 ue = myue if myue!='Résultat' else vet
 
                 # notes session1
@@ -324,6 +325,8 @@ def generate_stats(data, logger=None, filtre='', newmaquette=False):
             n2_vet = pv_vet.get('note2', n1_vet)
             maj1_vet = pv_vet.get('bdisc1').get('PY', None) if 'bdisc1' in pv_vet else pv_vet.get('maj1_1', None)
             maj2_vet = pv_vet.get('bdisc2').get('PY', maj1_vet) if 'bdisc2' in pv_vet else pv_vet.get('maj1_2', maj1_vet)
+            if not maj1_vet: maj1_vet=100
+            if not maj2_vet: maj2_vet=100
             if n1_vet: r1_vet = 'ADM' if n1_vet>=10 and (not newmaquette or maj1_vet>=50) else 'AJ'
             if n2_vet: r2_vet = 'ADM' if n2_vet>=10 and (not newmaquette or maj2_vet>=50) else 'AJ'
 

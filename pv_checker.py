@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New PV Checker                      ###
 ###                                                    ###
-###                Date: 02/02/2026                    ###
+###                Date: 03/02/2026                    ###
 ###                                                    ###
 ##########################################################
 from itertools import product
@@ -59,6 +59,7 @@ def SanityCheck(pv, logger=None, newmaquette=False):
             if newmaquette and not include_alacarte(vals, flag=newmaquette): continue
             if key in done or not key in UEs.keys() or vals.get('note','') in ['DIS']: continue
             if key[:2] in ['L3', 'L4', 'L5', 'L6'] and vals.get('note',None)==None: continue
+            if 'LAD' in key: continue
             ue_note = vals.get("note", 0)
             if ue_note in ['ABI', 'ABJ']: ue_note=0
             ue_ects = UEs.get(key, {}).get("ects", None)

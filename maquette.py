@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Maquette  Apogee                    ###
 ###                                                    ###
-###                Date: 31/01/2026                    ###
+###                Date: 03/02/2026                    ###
 ###                                                    ###
 ###                                                    ###
 ##########################################################
@@ -13,12 +13,15 @@ Blocs = {
     'LB3PYJ00': { 'nom': "MAJ", 'UE': [['UL2PY103', 'UL2PY110', 'UL2PY126']]},
     'LB3PYJ04': { 'nom': "MAJ", 'UE': [['UL2PY103', 'UL2PY110', 'UL2PY126']]},
     'LB3PY013': { 'nom': "MAJ", 'UE': [['UL2PY103', 'UL2PY110', 'UL2PY126']]},
+    'LB3PYJ03': { 'nom': "MAJ", 'UE': [['UL2PY403', 'UL2PY410', 'UL2PY426']]},
     'LK3PYJ03': { 'nom': "MAJ", 'UE': [['LU2PY403', 'LU2PY410', 'LU2PY424', 'LU2LVAN1']]},
     'LK3PYJ04': { 'nom': "MAJ", 'UE': [['LU2PY403', 'LU2PY424', 'LU2PY222', 'LU2LVAN1']]},
     'LK3PYJ05': { 'nom': "MAJ", 'UE': [['LU2PY103', 'LU2PY110', 'LU2PY125', 'LU2LVAN1'], ['LU2PY103', 'LU2PY110', 'LU2PY124', 'LU2LVAN1']]},
     'LK3PYJ06': { 'nom': "MAJ", 'UE': [['LU2PY103', 'LU2PY222', 'LU2PY125', 'LU2LVAN1']]},
     'LK3PYJ11': { },
+    'S3LPYII1': { },
     'LB3PYC00': { 'nom': "CMP", 'UE': [['UL2PY212', 'UL2PY222']]},
+    'LB3PYC03': { 'nom': "CMP", 'UE': [['UL2PY212', 'UL2PY222', 'UL2PY001']], 'SX':['UL2PY001']},
     'LB3PYC04': { 'nom': "CMP", 'UE': [['UL2PY212', 'UL2PY222']]},
     'LK3PYC04': { 'nom': "CMP", 'UE': [['LU2PY220', 'LU2PY222', 'LU2GSG31'], ['LU2PY220', 'LU2EE200', 'LU2GSG31']], 'SX':['LU2GSG31']},
     'LK3PYC00': { 'nom': "CMP", 'UE': [['LU2PY212', 'LU2PY220'], ['LU2PY041', 'LU2PY220']]},
@@ -177,12 +180,12 @@ UEs = {
   'LU2PY222': {'ects': 6, 'nom':'PhysNum' },   'UL2PY222': {'ects': 6, 'nom':'PhysNum' },
   'LU2PY403': {'ects': 6, 'nom':'Thermo'  },   'UL2PY403': {'ects': 6, 'nom':'Thermo'  },
   'LU2PY404': {'ects': 6, 'nom':'MecaRel' },
-  'LU2PY410': {'ects': 6, 'nom':'Math-S3' },
+  'LU2PY410': {'ects': 6, 'nom':'Math-S3' },   'UL2PY410': {'ects': 6, 'nom':'Math-S3' },
   'LU2PY421': {'ects':12, 'nom':'OEM'     },
   'LU2PY423': {'ects': 3, 'nom':'Math-S4' },
-  'LU2PY424': {'ects': 3, 'nom':'Relat'   },
+  'LU2PY424': {'ects': 3, 'nom':'Relat'   },   'UL2PY426': {'ects': 6, 'nom':'MecaRel' },
   'LU2PY520': {'ects': 6, 'nom':'MathCmp' },
-  'LU2PY531': {'ects': 6, 'nom':'Astro'   },
+  'LU2PY531': {'ects': 6, 'nom':'Astro'   },   'UL2PY001': {'ects': 6, 'nom':'Astro'   },
   'LU2PY532': {'ects': 6, 'nom':'ML'      },
 
   # L3 Phys
@@ -205,6 +208,7 @@ UEs = {
   'LU3PY233': {'ects': 6, 'nom':'PhysTheo'},
   'LU3PY234': {'ects': 6, 'nom':'OcnAtm'  },
   'LU3PY235': {'ects': 6, 'nom':'MecaAnl' },
+  'UL3PY318': {'ects': 6, 'nom':'Spectro' },
   'LU3PY401': {'ects': 6, 'nom':'PhysQ1'  },
   'LU3PY403': {'ects': 6, 'nom':'Thermo'  },
   'LU3PY411': {'ects': 6, 'nom':'PhysQ2'  },
@@ -376,7 +380,8 @@ UEs = {
 
   # Langues
   'LU2LVAN1': {'ects': 3, 'nom':'Anglais' },  'UL2LVAN2': {'ects': 3, 'nom':'Anglais' },
-  'LU3LVAN2': {'ects': 3, 'nom':'Anglais' }
+  'LU3LVAN2': {'ects': 3, 'nom':'Anglais' },
+  'UL3LAD01': {'ects': 3, 'nom':'Language'}
 }
 
 
