@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Générateur de PV PDF                ###
 ###                                                    ###
-###                Date: 02/02/2026                    ###
+###                Date: 09/02/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -84,7 +84,7 @@ def listes_ues(data, alacarte=False):
     num_ues = set()
     for etudiant in data.values():
         for pv in etudiant['pv'].values():
-            num_ues.add(len([k for k in pv.keys() if k in UEs.keys() and include_alacarte(pv[k], flag=alacarte) and not k.startswith(('L3', 'L4', 'L5', 'L6'))]))
+            num_ues.add(len([k for k in pv.keys() if k in UEs.keys() and include_alacarte(pv[k], flag=alacarte) and not k.startswith(('L3', 'L4', 'L5', 'L6')) and pv[k].get('active', True)]))
     return max(sorted(num_ues))
 
 ##########################################################
@@ -141,14 +141,14 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
         for vet_index, (vet, pv) in enumerate(sorted(etu_data['pv'].items())):
             # Initialisastion (blocs UEs et compensation)
             row = []
-            list_blocs = [k for k in pv.keys() if k in Blocs.keys() and 'nom' in Blocs[k].keys()]
-            list_ues = [k for k in pv.keys() if k in UEs.keys()]
+            list_blocs = [k for k in pv.keys() if k in Blocs.keys() and 'nom' in Blocs[k].keys() and pv[k].get('active',True)]
+            list_ues = [k for k in pv.keys() if k in UEs.keys() and pv[k].get('active',True)]
             matching_ue_set = {}
             for bloc in list_blocs:
                 possible_sets = []
                 for lst in Blocs[bloc]["UE"]: possible_sets.extend(expand_UE_list(lst, logger=logger))
                 for given_set in possible_sets:
-                    if all(ue in pv.keys() for ue in given_set):
+                    if all(myue in [ue for ue in pv if pv[ue].get('active',True)] for myue in given_set):
                         matching_ue_set[bloc] = given_set
                         break
             comp_vet1 = comp_vet2 = False
@@ -165,7 +165,8 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
 
             # Moyenne semestrielle
             res = pv.get("Résultat", {})
-            txt = f"<b>{''.join(sorted(vet[:2], key=str.isdigit))}</b><br />"
+            sem_txt = "S3" if vet =="Q2PYDL" else ''.join(sorted(vet[:2], key=str.isdigit))
+            txt = f"<b>{sem_txt}</b><br />"
             note1 = f"{res.get('note'):.2f}/{res.get('bareme','')}" if 'note' in res.keys() else res.get('resultat')
 
             # 1. une seule note
@@ -208,6 +209,7 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
                 if (alacarte and not include_alacarte(res, flag=alacarte) and res.get('note',None)==None) or (ue.startswith(('L3', 'L4', 'L5', 'L6')) and res.get('note',None)==None):
                     offset+=1
                     continue
+                if not res.get('active',True): offset+=1; continue
 
                 # Texte
                 color = colors.black if res['resultat']=='ADM' else (colors.orange if success else colors.red)
@@ -250,10 +252,10 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
 ###                                                    ###
 ##########################################################
 mineures = {
-   'CH': 'Chinois', 'CI':'Chimie', 'DS':'DataScience', 'EE': 'Elec',
-   'EV': 'Environnement', 'GS':'Gestion', 'HI':'Histoire',
+   'AL': 'Allemand', 'CH': 'Chinois', 'CI':'Chimie', 'DS':'DataScience',
+   'EE': 'Elec', 'EV': 'Environnement', 'GS':'Gestion', 'HI':'Histoire',
    'HN':'HistNat', 'IA':'InnovSanté', 'IN':'Info', 'MA':'Maths',
-   'ME':'Meca', 'PH':'Philo', 'PT':'ProfEcole', 'ST':'SdT'
+   'ME':'Meca', 'MT':'MédScient', 'PH':'Philo', 'PT':'ProfEcole', 'ST':'SdT'
 }
 
 # Fonctions auxiliaires : formattage texte

@@ -123,13 +123,15 @@ def MoyenneAnnuelle(data, logger=None, newmaquette=False):
                 # Calculs
                 if note2 not in (None, 'DIS') and resu['ects']!='':
                     session2 += note2*resu['ects']/resu['bareme']*100
-                    if 'maj' in resu['libelle'].lower():
+                    if Blocs[name]['nom']=='MAJ': 
+#                    if 'maj' in resu['libelle'].lower():
                         maj2     += note2*resu['ects']/resu['bareme']*100
                         maj_ects += resu['ects']
                     ects += resu['ects']
                 if note1 not in (None, 'DIS') and resu['ects']!='':
                     session1 += note1*resu['ects']/resu['bareme']*100
-                    if 'maj' in resu['libelle'].lower(): maj1 += note1*resu['ects']/resu['bareme']*100
+                    if Blocs[name]['nom']=='MAJ': maj1 += note1*resu['ects']/resu['bareme']*100
+#                    if 'maj' in resu['libelle'].lower(): maj1 += note1*resu['ects']/resu['bareme']*100
 
 
             # Parcours à la carte

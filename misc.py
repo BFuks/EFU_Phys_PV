@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Boîte à outils                      ###
 ###                                                    ###
-###                Date: 22/01/2026                    ###
+###                Date: 10/02/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -97,7 +97,7 @@ def build_pv(liste_pvs, logger=None, newmaquette=False, dm=False):
     logger.info("Calcul de la moyenne annuelle...")
     MoyenneAnnuelle(data, logger=logger, newmaquette=newmaquette)
 
-    if dm and not newmaquette:
+    if dm:
         logger.info("Calcul des Blocs disciplinaires...")
         BlocsDisciplinaires(data, logger=logger)
 

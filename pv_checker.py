@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New PV Checker                      ###
 ###                                                    ###
-###                Date: 03/02/2026                    ###
+###                Date: 10/02/2026                    ###
 ###                                                    ###
 ##########################################################
 from itertools import product
@@ -57,9 +57,9 @@ def SanityCheck(pv, logger=None, newmaquette=False):
         from pv_writer import include_alacarte
         for key,vals in pv_data.items():
             if newmaquette and not include_alacarte(vals, flag=newmaquette): continue
+            if not newmaquette and not vals.get('active'): continue  # A cause de l'info et des maths -> à vérifier
             if key in done or not key in UEs.keys() or vals.get('note','') in ['DIS']: continue
             if key[:2] in ['L3', 'L4', 'L5', 'L6'] and vals.get('note',None)==None: continue
-            if 'LAD' in key: continue
             ue_note = vals.get("note", 0)
             if ue_note in ['ABI', 'ABJ']: ue_note=0
             ue_ects = UEs.get(key, {}).get("ects", None)
@@ -103,7 +103,7 @@ def CheckBlock(bloc, pv, tag, logger=None):
     for lst in Blocs[bloc]["UE"]: possible_sets.extend(expand_UE_list(lst, logger=logger))
     matching_set = None
     for ue_list in possible_sets:
-        if all(ue in pv.keys() for ue in ue_list):
+        if all(myue in [ue for ue in pv if pv[ue].get('active',True)] for myue in ue_list):
             matching_set = ue_list
             break
     if matching_set is None:
@@ -133,7 +133,7 @@ def CheckBlock(bloc, pv, tag, logger=None):
             continue
 
         # SX: on ignore
-        if ue in Blocs[bloc].get('SX', []) or ue_note in ['DIS'] or pv[ue].get('resultat',None) in ['VAC']: continue
+        if ue in Blocs[bloc].get('SX', []) or ue_note in ['DIS'] or (pv[ue].get('resultat',None) in ['VAC'] and ue_note==0): continue
 
         # Tout va bien, on calcule la moyenne du bloc
         score += ue_note*ue_ects/pv[ue]['bareme']
