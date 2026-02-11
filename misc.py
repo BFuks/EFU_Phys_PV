@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Boîte à outils                      ###
 ###                                                    ###
-###                Date: 10/02/2026                    ###
+###                Date: 11/02/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -84,7 +84,7 @@ def choose(prompt, options):
 ###          Fonction principale: choix du PV          ###
 ###                                                    ###
 ##########################################################
-def build_pv(liste_pvs, logger=None, newmaquette=False, dm=False):
+def build_pv(liste_pvs, logger=None, newmaquette=False, dm=False, filtre=None):
     # Initialsation
     data = {}
     for sem, sem_data in sorted(liste_pvs.items()):
@@ -102,7 +102,7 @@ def build_pv(liste_pvs, logger=None, newmaquette=False, dm=False):
         BlocsDisciplinaires(data, logger=logger)
 
     logger.info("Calcul des classements...")
-    AddRankings(data, logger=logger)
+    AddRankings(data, logger=logger, filtre=filtre)
 
 
     return data

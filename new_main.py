@@ -29,13 +29,14 @@ logger.info(f"PV sélectionné : {annee} | {niveau} | {parcours}")
 newmaquette = True if int(annee.split('-')[0])>2024 and niveau=='L2' else False
 
 # Construction du dictionnaire
-data = build_pv(catalogue[annee][niveau][parcours], logger=logger, newmaquette=newmaquette, dm=(parcours in ('DM', 'DK')))
+filtre='MA'
+data = build_pv(catalogue[annee][niveau][parcours], logger=logger, newmaquette=newmaquette, dm=(parcours in ('DM', 'DK')), filtre=filtre)
 
 # Génération du fichier PDF
-generate_pv_pdf(data, annee, niveau, parcours, logger=logger, filtre='')
+generate_pv_pdf(data, annee, niveau, parcours, logger=logger, filtre=filtre)
 
 # Génération des données 'stats' et production des histos et tartes
-stat_data = generate_stats(data, logger=logger, newmaquette=newmaquette, filtre='')
+stat_data = generate_stats(data, logger=logger, newmaquette=newmaquette, filtre=filtre)
 pies  = pies(stat_data, title = niveau + ' (' + annee + ') - ' + parcours)
 hists = histos(stat_data, title = niveau + ' (' + annee + ') - ' + parcours)
 save_plots(pies, hists, annee, niveau, parcours)

@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Générateur de PV PDF                ###
 ###                                                    ###
-###                Date: 09/02/2026                    ###
+###                Date: 11/02/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -37,7 +37,7 @@ def lighten(color, alpha=0.8):
 ###           Routine principale (squelette)           ###
 ###                                                    ###
 ##########################################################
-def generate_pv_pdf(data, annee, niveau, parcours, logger=None, filtre=''):
+def generate_pv_pdf(data, annee, niveau, parcours, logger=None, filtre=None):
     # Nom du fichier PDF
     date = str(datetime.now().year*10000+datetime.now().month*100+datetime.now().day)
     output = SimpleDocTemplate('output/'+annee.replace('-','_')+'_'+niveau+'_'+parcours + '_v' + date + ".pdf",
@@ -118,7 +118,7 @@ def format_session(label, note, resultat, rank, comp):
 
 
 # Fonction principale
-def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=''):
+def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=None):
     # Initialisation
     table = []
     cell_styles = []
@@ -278,7 +278,7 @@ def format_annee_bdisc(label, note, resultat, rank, comp, bdisc):
 
 
 # Fonction principale
-def build_student_cell(etu_id, data, logger=None, filtre=''):
+def build_student_cell(etu_id, data, logger=None, filtre=None):
 
     # Parcours
     pattern_mono   = re.compile(r"(\dSLPY|S\dLPY)")
@@ -293,13 +293,13 @@ def build_student_cell(etu_id, data, logger=None, filtre=''):
         MIN = next((k[3:5] for k,v in data['pv'][sorted(data['VET'])[-1]].items() if k in Blocs and k[3:5] != "PY" and v.get('note','')!=''), '')
         data['mineure'] = MIN
         parcours = 'MajPhys - Min' + mineures.get(MIN,'') if MIN!='' else 'MajPhys'
-        if filtre!='' and MIN!=filtre: return None, None
+        if filtre and MIN!=filtre: return None, None
     elif all(pattern_dm.search(vet) for vet in data['VET']):
         MAJ2 = next((k[3:5] for k,v in data['pv'][sorted(data['VET'])[-1]].items() if k in Blocs and k[3:5] != "PY" and v.get('note','')!=''), '')
         if not MAJ2: MAJ2 = next((k[3:5] for k,v in data['pv'][sorted(data['VET'])[0]].items() if k in Blocs and k[3:5] != "PY" and v.get('note','')!=''), '')
         data['majeure2'] = MAJ2
         parcours = 'DMPhys - ' + mineures.get(MAJ2,'') if MAJ2!='' else 'DMPhys'
-        if filtre!='' and MAJ2!=filtre: return None, None
+        if filtre and MAJ2!=filtre: return None, None
     else:
         parcours = '???'
         logger.error(f"[{data['nom']} ({etu_id})] Parcours indéfini (pv_writer, {data['VET']})")

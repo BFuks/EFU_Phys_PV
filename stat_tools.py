@@ -2,13 +2,13 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 03/02/2026                    ###
+###                Date: 11/02/2026                    ###
 ###                                                    ###
 ##########################################################
 from collections import defaultdict
 from maquette import Blocs, UEs
 from pv_writer import include_alacarte
-
+import re
 
 ##########################################################
 ###                                                    ###
@@ -29,20 +29,37 @@ def compute_ranks(note_list):
     return ranks
 
 
+# Fonction auxiliaire : détermination de la second discipline
+def Discipline2(pv, vets):
+    # Initialisation
+    pattern_maj = re.compile(r"(\dSVPY|S\dVPY)")
+    pattern_dm  = re.compile(r"(\dSQPY|S\dQPY|Q2PYDL)")
+    if all(pattern_maj.search(vet) for vet in vets):
+        return next((k[3:5] for k,v in pv[vets[-1]].items() if k in Blocs and k[3:5]!="PY" and v.get('active',True)),'')
+    elif all(pattern_dm.search(vet) for vet in vets):
+        MAJ2 = next((k[3:5] for k,v in pv[vets[-1]].items() if k in Blocs and k[3:5]!="PY" and v.get('active',True)),'')
+        if not MAJ2: MAJ2 = next((k[3:5] for k,v in pv[vets[0]].items() if k in Blocs and k[3:5]!="PY" and v.get('active',True)),'')
+        return MAJ2
 
-def AddRankings(data, logger=None):
+
+def AddRankings(data, logger=None, filtre=None):
     # Initialisation
     ue_notes1 = {}
     ue_notes2 = {}
 
     # boucle sur les étudiants
     for etu_id, etu_data in data.items():
+        # Filtre MAJ/MIN ou DM spécifique
+        if filtre and Discipline2(etu_data['pv'], sorted(etu_data['VET']))!=filtre: continue
+
         # VET et éléments des VET
         for vet, elements in etu_data['pv'].items():
             for myue, vals in elements.items():
                 # init and safety
                 if myue==vet: continue
                 ue = myue if myue!='Résultat' else vet
+
+
 
                 # notes session1
                 note = vals.get('note')
@@ -71,6 +88,9 @@ def AddRankings(data, logger=None):
 
     # Injection dans le PV
     for etu_id, etu_data in data.items():
+        # Filtre MAJ/MIN ou DM spécifique
+        if filtre and Discipline2(etu_data['pv'], sorted(etu_data['VET']))!=filtre: continue
+
         for vet, elements in etu_data['pv'].items():
             for myue, vals in elements.items():
                 # init
@@ -290,7 +310,7 @@ def update_result(res, comp, maj, note):
 
 
 # Fonction principale
-def generate_stats(data, logger=None, filtre='', newmaquette=False):
+def generate_stats(data, logger=None, filtre=None, newmaquette=False):
     # Initialisation
     logger.info(f"Génération des statistiques de réussite globales")
     resultats  = defaultdict(list)   # les 'AJ', 'ADM', ...
@@ -301,7 +321,8 @@ def generate_stats(data, logger=None, filtre='', newmaquette=False):
     # Boucle principale sur les PV
     for etu_data in data.values():
         # Filtre
-        if 'mineure' in etu_data.keys() and filtre!='' and etu_data['mineure']!=filtre: continue
+        if 'mineure' in etu_data.keys() and filtre and etu_data['mineure']!=filtre: continue
+        if 'majeure2' in etu_data.keys() and filtre and etu_data['majeure2']!=filtre: continue
 
         # Résultats annuels
         comp1_an = comp2_an = False
