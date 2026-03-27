@@ -2,8 +2,8 @@ data/*
 output/*
 histos/*
 trash/*
-cci/*
 logs/*
+presences/*
 SU_data
 genessai.*
 *.swp

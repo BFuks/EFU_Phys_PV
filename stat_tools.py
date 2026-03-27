@@ -2,12 +2,14 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 11/02/2026                    ###
+###                Date: 27/03/2026                    ###
 ###                                                    ###
 ##########################################################
 from collections import defaultdict
 from maquette import Blocs, UEs
+from pathlib import Path
 from pv_writer import include_alacarte
+import pandas as pd
 import re
 
 ##########################################################
@@ -134,7 +136,7 @@ def MoyenneAnnuelle(data, logger=None, newmaquette=False):
             for name, resu in etu_data['pv'][vet].items():
 
                 # On ne garde que les blocs
-                if not name in Blocs.keys(): continue
+                if not name in Blocs.keys() or not Blocs[name]: continue
 
                 # Notes sessions 1 et 2
                 note1 = resu.get('note')
@@ -376,4 +378,120 @@ def generate_stats(data, logger=None, filtre=None, newmaquette=False):
 
     # Output
     return { "resultats": dict(resultats), 'resultats2': dict(resultats2), "notes": dict(notes), "notes2": dict(notes2) }
+
+
+
+
+##########################################################
+###                                                    ###
+###                 Analyse  présences                 ###
+###                                                    ###
+##########################################################
+
+# Reformattage du dictionnaire des PV pour ne garder que ce qui est pertinent
+def reformat_dict(data, parcours):
+    # Initialisation
+    ue_data = {}
+
+    # Boucle sur le dictionnaire
+    for student_id, student_data in data.items():
+        for pv in student_data.get('pv', {}).values():
+            for code, result in pv.items():
+
+                # Restriction: que les UEs et que si il existe une note
+                if code not in UEs: continue
+                note = result.get('note')
+                if note is None: continue
+
+                # Sauvegarde
+                ue_data.setdefault(code, {})[student_id] = { 'note': note, 'parcours': parcours }
+
+    return ue_data
+
+# Fusion de deux dictionnaires
+def merge_ue_dicts(target, source):
+    for ue, students in source.items():
+        target.setdefault(ue, {})
+        target[ue].update(students)
+    return target
+
+# Nettoyage de l'info d'une colonne de présence
+def _extract_status(cell):
+    # Safety
+    if pd.isna(cell): return None
+    s = str(cell).strip()
+    if not s: return None
+
+    # Main
+    if s.startswith("P"): return "P"
+    if s.startswith("A"): return "A"
+    if s.startswith("E"): return "E"
+    if s.startswith("?"): return "?"
+
+    # Safety again
+    return None
+
+# Fonction auxiliaire pour charger un fichier de présences
+def load_presence_info(filepath):
+
+    # Initialisation
+    filepath = Path(filepath)
+    drop_cols = { "Nom de famille", "Prénom", "ID Étudiant", "Adresse de courriel", "P", "R", "E", "A", "Sessions prises", "Points", "Pourcentage"}
+    id_col = "Numéro d’identification"
+
+    # Lecture du fichier (entête standardisée) et conversion des cellules
+    df = pd.read_excel(filepath, header=3).dropna(how='all').reset_index(drop=True)
+    df = df[[c for c in df.columns if c not in drop_cols]]
+    simple_df = df.copy()
+    session_cols = [c for c in simple_df.columns if c != id_col]
+    simple_df.loc[:, session_cols] = simple_df.loc[:, session_cols].apply(lambda col: col.map(_extract_status))
+
+    # Sélection des colonnes fiables : au moins une valeur P ou A
+    kept_cols = [ col for col in session_cols if simple_df[col].isin(["P", "A"]).any() ]
+    if not kept_cols: return {}
+
+    # On ne garde que l'identifiant + les colonnes retenues
+    final_df = simple_df[[id_col] + kept_cols].copy()
+    final_df.loc[:, kept_cols] = final_df.loc[:, kept_cols]
+
+    # Calcul par étudiant
+    result = {}
+    for _, row in final_df.iterrows():
+        vals = row[kept_cols].tolist()
+        if sum(v in ("P", "A", "E") for v in vals)>0:
+            presence_rate = 100.0 * sum(v == "P" for v in vals) / sum(v in ("P", "A", "E") for v in vals)
+            sid = row[id_col]
+            try: sid = str(int(sid))
+            except (TypeError, ValueError): sid = str(sid).strip()
+            result[sid] = { "taux_presence": presence_rate }
+
+    # output
+    return result
+
+
+# Fonction principale pour ajouter l'info sur les présences
+def add_info_presences(ue_data, annee, logger=None):
+    # Initilisation
+    attendance_dir = Path("presences/data")
+
+    # Loop sur les pv disponibles
+    for ue_code, students in ue_data.items():
+        # Path
+        filepath = attendance_dir / f"{annee}-{ue_code}.xlsx"
+
+        # Safety
+        if not filepath.exists():
+            if logger: logger.debug(f"Pas de fichier de présence pour {ue_code}")
+            continue
+
+        # Processing
+        data_presences = load_presence_info(filepath)
+        for student_id in list(students.keys()):
+            if student_id in data_presences: students[student_id].update(data_presences[student_id])
+            else: del students[student_id]
+
+    # output
+    return ue_data
+
+
 

@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New XML Reader                      ###
 ###                                                    ###
-###                Date: 09/02/2026                    ###
+###                Date: 16/02/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -133,6 +133,7 @@ def Parse_xml_to_Dict(filename, logger=None):
                 if code.startswith('LY'): code = children_data.get("COD_ELP_LSE_TPW")
 
                 # 7) Output avec le patch double majeure
+                if not code: continue
                 if code.startswith('S3Q'):
                    if not element['active']: continue
                    else: PV['Résultat'] = element

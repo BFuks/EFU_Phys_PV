@@ -2,17 +2,21 @@
 ###                                                    ###
 ###             Pie charts et histogrammes             ###
 ###                                                    ###
-###                Date: 02/02/2026                    ###
+###                Date: 27/03/2026                    ###
 ###                                                    ###
 ##########################################################
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.ticker import AutoMinorLocator
 from collections import Counter
 from datetime import datetime
 import numpy as np
 import re
+from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 from maquette import UEs, Blocs
+
+
 
 ##########################################################
 ###                                                    ###
@@ -24,6 +28,7 @@ from maquette import UEs, Blocs
 Sup_Style = { 'family': 'sans-serif', 'color': 'black', 'fontsize': 15, 'fontweight': 'bold'}
 Title_Style = { 'family': 'sans-serif', 'color': 'darkred', 'fontsize': 12, 'fontweight':'bold'}
 Label_Style = { 'family': 'sans-serif', 'color':'darkblue', 'fontsize': 11}
+Tick_Style = {'color':'black', 'labelsize': 10}
 
 # Fonction auxiliaire (single pie chart)
 def pie(ax, values, title):
@@ -224,4 +229,102 @@ def save_plots(pies, histos, annee, niveau, parcours):
     with open(pv_pdf, 'wb') as f: writer.write(f)
 
 
+
+##########################################################
+###                                                    ###
+###                  Plots absentéisme                 ###
+###                                                    ###
+##########################################################
+import numpy as np
+import matplotlib.pyplot as plt
+
+def correlations_reussite_presence(ue_data, logger=None):
+    # Init and settings
+    plots_per_page = 6
+    ue_list = sorted([ue for ue, students in ue_data.items() if any(info.get('taux_presence') is not None for info in students.values())])
+    n_pages = int(np.ceil(len(ue_list) / plots_per_page))
+
+    figures = []
+    if logger: logger.info('Correlations présences/notes')
+    for page in range(n_pages):
+        fig, axes = plt.subplots(2, 3, figsize=(11.7, 8.3))  # A4 landscape
+        axes = axes.flatten()
+
+        start = page*plots_per_page
+        end = min(start+plots_per_page, len(ue_list))
+        subset = ue_list[start:end]
+
+        # Boucle sur les UE
+        for i, ue in enumerate(sorted(subset)):
+            if logger: logger.info('  --> UE ' + ue)
+            scatter_presence(axes[i], ue_data[ue], ue)
+
+        # masquer axes vides
+        for j in range(len(subset), plots_per_page): axes[j].axis('off')
+
+        # Output
+        plt.tight_layout()
+        figures.append(fig)
+
+    return figures
+
+# Couleurs par parcours
+def parcours_family(parcours):
+    if parcours == 'MONO': return 'MONO'
+    if parcours in ['MAJ', 'MAJPM']: return 'MAJ'
+    return 'Intensif'
+PARCOURS_COLORS = { 'Intensif': 'darkred', 'MONO': 'darkblue', 'MAJ': 'darkgreen'}
+
+def scatter_presence(ax, data, ue):
+    # Init
+    groups = {'Intensif': ([], []), 'MONO': ([], []), 'MAJ': ([], [])}
+
+    for student_id, info in data.items():
+        # Data extraction
+        taux = info.get('taux_presence')
+        note = info.get('note')
+        fam = parcours_family(info.get('parcours'))
+
+        # Safety
+        if 'taux_presence' not in info or info['taux_presence'] is None: continue
+        if note in ('ABI', 'ABJ'): note = 0
+
+        # save data
+        groups[fam][0].append(float(taux))
+        groups[fam][1].append(float(note))
+
+    if not any(groups[g][0] for g in groups):
+        ax.axis('off')
+        return
+
+    # Plot
+    for fam, (x, y) in groups.items():
+        if x: ax.scatter(x, y, s=8, alpha=0.8, color=PARCOURS_COLORS[fam], label=fam)
+
+    # Légende
+    ax.legend(loc='upper left', fontsize=8)
+
+    # Layout
+    ax.grid(True, linestyle='--', linewidth=0.5, alpha=0.7)
+    ax.xaxis.set_minor_locator(AutoMinorLocator(5))
+    ax.yaxis.set_minor_locator(AutoMinorLocator(5))
+    ax.set_xlim(-2, 102)
+    ax.set_ylim(-2, 102)
+    ax.set_xlabel("Taux de présence (%)", fontdict=Label_Style)
+    ax.set_ylabel("Note / 100", fontdict=Label_Style)
+    ax.set_title(ue + " - " + UEs[ue]['nom'], fontdict=Title_Style)
+    ax.tick_params(axis='both', **Tick_Style)
+    for label in ax.get_xticklabels() + ax.get_yticklabels(): label.set_fontfamily('sans-serif')
+
+# PDF file
+def save_scatters(figures, annee):
+    # Filename
+    date = str(datetime.now().year*10000 + datetime.now().month*100 + datetime.now().day)
+    filename = annee.replace('-', '_') + '_v' + date + '.pdf'
+    scatter_pdf = Path('presences/output')/filename
+
+    # sauvegarde des figures
+    with PdfPages(scatter_pdf) as pdf:
+        for fig in figures:
+            pdf.savefig(fig, bbox_inches='tight', pad_inches=0.15)
 

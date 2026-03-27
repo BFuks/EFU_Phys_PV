@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Maquette  Apogee                    ###
 ###                                                    ###
-###                Date: 10/02/2026                    ###
+###                Date: 17/02/2026                    ###
 ###                                                    ###
 ###                                                    ###
 ##########################################################
@@ -210,6 +210,7 @@ UEs = {
   'LU2PY532': {'ects': 6, 'nom':'ML'      },
 
   # L3 Phys
+  'LU3PY015': {'ects': 6, 'nom':'PhysExp2'},
   'LU3PY024': {'ects': 6, 'nom':'ProjAutn'},
   'LU3PY206': {'ects': 3, 'nom':'HistMeca'},
   'LU3PY101': {'ects': 6, 'nom':'PhysQ1'  },
