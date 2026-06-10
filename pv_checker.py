@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New PV Checker                      ###
 ###                                                    ###
-###                Date: 10/02/2026                    ###
+###                Date: 10/06/2026                    ###
 ###                                                    ###
 ##########################################################
 from itertools import product
@@ -42,7 +42,9 @@ def SanityCheck(pv, logger=None, newmaquette=False):
                 score += sc
                 maxi  += mx
                 done  += mtch
-                if Blocs[key]['nom']=='MAJ': maj = pv_data[key].get('note',None)/pv_data[key].get('bareme',100)*100
+                if Blocs[key]['nom'] == 'MAJ':
+                    note = pv_data[key].get('note')
+                    maj = note/pv_data[key].get('bareme',100)*100 if isinstance(note,(int,float)) else None
 
             # Une UE : vérification
             elif key in UEs.keys():
@@ -59,6 +61,7 @@ def SanityCheck(pv, logger=None, newmaquette=False):
             if newmaquette and not include_alacarte(vals, flag=newmaquette): continue
             if not newmaquette and not vals.get('active'): continue  # A cause de l'info et des maths -> à vérifier
             if key in done or not key in UEs.keys() or vals.get('note','') in ['DIS']: continue
+            if not isinstance(vals.get('note',''),(int, float)) and vals.get('resultat','') in ['VAC']: continue
             if key[:2] in ['L3', 'L4', 'L5', 'L6'] and vals.get('note',None)==None: continue
             ue_note = vals.get("note", 0)
             if ue_note in ['ABI', 'ABJ']: ue_note=0

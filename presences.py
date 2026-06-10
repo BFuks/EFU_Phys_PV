@@ -2,6 +2,7 @@ import getopt, sys, time
 from colored_log import Init
 from misc import scan_pv_files, choose, build_pv
 from stat_tools import reformat_dict, add_info_presences, merge_ue_dicts
+import pandas as pd
 from pathlib import Path
 from plots import correlations_reussite_presence, save_scatters
 
@@ -34,6 +35,11 @@ for niveau in ['L2', 'L3']:
         ue_new = add_info_presences(ue_new, annee.replace('-','_'), logger=logger)
         merge_ue_dicts(ue_data, ue_new)
 
+# Feuille excel avec les données
+df = pd.concat(
+   {ue: pd.DataFrame.from_dict(students, orient='index') for ue, students in ue_data.items()}
+).reset_index().rename(columns={'level_0': 'UE', 'level_1': 'student_id'})
+df.to_excel(f"presences/output/output_{annee.replace('-','_')}.xlsx", index=False)
 
 # Figures
 correls = correlations_reussite_presence(ue_data,logger=logger)

@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Maquette  Apogee                    ###
 ###                                                    ###
-###                Date: 17/02/2026                    ###
+###                Date: 09/06/2026                    ###
 ###                                                    ###
 ###                                                    ###
 ##########################################################
@@ -30,6 +30,9 @@ Blocs = {
     'LK3PYC00': { 'nom': "CMP", 'UE': [['LU2PY212', 'LU2PY220'], ['LU2PY041', 'LU2PY220']]},
     'LK3PYC01': { 'nom': "CMP", 'UE': [['LU2PY212', 'LU2PY520','LU2PY531']], 'SX':['LU2PY531']},
     'LB4PYJ00': { 'nom': "MAJ", 'UE': [['UL2PY125', 'UL2PY130', 'UL2PY131', 'UL2PY210']]},
+    'LB4PYJ02': { 'nom': "MAJ", 'UE': [['UL2PY125', 'UL2PY130', 'UL2PY131', 'UL2PY002']]},
+    'LB4PYJ03': { 'nom': "MAJ", 'UE': [['UL2PY125', 'UL2PY430', 'UL2PY431', 'UL2PY510']]},
+    'LB4PYJ04': { 'nom': "MAJ", 'UE': [['UL2PY218', 'UL2PY130', 'UL2PY131', 'UL2PY210']]},
     'LB4PY013': { 'nom': "MAJ", 'UE': [['UL2PY125', 'UL2PY130', 'UL2PY131', 'UL2PY210']]},
     'LK4PYJ03': { 'nom': "MAJ", 'UE': [['LU2PY404', 'LU2PY421', 'LU2PY423']]},
     'LK4PYJ05': { 'nom': "MAJ", 'UE': [['LU2PY126', 'LU2PY121', 'LU2PY123'],['LU2PY104','LU2PY121','LU2PY123']]},
@@ -39,6 +42,9 @@ Blocs = {
     'LK4PYJ23': { 'nom': "MAJ", 'UE': [['LU2PY215', 'LU2PY121', 'LU2PY123']]},
     'LK4PYJ24': { 'nom': "MAJ", 'UE': [['LU2PY126', 'LU2PY121']]},
     'LB4PYC00': { 'nom': "CMP", 'UE': [['UL2PY215', 'UL2PY216', 'UL2LVAN2']]},
+    'LB4PYC01': { 'nom': "CMP", 'UE': [['UL2PY006', 'UL2CI101', 'UL2PYS01']], 'SX':['UL2PYS01']},
+    'LB4PYC03': { 'nom': "CMP", 'UE': [['UL2PY004', 'UL2PY215', 'UL2PY003', 'UL2LVAN2']], 'SX':['UL2PY003']},
+    'LB4PYC04': { 'nom': "CMP", 'UE': [['UL2PY128', 'UL2PY215', 'UL2LAD02']]},
     'LK4PYC00': { 'nom': "CMP", 'UE': [['LU2PY215', 'LU2PY222']]},
     'LK4PYC01': { 'nom': "CMP", 'UE': [['LU2PY215', 'LU2PY222', 'LU2PY532']], 'SX':['LU2PY532']},
     'LK4PYC04': { 'nom': "CMP", 'UE': [['LU2CI101', 'LU2PY127', 'LU2PY102']], 'SX':['LU2PY102']},
@@ -191,13 +197,14 @@ UEs = {
   'LU2PY124': {'ects': 3, 'nom':'Relat'   },
   'LU2PY125': {'ects': 3, 'nom':'Climat'  },   'UL2PY125': {'ects': 3, 'nom':'Climat'  },
   'LU2PY126': {'ects': 6, 'nom':'MecaRel' },   'UL2PY126': {'ects': 6, 'nom':'MecaRel' },
-  'LU2PY127': {'ects': 6, 'nom':'PrjSptil'},
+  'LU2PY127': {'ects': 6, 'nom':'PrjSptil'},   'UL2PY128': {'ects': 3, 'nom':'IntroMQ' },
                                                'UL2PY130': {'ects': 6, 'nom':'Ondes'   },
                                                'UL2PY131': {'ects': 6, 'nom':'Elctrmag'},
   'LU2PY215': {'ects': 3, 'nom':'PhysExp2'},   'UL2PY215': {'ects': 3, 'nom':'PhysExp2'},
                                                'UL2PY216': {'ects': 3, 'nom':'CmplPhys'},
   'LU2PY212': {'ects': 6, 'nom':'PhysExp1'},   'UL2PY212': {'ects': 6, 'nom':'PhysExp1'},
   'LU2PY220': {'ects': 6, 'nom':'MathCmp' },   'UL2PY210': {'ects': 6, 'nom':'Maths 2' },
+                                               'UL2PY218': {'ects': 3, 'nom':'Maths 3' },
   'LU2PY222': {'ects': 6, 'nom':'PhysNum' },   'UL2PY222': {'ects': 6, 'nom':'PhysNum' },
   'LU2PY403': {'ects': 6, 'nom':'Thermo'  },   'UL2PY403': {'ects': 6, 'nom':'Thermo'  },
   'LU2PY404': {'ects': 6, 'nom':'MecaRel' },
@@ -205,11 +212,19 @@ UEs = {
   'LU2PY421': {'ects':12, 'nom':'OEM'     },
   'LU2PY423': {'ects': 3, 'nom':'Math-S4' },
   'LU2PY424': {'ects': 3, 'nom':'Relat'   },   'UL2PY426': {'ects': 6, 'nom':'MecaRel' },
-  'LU2PY520': {'ects': 6, 'nom':'MathCmp' },
+  'LU2PY520': {'ects': 6, 'nom':'MathCmp' },   'UL2PY510': {'ects': 6, 'nom':'Maths 2' },
+                                               'UL2PY430': {'ects': 6, 'nom':'Ondes'   },
+                                               'UL2PY431': {'ects': 6, 'nom':'Elctrmag'},
   'LU2PY531': {'ects': 6, 'nom':'Astro'   },   'UL2PY001': {'ects': 6, 'nom':'Astro'   },
-  'LU2PY532': {'ects': 6, 'nom':'ML'      },
+                                               'UL2PY002': {'ects': 3, 'nom':'Maths 2' },
+  'LU2PY532': {'ects': 6, 'nom':'ML'      },   'UL2PY003': {'ects': 6, 'nom':'ML'      },
+                                               'UL2PY004': {'ects': 3, 'nom':'MecaAnl' },
+                                               'UL2PY006': {'ects': 6, 'nom':'PrjSpatl'},
+                                               'UL2PYS01': {'ects': 6, 'nom':'StageNtr'},
 
   # L3 Phys
+  'LU3PY002': {'ects': 6, 'nom':'PhysNum' },
+  'LU3PY012': {'ects': 6, 'nom':'PhysExp1'},
   'LU3PY015': {'ects': 6, 'nom':'PhysExp2'},
   'LU3PY024': {'ects': 6, 'nom':'ProjAutn'},
   'LU3PY206': {'ects': 3, 'nom':'HistMeca'},
@@ -230,7 +245,9 @@ UEs = {
   'LU3PY233': {'ects': 6, 'nom':'PhysTheo'},
   'LU3PY234': {'ects': 6, 'nom':'OcnAtm'  },
   'LU3PY235': {'ects': 6, 'nom':'MecaAnl' },
+  'UL3PY317': {'ects': 3, 'nom':'Astro'   },
   'UL3PY318': {'ects': 3, 'nom':'Spectro' },
+  'UL3PY319': {'ects': 3, 'nom':'QInfo'   },
   'LU3PY401': {'ects': 6, 'nom':'PhysQ1'  },
   'LU3PY403': {'ects': 6, 'nom':'Thermo'  },
   'LU3PY411': {'ects': 6, 'nom':'PhysQ2'  },
@@ -240,13 +257,14 @@ UEs = {
   'LU3PY536': {'ects': 6, 'nom':'MecaRel' },
   'LU3PY537': {'ects': 6, 'nom':'InfoQ'   },
   'LU3PYOIP': {'ects': 3, 'nom':'OIP'     },
+  'LU3PYSO3': {'ects': 6, 'nom':'Stage'   },
 
   # Autres Departements
   'UL2CI004': {'ects': 3, 'nom':'RsquesCh'},
   'LU2CI011': {'ects': 6, 'nom':'Thermo'  },   'UL2CI011': {'ects': 6, 'nom':'Thermo'  },
   'LU2CI012': {'ects': 6, 'nom':'ChimInrg'},   'UL2CI012': {'ects': 6, 'nom':'ChimInrg'},
   'LU2CI031': {'ects': 6, 'nom':'CinChim' },   'UL2CI031': {'ects': 3, 'nom':'CinChim' },
-  'LU2CI101': {'ects': 3, 'nom':'Liaisons'},
+  'LU2CI101': {'ects': 3, 'nom':'Liaisons'},   'UL2CI101': {'ects': 3, 'nom':'Liaisons'},
   'LU2CI102': {'ects': 6, 'nom':'ChimOrga'},
   'LU2CI105': {'ects': 6, 'nom':'Spectro' },
   'LU3CI003': {'ects': 3, 'nom':'Polymrs' },
@@ -411,7 +429,7 @@ UEs = {
   # Langues
   'LU2LVAN1': {'ects': 3, 'nom':'Anglais' },  'UL2LVAN2': {'ects': 3, 'nom':'Anglais' },
   'LU3LVAN2': {'ects': 3, 'nom':'Anglais' },
-  'UL2LAD01': {'ects': 3, 'nom':'Language'},
-  'UL3LAD01': {'ects': 3, 'nom':'Language'}
+  'UL2LAD01': {'ects': 3, 'nom':'Language'},  'UL2LAD02': {'ects': 3, 'nom':'Language'},
+  'UL3LAD01': {'ects': 3, 'nom':'Language'},  'UL3LAD02': {'ects': 3, 'nom':'Language'}
 }
 

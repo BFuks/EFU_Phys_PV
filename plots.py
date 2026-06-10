@@ -272,12 +272,14 @@ def correlations_reussite_presence(ue_data, logger=None):
 def parcours_family(parcours):
     if parcours == 'MONO': return 'MONO'
     if parcours in ['MAJ', 'MAJPM']: return 'MAJ'
+    if parcours in ['SPRINT']: return 'SPRINT'
     return 'Intensif'
-PARCOURS_COLORS = { 'Intensif': 'darkred', 'MONO': 'darkblue', 'MAJ': 'darkgreen'}
+
+PARCOURS_COLORS = { 'Intensif': 'darkred', 'MONO': 'darkblue', 'MAJ': 'darkgreen', 'SPRINT': 'teal'}
 
 def scatter_presence(ax, data, ue):
     # Init
-    groups = {'Intensif': ([], []), 'MONO': ([], []), 'MAJ': ([], [])}
+    groups = {'Intensif': ([], []), 'MONO': ([], []), 'MAJ': ([], []), 'SPRINT' : ([], []) }
 
     for student_id, info in data.items():
         # Data extraction
