@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Générateur de PV PDF                ###
 ###                                                    ###
-###                Date: 11/02/2026                    ###
+###                Date: 12/06/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -165,7 +165,7 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=None):
 
             # Moyenne semestrielle
             res = pv.get("Résultat", {})
-            sem_txt = "S3" if vet =="Q2PYDL" else ''.join(sorted(vet[:2], key=str.isdigit))
+            sem_txt = "S3" if vet =="Q2PYDL1" else ("S4" if vet =="Q2PYDL2" else ''.join(sorted(vet[:2], key=str.isdigit)))
             txt = f"<b>{sem_txt}</b><br />"
             note1 = f"{res.get('note'):.2f}/{res.get('bareme','')}" if 'note' in res.keys() else res.get('resultat')
 
@@ -198,7 +198,7 @@ def build_pv_data(data, num_ues, logger=None, alacarte=False, filtre=None):
                     colorname = colors.blue if Blocs[bloc]['nom']=='MAJ' else colors.green
                     if pv[bloc].get('resultat') in ('DIS', 'NCAE', 'ENCO'): continue
                     if pv[bloc].get('resultat') == None and pv[bloc].get('note2',pv[bloc].get('note',None))==None: continue
-                    txt += f"<font color=\'{colorname}\'>{Blocs[bloc]['nom']} : {pv[bloc].get('note2',pv[bloc].get('note')):.2f}/{pv[bloc].get('bareme','')}</font><br />"
+                    txt += f"<font color=\'{colorname}\'>{Blocs[bloc]['nom']} : {pv[bloc].get('note2',pv[bloc].get('note',0)):.2f}/{pv[bloc].get('bareme','')}</font><br />"
             row.append(Paragraph(txt, StyleCell))
 
             # UEs
@@ -255,14 +255,18 @@ mineures = {
    'AL': 'Allemand', 'CH': 'Chinois', 'CI':'Chimie', 'DS':'DataScience',
    'EE': 'Elec', 'EV': 'Environnement', 'GS':'Gestion', 'HI':'Histoire',
    'HN':'HistNat', 'IA':'InnovSanté', 'IN':'Info', 'MA':'Maths',
-   'ME':'Meca', 'MT':'MédScient', 'PH':'Philo', 'PT':'ProfEcole', 'ST':'SdT'
+   'ME':'Meca', 'MT':'MédScient', 'PH':'Philo', 'PT':'ProfEcole', 'ST':'SdT',
+   'FL':'FL'
 }
 
 # Fonctions auxiliaires : formattage texte
 def format_annee(label, note, maj, resultat, rank, comp):
     color = colors.black if resultat=='ADM' and not comp else (colors.orange if resultat=='ADM' else colors.red)
-    color_maj = '\'grey\'' if maj>=50 else colors.red
-    return f"<br /><b>{label} : <font color='{color}'>{note:.2f}</font></b><font color='grey' size='7'> (#{rank} ; MAJ : <font color={color_maj}>{maj:.2f}/100</font>)</font>"
+    if maj is None: maj_txt = "MAJ : —"
+    else:
+        color_maj = "'grey'" if maj >= 50 else colors.red
+        maj_txt = f"MAJ : <font color={color_maj}>{maj:.2f}/100</font>"
+    return  f"<br /><b>{label} : <font color='{color}'>{note:.2f}</font></b><font color='grey' size='7'> (#{rank} ; {maj_txt})</font>"
 
 
 def format_annee_bdisc(label, note, resultat, rank, comp, bdisc):

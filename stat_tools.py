@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 27/03/2026                    ###
+###                Date: 12/06/2026                    ###
 ###                                                    ###
 ##########################################################
 from collections import defaultdict
@@ -119,75 +119,139 @@ def AddRankings(data, logger=None, filtre=None):
 ###                  Moyenne annuelle                  ###
 ###                                                    ###
 ##########################################################
-def MoyenneAnnuelle(data, logger=None, newmaquette=False):
+#Bcp de hlpers pour rendre la fonction princnipale claire et compacte
+def clean_note(note): return 0 if note in ('ABI', 'ABJ') else note
 
+def is_valid_note(note): return note not in (None, 'DIS', 'VAC')
+
+def get_ue_ects(ue, resu_ue):
+    ects = UEs.get(ue, {}).get('ects', resu_ue.get('ects'))
+    return None if ects in (None, '') else ects
+
+def get_matching_ue_set(bloc, pv_vet):
+    ue_sets = Blocs[bloc].get('UE', [])
+    for ue_set in ue_sets:
+        if all( ue in pv_vet and pv_vet[ue].get('active', True) for ue in ue_set): return ue_set
+    return []
+
+def effective_block_ects(bloc, pv_vet, session=1):
+    # Init
+    ue_set = get_matching_ue_set(bloc, pv_vet)
+    total = 0.0
+    used_ues = set()
+    for ue in ue_set:
+        # Safety
+        if ue not in pv_vet: continue
+        resu_ue = pv_vet[ue]
+        if not resu_ue.get('active', True): continue
+
+        # note
+        note = (resu_ue.get('note2', resu_ue.get('note')) if session==2 else resu_ue.get('note'))
+        note = clean_note(note)
+        if not is_valid_note(note): continue
+
+        # ECTS
+        ects = get_ue_ects(ue, resu_ue)
+        if ects is None: continue
+        total += ects
+        used_ues.add(ue)
+
+    # output
+    return total, used_ues
+
+
+def MoyenneAnnuelle(data, logger=None, newmaquette=False):
     # Boucle sur les étudiants
     for etu_id, etu_data in data.items():
+        # Si une VET est ENCO/NCAE, on ne calcule pas l'année.
         if any(vet_data.get('Résultat', {}).get('resultat') in ['ENCO', 'NCAE'] for vet_data in etu_data.get('pv', {}).values()): continue
-        session1 = maj1 = session2 = maj2 = ects = maj_ects = 0
+
+        # Init
+        session1 = session2 = ects1 = ects2 = 0
+        maj1 = maj2 = maj_ects1 = maj_ects2 = 0
 
         # Boucle sur les VET
         for vet in etu_data['VET']:
+            # Init
             logger.debug(f"[{etu_data['nom']} ({etu_id})] Calcul de la moyenne pour la VET {vet}")
-            # Calcul de moyenne non nécessaire
-            if etu_data['pv'][vet]['Résultat']['resultat'] in ['NCAE', 'ENCO']: continue
+            pv_vet = etu_data['pv'][vet]
+            used_ues1 = set()
+            used_ues2 = set()
 
-            # Calcul des moyennes annuelles session1 et session2
-            for name, resu in etu_data['pv'][vet].items():
+            # Calcul des moyennes annuelles session1 et session2 (blocs)
+            for name, resu in pv_vet.items():
 
                 # On ne garde que les blocs
-                if not name in Blocs.keys() or not Blocs[name]: continue
+                if name not in Blocs.keys() or not Blocs[name]: continue
+                if not resu.get('active',True): continue
 
-                # Notes sessions 1 et 2
-                note1 = resu.get('note')
-                note2 = resu.get('note2', note1)
+                # Notes sessions 1 et 2 + quelques infos
+                note1 = clean_note(resu.get('note'))
+                note2 = clean_note(resu.get('note2', note1))
+                bareme = resu.get('bareme', 100)
+                is_maj = (Blocs[name].get('nom') == 'MAJ')
 
-                # Calculs
-                if note2 not in (None, 'DIS') and resu['ects']!='':
-                    session2 += note2*resu['ects']/resu['bareme']*100
-                    if Blocs[name]['nom']=='MAJ': 
-#                    if 'maj' in resu['libelle'].lower():
-                        maj2     += note2*resu['ects']/resu['bareme']*100
-                        maj_ects += resu['ects']
-                    ects += resu['ects']
-                if note1 not in (None, 'DIS') and resu['ects']!='':
-                    session1 += note1*resu['ects']/resu['bareme']*100
-                    if Blocs[name]['nom']=='MAJ': maj1 += note1*resu['ects']/resu['bareme']*100
-#                    if 'maj' in resu['libelle'].lower(): maj1 += note1*resu['ects']/resu['bareme']*100
+                # ECTS effectifs reconstruits depuis les UE du bloc
+                bloc_ects1, bloc_ues1 = effective_block_ects(name, pv_vet, session=1)
+                bloc_ects2, bloc_ues2 = effective_block_ects(name, pv_vet, session=2)
+                used_ues1.update(bloc_ues1)
+                used_ues2.update(bloc_ues2)
 
+                # Calculs session 1
+                if is_valid_note(note1) and bloc_ects1:
+                    contribution1 = note1 * bloc_ects1 / bareme * 100.0
+                    session1 += contribution1
+                    ects1 += bloc_ects1
+                    if is_maj:
+                        maj1 += contribution1
+                        maj_ects1 += bloc_ects1
 
-            # Parcours à la carte
-            if newmaquette and session1==0 and ects==0:
-                for name, resu in etu_data['pv'][vet].items():
+                # Calculs session 2
+                if is_valid_note(note2) and bloc_ects2:
+                    contribution2 = note2 * bloc_ects2 / bareme * 100.0
+                    session2 += contribution2
+                    ects2 += bloc_ects2
+                    if is_maj:
+                        maj2 += contribution2
+                        maj_ects2 += bloc_ects2
 
-                    # On ne garde que les UEs
-                    if not name in UEs.keys() or not include_alacarte(resu, flag=newmaquette): continue
+            # Ajout systématique des UE actives non déjà utilisées par un bloc
+            for name, resu in pv_vet.items():
+                # On ne garde que les UE actives
+                if name not in UEs: continue
+                if not resu.get('active', True): continue
 
-                    # Notes sessions 1 et 2
-                    note1 = 0 if resu.get('note') in ('ABI', 'ABJ') else resu.get('note')
-                    note2 = 0 if resu.get('note2', note1) in ('ABI', 'ABJ') else resu.get('note2', note1)
+                # ECTS, notes et barème
+                ects = get_ue_ects(name, resu)
+                if ects is None: continue
+                bareme = resu.get('bareme', 100)
+                note1 = clean_note(resu.get('note'))
+                note2 = clean_note(resu.get('note2', note1))
 
-                    # Calculs
-                    if note2 not in (None, 'DIS'):
-                        session2 += note2*UEs[name]['ects']/resu['bareme']*100
-                        ects += UEs[name]['ects']
-                    if note1 not in (None, 'DIS'):
-                        session1 += note1*UEs[name]['ects']/resu['bareme']*100
+                # Session 1 : seulement si l'UE n'a pas déjà été absorbée par un bloc
+                if name not in used_ues1 and is_valid_note(note1):
+                    session1 += note1 * ects / bareme * 100.0
+                    ects1 += ects
+                # Session 2 : idem
+                if name not in used_ues2 and is_valid_note(note2):
+                    session2 += note2 * ects / bareme * 100.0
+                    ects2 += ects
 
         # Résultats
-        if ects:
-            session1 = session1/(5.*ects)
-            session2 = session2/(5.*ects)
-            if maj_ects:
-                maj1 = maj1/maj_ects
-                maj2 = maj2/maj_ects
-            if newmaquette and maj_ects:
-                resu1 = 'ADM' if (session1>=10 and maj1>=50) else 'AJ'
-                resu2 = 'ADM' if (session2>=10 and maj2>=50) else 'AJ'
+        if ects1:
+            moyenne1 = session1 / (5.0 * ects1)
+            moyenne2 = session2 / (5.0 * ects2)
+            maj_moy1 = maj1 / maj_ects1 if maj_ects1 else None
+            maj_moy2 = maj2 / maj_ects2 if maj_ects2 else None
+            if newmaquette and maj_moy1 is not None:
+                resu1 = 'ADM' if moyenne1 >= 10 and maj_moy1 >= 50 else 'AJ'
+                resu2 = 'ADM' if moyenne2 >= 10 and maj_moy2 >= 50 else 'AJ'
             else:
-                resu1 = 'ADM' if session1>=10 else 'AJ'
-                resu2 = 'ADM' if session2>=10 else 'AJ'
-            etu_data['annee'] = {'note':session1, 'resultat':resu1, 'note2':session2, 'resultat2':resu2, 'maj1_1':maj1, 'maj1_2':maj2}
+                resu1 = 'ADM' if moyenne1 >= 10 else 'AJ'
+                resu2 = 'ADM' if moyenne2 >= 10 else 'AJ'
+
+            # Output
+            etu_data['annee'] = {'note':moyenne1, 'resultat':resu1, 'note2':moyenne2, 'resultat2':resu2, 'maj1_1':maj_moy1, 'maj1_2':maj_moy2}
 
 
 ##########################################################
@@ -231,7 +295,7 @@ def BlocsDisciplinaires(data, logger=None):
                 if not ects: continue
 
                 # Notes sessions 1 et 2 et bloc associé à l'UE
-                bloc = next((b for b in blocs if b in ue), None)
+                bloc = next((b for b in blocs if b.replace('FL','SX') in ue), None)
                 if bloc is None: continue
                 note1 = resu.get('note') if not resu.get('note') in ['ABI','ABJ'] else 0
                 note2 = resu.get('note2',note1) if not resu.get('note2',note1) in ['ABI','ABJ'] else 0
