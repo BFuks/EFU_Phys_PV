@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New PV Checker                      ###
 ###                                                    ###
-###                Date: 12/06/2026                    ###
+###                Date: 07/07/2026                    ###
 ###                                                    ###
 ##########################################################
 from itertools import product
@@ -13,7 +13,7 @@ from maquette import Blocs, UEs, Listes
 ###          Vérification des données APOGEE           ###
 ###                                                    ###
 ##########################################################
-def SanityCheck(pv, logger=None, newmaquette=False):
+def SanityCheck(pv, logger=None, newmaquette=False, session2=False):
     # Boucle sur les étudiants
     for student_id, student_data in pv.items():
         # Init
@@ -33,9 +33,8 @@ def SanityCheck(pv, logger=None, newmaquette=False):
             # Un bloc : vérification
             elif key in Blocs.keys():
 
-                # safety: blocs vides et chapeaux
-                if not 'nom' in Blocs[key].keys(): continue
-                if not pv_data[key]['active']: continue
+                # Safety: blocs vides et chapeaux
+                if not 'nom' in Blocs[key].keys() or not pv_data[key]['active']: continue
 
                 # calcul de la note
                 sc, mx, mtch = CheckBlock(key, pv_data, tag, logger=logger)
@@ -73,7 +72,7 @@ def SanityCheck(pv, logger=None, newmaquette=False):
             maxi +=ue_ects
 
         # 3) Vérification de la moyenne d'année
-        CheckSemestre(score, maxi, maj, comp, pv_data, tag, logger=logger, newmaquette=newmaquette)
+        CheckSemestre(score, maxi, maj, comp, pv_data, tag, logger=logger, newmaquette=newmaquette, session2=session2)
 
         # Exit
         logger.debug("OK")
@@ -199,7 +198,7 @@ def CheckUE(ue, data, tag, logger=None):
 ###         Vérification du résultat semestriel        ###
 ###                                                    ###
 ##########################################################
-def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=False):
+def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=False, session2=False):
     # Initialisation et safety
     logger.debug(f"  - Vérification de la moyenne semestrielle")
     if "Résultat" not in data.keys(): logger.warning(f"{tag} Aucune entrée 'Résultat' dans le PV")
@@ -228,7 +227,7 @@ def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=Fa
         if resultat=='ADM' and not comp:
           logger.warning(f"{tag} Résultat incorrect pour l'année : "
              f"attendu={resultat}, PV={data['Résultat']['resultat']}")
-        elif resultat=='ADM' and comp:
+        elif resultat=='ADM' and comp and not session2:
           logger.warning(f"{tag} Refus de compensation pour le semestre")
         elif newmaquette and resultat=='AJ':
           logger.warning(f"{tag} Le résultat de la VET devrait être AJ")

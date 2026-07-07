@@ -134,7 +134,7 @@ def Parse_xml_to_Dict(filename, logger=None):
 
                 # 7) Output avec le patch double majeure
                 if not code: continue
-                if code.startswith('S3Q'):
+                if code.startswith('S3Q') or code.startswith('S4Q'):
                    if not element['active']: continue
                    else: PV['Résultat'] = element
                 elif code is not None and not code in ['Observat.']: PV[code] = element

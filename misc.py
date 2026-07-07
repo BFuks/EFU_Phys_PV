@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Boîte à outils                      ###
 ###                                                    ###
-###                Date: 11/02/2026                    ###
+###                Date: 07/07/2026                    ###
 ###                                                    ###
 ##########################################################
 import re
@@ -126,7 +126,7 @@ def load_semester(sem_data, logger=None, newmaquette=False):
     if 'Session2' in sem_data:
         logger.info("  -> Session 2...")
         dic_sess2 = Parse_xml_to_Dict(sem_data['Session2'], logger=logger)
-        SanityCheck(dic_sess2['students'], logger=logger)
+        SanityCheck(dic_sess2['students'], logger=logger, session2=True)
         return MergeSessions(dic_sess1, dic_sess2, logger=logger)
 
     # Pas de session 2 => formatage

@@ -255,7 +255,7 @@ mineures = {
    'AL': 'Allemand', 'CH': 'Chinois', 'CI':'Chimie', 'DS':'DataScience',
    'EE': 'Elec', 'EV': 'Environnement', 'GS':'Gestion', 'HI':'Histoire',
    'HN':'HistNat', 'IA':'InnovSanté', 'IN':'Info', 'MA':'Maths',
-   'ME':'Meca', 'MT':'MédScient', 'PH':'Philo', 'PT':'ProfEcole', 'ST':'SdT',
+   'ME':'Meca', 'MT':'MédScient', 'PH':'Philo', 'PT':'ProfEcole', 'ST':'SdT', 'SV':'SdV',
    'FL':'FL'
 }
 

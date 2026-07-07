@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 12/06/2026                    ###
+###                Date: 07/07/2026                    ###
 ###                                                    ###
 ##########################################################
 from collections import defaultdict
@@ -102,7 +102,7 @@ def AddRankings(data, logger=None, filtre=None):
                 if ue in ue_ranks1.keys() and etu_id in ue_ranks1[ue]: vals["rank"] = ue_ranks1[ue][etu_id]
 
                 # Classement session 2
-                if ue in ue_ranks2.keys() and 'note2' in vals.keys(): vals["rank2"] = ue_ranks2[ue][etu_id]
+                if ue in ue_ranks2.keys() and etu_id in ue_ranks2[ue] and 'note2' in vals.keys(): vals["rank2"] = ue_ranks2[ue][etu_id]
 
         if 'annee' in etu_data.keys():
             # Classement session 1

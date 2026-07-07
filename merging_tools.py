@@ -2,7 +2,7 @@
 ###                                                    ###
 ###               Outils de Fusion de PV               ###
 ###                                                    ###
-###                Date: 19/01/2025                    ###
+###                Date: 07/07/2026                    ###
 ###                                                    ###
 ##########################################################
 
@@ -43,10 +43,11 @@ def MergeSessions(session1, session2, logger=None):
                     pv[etu_id]['pv'][session1['VET']][ue] = dict(data)
                     continue
                 if not 'note' in data.keys(): continue
+                sess1=True if 'note' in pv[etu_id]['pv'][session1['VET']][ue].keys() else False
 
                 # UE présente dans les deux sessions
                 # 1) Check la note n'a pas diminué
-                note1 = 0 if pv[etu_id]['pv'][session1['VET']][ue]["note"] in ['ABI', 'ABJ'] else pv[etu_id]['pv'][session1['VET']][ue]["note"]
+                note1 = 0 if (not sess1 or pv[etu_id]['pv'][session1['VET']][ue]["note"] in ['ABI', 'ABJ']) else pv[etu_id]['pv'][session1['VET']][ue]["note"]
                 note2 = 0 if data["note"] in ['ABI', 'ABJ'] else data['note']
                 if note1 > note2:
                     logger.error(f"[{pv[etu_id]['nom']} ({etu_id})] note de {ue} en session 2 ({data['note']}) "
