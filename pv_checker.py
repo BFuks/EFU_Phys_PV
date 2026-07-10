@@ -2,7 +2,7 @@
 ###                                                    ###
 ###                New PV Checker                      ###
 ###                                                    ###
-###                Date: 07/07/2026                    ###
+###                Date: 09/07/2026                    ###
 ###                                                    ###
 ##########################################################
 from itertools import product
@@ -24,6 +24,9 @@ def SanityCheck(pv, logger=None, newmaquette=False, session2=False):
         maj   = None
         comp  = False
         done = []
+
+        # Safety
+        if len( [ [ue, pv_data[ue]] for ue in pv_data.keys() if pv_data[ue].get('active',False) and ue!='Résultat'])==0: continue
 
         # 1) Vérification des blocs et des UEs
         for key in pv_data.keys():
@@ -52,7 +55,7 @@ def SanityCheck(pv, logger=None, newmaquette=False, session2=False):
                 if not note_str in ['DIS'] and (note_str in ['ABI', 'ABJ'] or pv_data[key].get('note',0)<50): comp = True
 
             # Problème...
-            else: logger.warning(f"{tag} Bloc/UE inconnu dans le PV : {key}")
+            elif pv_data[key].get('active',False): logger.warning(f"{tag} Bloc/UE inconnu dans le PV : {key}")
 
         # 2) UEs hors blocs
         from pv_writer import include_alacarte
@@ -216,8 +219,7 @@ def CheckSemestre(score, maxi, maj, comp, data, tag, logger=None, newmaquette=Fa
     # 1) Vérification moyenne
     annee = (1 if (score==0 and maxi==0) else score/maxi)*data['Résultat']['bareme']+data["Résultat"].get('pnt_jury',0)
     note_pv  = data["Résultat"]["note"]
-    if abs(annee-note_pv)>5e-2:
-        logger.error(f"{tag} Différence de moyenne semestrielle : calculée={annee:.3f}, PV={note_pv}")
+    if abs(annee-note_pv)>5e-2: logger.error(f"{tag} Différence de moyenne semestrielle : calculée={annee:.3f}, PV={note_pv}")
 
     # 2) Vérification du résultat semestriel
     if newmaquette and maj!=None: resultat = "ADM" if (note_pv>=10 and maj>=50) else "AJ"

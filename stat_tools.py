@@ -2,12 +2,13 @@
 ###                                                    ###
 ###                Outils  statistiques                ###
 ###                                                    ###
-###                Date: 07/07/2026                    ###
+###                Date: 10/07/2026                    ###
 ###                                                    ###
 ##########################################################
 from collections import defaultdict
 from maquette import Blocs, UEs
 from pathlib import Path
+from pv_checker import expand_UE_list
 from pv_writer import include_alacarte
 import pandas as pd
 import re
@@ -130,7 +131,9 @@ def get_ue_ects(ue, resu_ue):
 
 def get_matching_ue_set(bloc, pv_vet):
     ue_sets = Blocs[bloc].get('UE', [])
-    for ue_set in ue_sets:
+    expanded = []
+    for ue_set in ue_sets: expanded.extend(expand_UE_list(ue_set))
+    for ue_set in expanded:
         if all( ue in pv_vet and pv_vet[ue].get('active', True) for ue in ue_set): return ue_set
     return []
 
@@ -153,7 +156,7 @@ def effective_block_ects(bloc, pv_vet, session=1):
         # ECTS
         ects = get_ue_ects(ue, resu_ue)
         if ects is None: continue
-        total += ects
+        if not ue in Blocs[bloc].get('SX',[]): total += ects
         used_ues.add(ue)
 
     # output
@@ -163,6 +166,10 @@ def effective_block_ects(bloc, pv_vet, session=1):
 def MoyenneAnnuelle(data, logger=None, newmaquette=False):
     # Boucle sur les étudiants
     for etu_id, etu_data in data.items():
+        if '21313665' == etu_id:
+            for vet in etu_data['VET']:
+                pv_vet = etu_data['pv'][vet]
+
         # Si une VET est ENCO/NCAE, on ne calcule pas l'année.
         if any(vet_data.get('Résultat', {}).get('resultat') in ['ENCO', 'NCAE'] for vet_data in etu_data.get('pv', {}).values()): continue
 
@@ -236,6 +243,26 @@ def MoyenneAnnuelle(data, logger=None, newmaquette=False):
                 if name not in used_ues2 and is_valid_note(note2):
                     session2 += note2 * ects / bareme * 100.0
                     ects2 += ects
+
+            # Réorientation
+            # Cas particulier : VET notée, mais aucun bloc ni UE actif/contributif
+            has_active_bloc = any(name in Blocs and Blocs[name] and resu.get('active', True) for name, resu in pv_vet.items())
+            has_active_ue = any(name in UEs and resu.get('active', True) for name, resu in pv_vet.items())
+            if not has_active_bloc and not has_active_ue:
+                resu_vet = pv_vet.get('Résultat', {})
+                vet_ects = resu_vet.get('ects')
+                if vet_ects in (None, ''): vet_ects = 30
+                note1 = clean_note(resu_vet.get('note'))
+                note2 = clean_note(resu_vet.get('note2', note1))
+                bareme = resu_vet.get('bareme', 20)
+
+                if is_valid_note(note1):
+                    session1 += note1 * vet_ects / bareme * 100.0
+                    ects1 += vet_ects
+
+                if is_valid_note(note2):
+                    session2 += note2 * vet_ects / bareme * 100.0
+                    ects2 += vet_ects
 
         # Résultats
         if ects1:
